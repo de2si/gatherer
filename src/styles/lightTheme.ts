@@ -1,0 +1,51 @@
+import {MD3LightTheme} from 'react-native-paper';
+
+const appLightTheme = {
+  colors: {
+    primary: 'rgb(0, 108, 79)',
+    onPrimary: 'rgb(255, 255, 255)',
+    primaryContainer: 'rgb(84, 253, 196)',
+    onPrimaryContainer: 'rgb(0, 33, 22)',
+    secondary: 'rgb(111, 77, 160)',
+    onSecondary: 'rgb(255, 255, 255)',
+    secondaryContainer: 'rgb(237, 220, 255)',
+    onSecondaryContainer: 'rgb(40, 0, 86)',
+    tertiary: 'rgb(0, 102, 132)',
+    onTertiary: 'rgb(255, 255, 255)',
+    tertiaryContainer: 'rgb(190, 233, 255)',
+    onTertiaryContainer: 'rgb(0, 31, 42)',
+    error: 'rgb(186, 26, 26)',
+    onError: 'rgb(255, 255, 255)',
+    errorContainer: 'rgb(255, 218, 214)',
+    onErrorContainer: 'rgb(65, 0, 2)',
+    background: 'rgb(251, 253, 249)',
+    onBackground: 'rgb(25, 28, 26)',
+    surface: 'rgb(251, 253, 249)',
+    onSurface: 'rgb(25, 28, 26)',
+    surfaceVariant: 'rgb(219, 229, 222)',
+    onSurfaceVariant: 'rgb(64, 73, 68)',
+    outline: 'rgb(112, 121, 116)',
+    outlineVariant: 'rgb(191, 201, 194)',
+    shadow: 'rgb(0, 0, 0)',
+    scrim: 'rgb(0, 0, 0)',
+    inverseSurface: 'rgb(46, 49, 47)',
+    inverseOnSurface: 'rgb(239, 241, 238)',
+    inversePrimary: 'rgb(39, 224, 169)',
+    elevation: {
+      level0: 'transparent',
+      level1: 'rgb(238, 246, 241)',
+      level2: 'rgb(231, 241, 235)',
+      level3: 'rgb(223, 237, 230)',
+      level4: 'rgb(221, 236, 229)',
+      level5: 'rgb(216, 233, 225)',
+    },
+    surfaceDisabled: 'rgba(25, 28, 26, 0.12)',
+    onSurfaceDisabled: 'rgba(25, 28, 26, 0.38)',
+    backdrop: 'rgba(42, 50, 46, 0.4)',
+  },
+};
+
+export const lightTheme = {
+  ...MD3LightTheme,
+  colors: appLightTheme.colors,
+};

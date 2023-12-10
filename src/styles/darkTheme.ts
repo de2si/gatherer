@@ -1,0 +1,51 @@
+import {MD3DarkTheme as DefaultTheme} from 'react-native-paper';
+
+const appDarkTheme = {
+  colors: {
+    primary: 'rgb(39, 224, 169)',
+    onPrimary: 'rgb(0, 56, 39)',
+    primaryContainer: 'rgb(0, 81, 59)',
+    onPrimaryContainer: 'rgb(84, 253, 196)',
+    secondary: 'rgb(215, 186, 255)',
+    onSecondary: 'rgb(63, 28, 110)',
+    secondaryContainer: 'rgb(86, 53, 135)',
+    onSecondaryContainer: 'rgb(237, 220, 255)',
+    tertiary: 'rgb(104, 211, 255)',
+    onTertiary: 'rgb(0, 53, 70)',
+    tertiaryContainer: 'rgb(0, 77, 100)',
+    onTertiaryContainer: 'rgb(190, 233, 255)',
+    error: 'rgb(255, 180, 171)',
+    onError: 'rgb(105, 0, 5)',
+    errorContainer: 'rgb(147, 0, 10)',
+    onErrorContainer: 'rgb(255, 180, 171)',
+    background: 'rgb(25, 28, 26)',
+    onBackground: 'rgb(225, 227, 223)',
+    surface: 'rgb(25, 28, 26)',
+    onSurface: 'rgb(225, 227, 223)',
+    surfaceVariant: 'rgb(64, 73, 68)',
+    onSurfaceVariant: 'rgb(191, 201, 194)',
+    outline: 'rgb(137, 147, 141)',
+    outlineVariant: 'rgb(64, 73, 68)',
+    shadow: 'rgb(0, 0, 0)',
+    scrim: 'rgb(0, 0, 0)',
+    inverseSurface: 'rgb(225, 227, 223)',
+    inverseOnSurface: 'rgb(46, 49, 47)',
+    inversePrimary: 'rgb(0, 108, 79)',
+    elevation: {
+      level0: 'transparent',
+      level1: 'rgb(26, 38, 33)',
+      level2: 'rgb(26, 44, 37)',
+      level3: 'rgb(27, 50, 42)',
+      level4: 'rgb(27, 52, 43)',
+      level5: 'rgb(27, 55, 46)',
+    },
+    surfaceDisabled: 'rgba(225, 227, 223, 0.12)',
+    onSurfaceDisabled: 'rgba(225, 227, 223, 0.38)',
+    backdrop: 'rgba(42, 50, 46, 0.4)',
+  },
+};
+
+export const darkTheme = {
+  ...DefaultTheme,
+  colors: appDarkTheme.colors,
+};

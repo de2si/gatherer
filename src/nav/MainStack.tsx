@@ -1,7 +1,8 @@
 // MainStack.tsx
 
 import React from 'react';
-import {Button} from 'react-native';
+import {TouchableOpacity} from 'react-native';
+import {useTheme, Icon} from 'react-native-paper';
 
 // navigation
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -20,8 +21,13 @@ export type MainStackScreenProps = {
 const Stack = createNativeStackNavigator<MainStackScreenProps>();
 
 const MainStack = (): React.JSX.Element => {
+  const theme = useTheme();
   const logoutButton = () => {
-    return <Button title="Logout" />;
+    return (
+      <TouchableOpacity>
+        <Icon source="power" size={32} />
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -32,14 +38,15 @@ const MainStack = (): React.JSX.Element => {
         options={{
           title: 'Gatherer',
           headerBackVisible: false,
+          headerRight: logoutButton,
           headerTitleStyle: {
             fontSize: 24,
-            color: 'white',
+            color: theme.colors.onPrimaryContainer,
           },
           headerStyle: {
-            backgroundColor: '#00563B',
+            backgroundColor: theme.colors.primaryContainer,
           },
-          headerRight: logoutButton,
+          headerShadowVisible: false,
         }}
       />
       <Stack.Screen

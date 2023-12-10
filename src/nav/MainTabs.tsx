@@ -1,4 +1,5 @@
 import React from 'react';
+import {useTheme} from 'react-native-paper';
 
 // navigation
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -17,21 +18,21 @@ export type MainTabsNavProps = {
 const Tab = createMaterialTopTabNavigator<MainTabsNavProps>();
 
 const MainTabs = () => {
+  const theme = useTheme();
   return (
     <Tab.Navigator
       initialRouteName="HomeScreen"
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: '#00563B',
+          backgroundColor: theme.colors.primaryContainer,
         },
-        tabBarActiveTintColor: 'white',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.backdrop,
         tabBarLabelStyle: {
           fontWeight: 'bold',
         },
         tabBarIndicatorStyle: {
-          backgroundColor: 'white',
-          borderColor: 'white',
+          backgroundColor: theme.colors.primary,
         },
       }}>
       <Tab.Screen

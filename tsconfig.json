@@ -1,14 +1,15 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
       "@nav/*": ["src/nav/*"],
-      "@assets/*": ["src/assets/*"]
+      "@assets/*": ["src/assets/*"],
+      "@styles/*": ["src/styles/*"]
     }
   }
 }
