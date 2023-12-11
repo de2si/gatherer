@@ -1,8 +1,9 @@
 /** Gatherer App */
 
 import React from 'react';
-import {StatusBar, useColorScheme} from 'react-native';
+import {StatusBar, StyleSheet, useColorScheme} from 'react-native';
 import {PaperProvider} from 'react-native-paper';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 import {lightTheme} from '@styles/lightTheme';
 import {darkTheme} from '@styles/darkTheme';
@@ -13,15 +14,23 @@ function App(): React.JSX.Element {
   const theme = isDarkMode ? darkTheme : lightTheme;
 
   return (
-    <PaperProvider theme={theme}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={theme.colors.primaryContainer}
-        translucent
-      />
-      <AppNav />
-    </PaperProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <PaperProvider theme={theme}>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={theme.colors.primaryContainer}
+          translucent
+        />
+        <AppNav />
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 }
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
