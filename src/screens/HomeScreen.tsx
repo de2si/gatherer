@@ -1,11 +1,11 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import ImagePicker from '@components/ImagePicker';
+import ImageInput from '@components/ImageInput';
 
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <ImagePicker />
+      <ImageInput />
     </View>
   );
 };
