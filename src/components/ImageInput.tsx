@@ -87,7 +87,6 @@ const ImageInput = () => {
           break;
       }
       setSnackbarVisible(true);
-      setSnackbarMessage('Error picking image');
     } else if (response.assets) {
       const {uri} = response.assets[0];
       setSelectedImage(uri ? uri : null);
