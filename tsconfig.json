@@ -10,7 +10,8 @@
       "@screens/*": ["src/screens/*"],
       "@nav/*": ["src/nav/*"],
       "@assets/*": ["src/assets/*"],
-      "@styles/*": ["src/styles/*"]
+      "@styles/*": ["src/styles/*"],
+      "@api/*": ["src/api/*"]
     }
   }
 }
