@@ -11,7 +11,8 @@
       "@nav/*": ["src/nav/*"],
       "@assets/*": ["src/assets/*"],
       "@styles/*": ["src/styles/*"],
-      "@api/*": ["src/api/*"]
+      "@api/*": ["src/api/*"],
+      "@hooks/*": ["src/hooks/*"]
     }
   }
 }
