@@ -8,6 +8,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {lightTheme} from '@styles/lightTheme';
 import {darkTheme} from '@styles/darkTheme';
 import AppNav from '@nav/AppNav';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -18,10 +19,12 @@ function App(): React.JSX.Element {
       <PaperProvider theme={theme}>
         <StatusBar
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={theme.colors.primaryContainer}
+          backgroundColor={theme.colors.background}
           translucent
         />
-        <AppNav />
+        <SafeAreaView style={styles.container}>
+          <AppNav />
+        </SafeAreaView>
       </PaperProvider>
     </GestureHandlerRootView>
   );

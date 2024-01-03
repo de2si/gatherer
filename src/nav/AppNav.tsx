@@ -1,5 +1,5 @@
 /**
- * AppNavigation.tsx
+ * AppNav.tsx
  * Define's app navigation flow
  */
 
@@ -8,7 +8,7 @@ import React from 'react';
 // navigation
 import {NavigationContainer} from '@react-navigation/native';
 import AuthStack from '@nav/AuthStack';
-import MainStack from '@nav/MainStack';
+import BottomTabs from '@nav/BottomTabs';
 
 // screens
 import SplashScreen from '@screens/SplashScreen';
@@ -21,7 +21,7 @@ const AppNav = (): React.JSX.Element => {
   }
   return (
     <NavigationContainer>
-      {authStatus ? <MainStack /> : <AuthStack />}
+      {authStatus ? <BottomTabs /> : <AuthStack />}
     </NavigationContainer>
   );
 };
