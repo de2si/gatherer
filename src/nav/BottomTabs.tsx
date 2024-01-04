@@ -9,13 +9,14 @@ import DataTabs from '@nav/DataTabs';
 
 // screens
 import PlaceholderScreen from '@screens/PlaceholderScreen';
+import ProfileStack from '@nav/ProfileStack';
 
 // define screen params
 export type BottomTabsNavProps = {
   Data: undefined;
   Project: {name: string};
   User: {name: string};
-  Profile: {name: string};
+  Profile: {};
 };
 
 // create navigation tab
@@ -44,8 +45,7 @@ const BottomTabs = () => {
       />
       <BottomTabNav.Screen
         name="Profile"
-        component={PlaceholderScreen}
-        initialParams={{name: 'Profile'}}
+        component={ProfileStack}
         options={{tabBarIcon: 'account-details', title: 'Profile'}}
       />
     </BottomTabNav.Navigator>
