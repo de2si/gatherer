@@ -16,12 +16,13 @@ interface AuthStore {
     password: string,
   ) => Promise<{isSuccessful: boolean; errorMessage?: string}>;
   logout: () => void;
+  initializeAxios: () => void;
 }
 
 // Create the store
 export const useAuthStore = create(
   persist<AuthStore>(
-    set => ({
+    (set, get) => ({
       isLoading: false,
       isAuthenticated: false,
       token: '',
@@ -41,7 +42,6 @@ export const useAuthStore = create(
         } catch (error) {
           if (axios.isAxiosError(error)) {
             set({token: ''});
-            set({isAuthenticated: false});
             isLoginSuccessful = false;
             errorMessage =
               error?.response?.data?.non_field_errors?.[0] ?? 'Login error';
@@ -55,6 +55,13 @@ export const useAuthStore = create(
         delete api.defaults.headers.common.Authorization;
         set({token: ''});
         set({isAuthenticated: false});
+      },
+      initializeAxios: () => {
+        let {isAuthenticated, token} = get();
+        // If a token is available, set it in the Authorization header
+        if (isAuthenticated && token) {
+          api.defaults.headers.common.Authorization = `Token ${token}`;
+        }
       },
     }),
     {name: 'QJn5RXGF1dlx', storage: createJSONStorage(() => AsyncStorage)},
