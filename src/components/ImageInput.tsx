@@ -1,35 +1,39 @@
-import React, {useState, useRef} from 'react';
+// ImageInput.tsx
+
+import React, {useState} from 'react';
+import {Image, Pressable, StyleSheet, View} from 'react-native';
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Image,
-} from 'react-native';
-import {Button, Icon, Text, useTheme, Snackbar} from 'react-native-paper';
+  Button,
+  Icon,
+  Portal,
+  Snackbar,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import {
   ImagePickerResponse,
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 
 const ImageInput = () => {
   const theme = useTheme();
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const renderBackdrop = (props: BottomSheetBackdropProps) => (
+    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+  );
+
   const handleImageContainerPress = () => {
     setBottomSheetVisible(true);
-  };
-
-  const handleOutsidePress = () => {
-    if (bottomSheetRef.current) {
-      bottomSheetRef.current.close();
-    }
   };
 
   const handleBottomSheetClose = () => {
@@ -47,8 +51,8 @@ const ImageInput = () => {
   const handleClearPress = () => {
     setSelectedImage(null);
     setBottomSheetVisible(false);
-    setSnackbarVisible(true);
-    setSnackbarMessage('Image cleared');
+    // setSnackbarVisible(true);
+    // setSnackbarMessage('Image cleared');
   };
 
   const handleImagePickerAction = async (source: 'camera' | 'gallery') => {
@@ -91,8 +95,8 @@ const ImageInput = () => {
       const {uri} = response.assets[0];
       setSelectedImage(uri ? uri : null);
       setBottomSheetVisible(false);
-      setSnackbarVisible(true);
-      setSnackbarMessage('Image selected');
+      // setSnackbarVisible(true);
+      // setSnackbarMessage('Image selected');
     }
   };
 
@@ -101,105 +105,92 @@ const ImageInput = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={[styles.imageInputContainer]}
-          onPress={handleImageContainerPress}>
-          {selectedImage ? (
-            <Image source={{uri: selectedImage}} style={styles.selectedImage} />
-          ) : (
-            <View
-              style={[
-                styles.imagePlaceholderContent,
-                {backgroundColor: theme.colors.secondaryContainer},
-              ]}>
-              <Icon source="upload" size={24} />
-              <Text style={[styles.imagePlaceholderText]}>Photo</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+    <View>
+      <Pressable onPress={handleImageContainerPress}>
+        {selectedImage ? (
+          <Image source={{uri: selectedImage}} style={styles.imageBoundary} />
+        ) : (
+          <View
+            style={[
+              styles.imageBoundary,
+              styles.imagePlaceholderContent,
+              {backgroundColor: theme.colors.tertiaryContainer},
+            ]}>
+            <Icon source="upload" size={24} />
+            <Text style={theme.fonts.labelMedium}>Photo</Text>
+          </View>
+        )}
+      </Pressable>
 
-        {bottomSheetVisible && (
+      {bottomSheetVisible && (
+        <Portal>
           <BottomSheet
-            ref={bottomSheetRef}
-            snapPoints={['20%']}
-            handleComponent={null}
+            snapPoints={[150]}
+            enablePanDownToClose
+            backdropComponent={renderBackdrop}
             onClose={handleBottomSheetClose}>
-            <View style={styles.bottomSheetRow}>
+            <BottomSheetView style={styles.bottomSheetRow}>
               <Button
-                icon="camera-outline"
                 buttonColor={theme.colors.primaryContainer}
-                textColor={theme.colors.onPrimaryContainer}
+                icon="camera-outline"
+                mode="contained-tonal"
                 onPress={handleCameraPress}
                 style={styles.bottomSheetButton}>
                 Camera
               </Button>
               <Button
-                icon="image-outline"
                 buttonColor={theme.colors.secondaryContainer}
-                textColor={theme.colors.onSecondaryContainer}
+                icon="image-outline"
+                mode="contained-tonal"
                 onPress={handleGalleryPress}
                 style={styles.bottomSheetButton}>
                 Gallery
               </Button>
               <Button
+                buttonColor={theme.colors.tertiaryContainer}
+                disabled={!selectedImage}
                 icon="backspace-outline"
                 mode="contained-tonal"
-                buttonColor={theme.colors.tertiaryContainer}
-                textColor={theme.colors.onTertiaryContainer}
                 onPress={handleClearPress}
-                disabled={!selectedImage}
                 style={styles.bottomSheetButton}>
                 Clear
               </Button>
-            </View>
+            </BottomSheetView>
           </BottomSheet>
-        )}
-
+        </Portal>
+      )}
+      <Portal>
         <Snackbar
           visible={snackbarVisible}
           onDismiss={handleSnackbarDismiss}
           duration={Snackbar.DURATION_SHORT}>
           {snackbarMessage}
         </Snackbar>
-      </View>
-    </TouchableWithoutFeedback>
+      </Portal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  imageInputContainer: {
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  selectedImage: {
+  imageBoundary: {
     width: 100,
     height: 100,
     borderRadius: 50,
   },
   imagePlaceholderContent: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  imagePlaceholderText: {
-    margin: 4,
+    rowGap: 4,
   },
   bottomSheetRow: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    columnGap: 12,
   },
   bottomSheetButton: {
-    margin: 4,
-    minWidth: 120,
+    minWidth: 100,
   },
 });
 
