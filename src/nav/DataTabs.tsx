@@ -5,13 +5,14 @@ import {useTheme} from 'react-native-paper';
 
 // navigation
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import FarmerStack from '@nav/FarmerStack';
 
 // screens
 import PlaceholderScreen from '@screens/PlaceholderScreen';
 
 // define screen params
 export type DataTabsNavProps = {
-  Farmer: {name: string};
+  Farmer: {};
   Land: {name: string};
   Member: {name: string};
 };
@@ -36,11 +37,7 @@ const DataTabs = () => {
           backgroundColor: theme.colors.primary,
         },
       }}>
-      <Tab.Screen
-        name="Farmer"
-        component={PlaceholderScreen}
-        initialParams={{name: 'Farmer'}}
-      />
+      <Tab.Screen name="Farmer" component={FarmerStack} />
       <Tab.Screen
         name="Land"
         component={PlaceholderScreen}
