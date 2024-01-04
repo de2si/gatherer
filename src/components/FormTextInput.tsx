@@ -1,20 +1,20 @@
-// FormInput.tsx
+// FormTextInput.tsx
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {HelperText, TextInput, TextInputProps} from 'react-native-paper';
 import {Controller, Control, FieldValues} from 'react-hook-form';
 
-interface FormInputProps<TFieldValues extends FieldValues> {
+interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   name: FieldValues['name'];
   inputProps?: TextInputProps; // Pass TextInputProps directly
 }
 
-const FormInput = <TFieldValues extends FieldValues>({
+const FormTextInput = <TFieldValues extends FieldValues>({
   control,
   name,
   inputProps = {},
-}: FormInputProps<TFieldValues>) => {
+}: FormTextInputProps<TFieldValues>) => {
   return (
     <Controller
       control={control}
@@ -48,4 +48,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FormInput;
+export default FormTextInput;

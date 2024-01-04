@@ -1,7 +1,14 @@
 // FormImageInput.tsx
 
 import React, {useState} from 'react';
-import {Image, Pressable, StyleSheet, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {
   Button,
   Icon,
@@ -26,12 +33,18 @@ interface FormImageInputProps {
   name: string; // form field name
   control: Control; // form control
   label?: string;
+  variant?: 'round' | 'square';
+  border?: 'none' | 'dashed';
+  placeholderViewStyles?: StyleProp<ViewStyle>;
 }
 
 const FormImageInput: React.FC<FormImageInputProps> = ({
   name,
   control,
   label = 'Photo',
+  variant = 'round',
+  border = 'none',
+  placeholderViewStyles = {},
 }) => {
   const theme = useTheme();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
@@ -122,17 +135,25 @@ const FormImageInput: React.FC<FormImageInputProps> = ({
     setSnackbarVisible(false);
   };
 
+  const imageBoundaryStyle =
+    variant === 'square'
+      ? styles.imageBoundarySquare
+      : styles.imageBoundaryRound;
+  const placeholderBorderStyle =
+    border === 'dashed' ? styles.dashedBorder : null;
   return (
     <View>
       <Pressable onPress={handleImageContainerPress}>
         {value ? (
-          <Image source={{uri: value}} style={styles.imageBoundary} />
+          <Image source={{uri: value}} style={imageBoundaryStyle} />
         ) : (
           <View
             style={[
-              styles.imageBoundary,
+              imageBoundaryStyle,
+              placeholderBorderStyle,
               styles.imagePlaceholderContent,
               {backgroundColor: theme.colors.tertiaryContainer},
+              placeholderViewStyles,
             ]}>
             <Icon source="tray-arrow-up" size={24} />
             <Text style={theme.fonts.labelMedium}>{label}</Text>
@@ -190,10 +211,19 @@ const FormImageInput: React.FC<FormImageInputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  imageBoundary: {
+  imageBoundaryRound: {
     width: 100,
     height: 100,
     borderRadius: 50,
+  },
+  imageBoundarySquare: {
+    width: 120,
+    height: 120,
+    borderRadius: 4,
+  },
+  dashedBorder: {
+    borderStyle: 'dashed',
+    borderWidth: 1,
   },
   imagePlaceholderContent: {
     justifyContent: 'center',

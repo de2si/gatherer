@@ -15,7 +15,7 @@ import {useAuthStore} from '@hooks/useAuthStore';
 import * as Yup from 'yup';
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
-import FormInput from '@components/FormInput';
+import FormTextInput from '@components/FormTextInput';
 
 // assets
 import Logo from '@assets/logo.png';
@@ -78,12 +78,12 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
         </Text>
       </View>
       <View style={styles.formContainer}>
-        <FormInput<LoginForm>
+        <FormTextInput<LoginForm>
           name="phoneNumber"
           control={control}
           inputProps={{placeholder: 'Phone number', keyboardType: 'numeric'}}
         />
-        <FormInput<LoginForm>
+        <FormTextInput<LoginForm>
           name="password"
           control={control}
           inputProps={{placeholder: 'Password', secureTextEntry: true}}
