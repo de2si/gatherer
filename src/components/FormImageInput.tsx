@@ -1,4 +1,4 @@
-// ImageInput.tsx
+// FormImageInput.tsx
 
 import React, {useState} from 'react';
 import {Image, Pressable, StyleSheet, View} from 'react-native';
@@ -20,13 +20,30 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
+import {Control, useController} from 'react-hook-form';
 
-const ImageInput = () => {
+interface FormImageInputProps {
+  name: string; // form field name
+  control: Control; // form control
+  label?: string;
+}
+
+const FormImageInput: React.FC<FormImageInputProps> = ({
+  name,
+  control,
+  label = 'Photo',
+}) => {
   const theme = useTheme();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const {
+    field: {value, onChange},
+  } = useController({
+    name,
+    control,
+  });
 
   const renderBackdrop = (props: BottomSheetBackdropProps) => (
     <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
@@ -49,7 +66,8 @@ const ImageInput = () => {
   };
 
   const handleClearPress = () => {
-    setSelectedImage(null);
+    onChange(null);
+
     setBottomSheetVisible(false);
     // setSnackbarVisible(true);
     // setSnackbarMessage('Image cleared');
@@ -93,7 +111,7 @@ const ImageInput = () => {
       setSnackbarVisible(true);
     } else if (response.assets) {
       const {uri} = response.assets[0];
-      setSelectedImage(uri ? uri : null);
+      onChange(uri ? uri : null);
       setBottomSheetVisible(false);
       // setSnackbarVisible(true);
       // setSnackbarMessage('Image selected');
@@ -107,8 +125,8 @@ const ImageInput = () => {
   return (
     <View>
       <Pressable onPress={handleImageContainerPress}>
-        {selectedImage ? (
-          <Image source={{uri: selectedImage}} style={styles.imageBoundary} />
+        {value ? (
+          <Image source={{uri: value}} style={styles.imageBoundary} />
         ) : (
           <View
             style={[
@@ -116,8 +134,8 @@ const ImageInput = () => {
               styles.imagePlaceholderContent,
               {backgroundColor: theme.colors.tertiaryContainer},
             ]}>
-            <Icon source="upload" size={24} />
-            <Text style={theme.fonts.labelMedium}>Photo</Text>
+            <Icon source="tray-arrow-up" size={24} />
+            <Text style={theme.fonts.labelMedium}>{label}</Text>
           </View>
         )}
       </Pressable>
@@ -148,7 +166,7 @@ const ImageInput = () => {
               </Button>
               <Button
                 buttonColor={theme.colors.tertiaryContainer}
-                disabled={!selectedImage}
+                disabled={!value}
                 icon="backspace-outline"
                 mode="contained-tonal"
                 onPress={handleClearPress}
@@ -194,4 +212,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ImageInput;
+export default FormImageInput;
