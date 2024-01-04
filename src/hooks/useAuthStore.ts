@@ -11,7 +11,10 @@ interface AuthStore {
   isLoading: boolean;
   isAuthenticated: boolean;
   token: string;
-  login: (phoneNumber: string, password: string) => Promise<boolean>;
+  login: (
+    phoneNumber: string,
+    password: string,
+  ) => Promise<{isSuccessful: boolean; errorMessage?: string}>;
   logout: () => void;
 }
 
@@ -24,7 +27,8 @@ export const useAuthStore = create(
       token: '',
       login: async (phoneNumber: string, password: string) => {
         set({isLoading: true});
-        let loginResult = false;
+        let isLoginSuccessful = false;
+        let errorMessage = '';
         try {
           const res = await api.post('api-token-auth/', {
             phone_number: phoneNumber,
@@ -33,17 +37,18 @@ export const useAuthStore = create(
           set({token: res.data.token});
           api.defaults.headers.common.Authorization = `Token ${res.data.token}`;
           set({isAuthenticated: true});
-          loginResult = true;
+          isLoginSuccessful = true;
         } catch (error) {
           if (axios.isAxiosError(error)) {
             set({token: ''});
             set({isAuthenticated: false});
-            console.log('Login error:', error);
-            loginResult = false;
+            isLoginSuccessful = false;
+            errorMessage =
+              error?.response?.data?.non_field_errors?.[0] ?? 'Login error';
           }
         } finally {
           set({isLoading: false});
-          return loginResult;
+          return {isSuccessful: isLoginSuccessful, errorMessage};
         }
       },
       logout: () => {

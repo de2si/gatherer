@@ -14,7 +14,7 @@ import BottomTabs from '@nav/BottomTabs';
 import SplashScreen from '@screens/SplashScreen';
 
 const AppNav = (): React.JSX.Element => {
-  let authStatus = true;
+  let authStatus = false;
   let loading = false;
   if (loading) {
     return <SplashScreen />;

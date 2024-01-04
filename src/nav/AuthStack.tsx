@@ -10,7 +10,7 @@ import LoginScreen from '@screens/Auth/LoginScreen';
 
 // define screen params
 export type AuthStackScreenProps = {
-  LoginScreen: undefined;
+  LoginScreen: {};
 };
 
 // create navigation stack
@@ -19,7 +19,11 @@ const Stack = createNativeStackNavigator<AuthStackScreenProps>();
 const AuthStack = (): React.JSX.Element => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };
