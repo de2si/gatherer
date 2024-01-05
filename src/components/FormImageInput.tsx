@@ -27,25 +27,25 @@ import BottomSheet, {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
-import {Control, useController} from 'react-hook-form';
+import {Control, FieldValues, useController} from 'react-hook-form';
 
-interface FormImageInputProps {
-  name: string; // form field name
-  control: Control; // form control
+interface FormImageInputProps<TFieldValues extends FieldValues> {
+  name: FieldValues['name']; // form field name
+  control: Control<TFieldValues>; // form control
   label?: string;
   variant?: 'round' | 'square';
   border?: 'none' | 'dashed';
   placeholderViewStyles?: StyleProp<ViewStyle>;
 }
 
-const FormImageInput: React.FC<FormImageInputProps> = ({
+const FormImageInput = <TFieldValues extends FieldValues>({
   name,
   control,
   label = 'Photo',
   variant = 'round',
   border = 'none',
   placeholderViewStyles = {},
-}) => {
+}: FormImageInputProps<TFieldValues>) => {
   const theme = useTheme();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
