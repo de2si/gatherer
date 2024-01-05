@@ -10,6 +10,7 @@ import DataTabs from '@nav/DataTabs';
 // screens
 import PlaceholderScreen from '@screens/PlaceholderScreen';
 import ProfileStack from '@nav/ProfileStack';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 // define screen params
 export type BottomTabsNavProps = {
@@ -23,6 +24,7 @@ export type BottomTabsNavProps = {
 const BottomTabNav = createMaterialBottomTabNavigator<BottomTabsNavProps>();
 
 const BottomTabs = () => {
+  let userType = useAuthStore(store => store.user.userType);
   const theme = useTheme();
   return (
     <BottomTabNav.Navigator theme={theme}>
@@ -37,12 +39,14 @@ const BottomTabs = () => {
         initialParams={{name: 'Project'}}
         options={{tabBarIcon: 'ruler-square-compass', title: 'Projects'}}
       />
-      <BottomTabNav.Screen
-        name="User"
-        component={PlaceholderScreen}
-        initialParams={{name: 'User'}}
-        options={{tabBarIcon: 'account-supervisor', title: 'Users'}}
-      />
+      {userType !== 'SURVEYOR' && (
+        <BottomTabNav.Screen
+          name="User"
+          component={PlaceholderScreen}
+          initialParams={{name: 'User'}}
+          options={{tabBarIcon: 'account-supervisor', title: 'Users'}}
+        />
+      )}
       <BottomTabNav.Screen
         name="Profile"
         component={ProfileStack}
