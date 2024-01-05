@@ -22,10 +22,15 @@ const AppNav = (): React.JSX.Element => {
   const initializeAxios = useAuthStore(store => store.initializeAxios);
 
   useEffect(() => {
-    setIsProcessing(true);
-    initializeAxios();
-    // TODO: fetch user details/profile data
-    setIsProcessing(false);
+    const init = async () => {
+      setIsProcessing(true);
+      await useAuthStore.persist.rehydrate();
+      initializeAxios();
+      // TODO: fetch user details/profile data
+      setIsProcessing(false);
+    };
+
+    init();
   }, [initializeAxios]);
 
   if (isProcessing) {
