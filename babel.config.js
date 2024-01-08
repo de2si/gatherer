@@ -18,6 +18,7 @@ module.exports = {
           '@styles': './src/styles',
           '@api': './src/api',
           '@hooks': './src/hooks',
+          '@helpers': './src/helpers',
         },
       },
     ],
