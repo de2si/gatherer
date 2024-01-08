@@ -21,7 +21,7 @@ type LocationSelectProps<TForm extends FieldValues = any> = Omit<
   codes?: number[];
 };
 
-const renderLocationItem = (item: Location) => {
+const RenderLocationItem = (item: Location) => {
   return (
     <View style={styles.item}>
       <Text>
@@ -29,6 +29,56 @@ const renderLocationItem = (item: Location) => {
       </Text>
     </View>
   );
+};
+
+interface RenderLocationSelectInputProps<TFieldValues extends FieldValues> {
+  data: Location[];
+  placeholder: string;
+  otherProps: Omit<
+    FormSelectInputProps<Location, TFieldValues>,
+    'loading' | 'selectProps'
+  >;
+  loading: boolean;
+}
+const RenderLocationSelectInput = <TFieldValues extends FieldValues>({
+  data = [],
+  placeholder = 'Select',
+  otherProps,
+  loading,
+}: RenderLocationSelectInputProps<TFieldValues>) => {
+  const selectProps = {
+    data,
+    labelField: 'name' as const,
+    valueField: 'code' as const,
+    placeholder: placeholder,
+    renderItem: RenderLocationItem,
+  };
+
+  return (
+    <FormSelectInput
+      {...otherProps}
+      selectProps={{...selectProps}}
+      loading={loading}
+    />
+  );
+};
+
+const populateData = async (
+  codes: number[],
+  fetchFn: (codes: number[]) => Promise<void>,
+  getData: (codes: number[]) => Location[],
+  setLocalData: {
+    (value: React.SetStateAction<Location[]>): void;
+    (arg0: Location[]): void;
+  },
+) => {
+  try {
+    await fetchFn(codes);
+    const tempData = getData(codes);
+    setLocalData(tempData);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 };
 
 const StateSelect = <TFieldValues extends FieldValues>({
@@ -43,20 +93,11 @@ const StateSelect = <TFieldValues extends FieldValues>({
     fetchFn();
   }, [fetchFn]);
 
-  const stateSelectProps = {
-    ...{
-      data,
-      labelField: 'name' as const,
-      valueField: 'code' as const,
-      placeholder: 'Select state',
-      renderItem: renderLocationItem,
-    },
-  };
-
   return (
-    <FormSelectInput
-      {...props}
-      selectProps={{...stateSelectProps}}
+    <RenderLocationSelectInput
+      data={data}
+      placeholder="Select state"
+      otherProps={{...props}}
       loading={isLoading}
     />
   );
@@ -72,32 +113,14 @@ const DistrictSelect = <TFieldValues extends FieldValues>({
   const [localData, setLocalData] = useState<Location[]>([]);
 
   useEffect(() => {
-    const populateData = async () => {
-      try {
-        await fetchFn(codes);
-        const tempData = getData(codes);
-        setLocalData(tempData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    populateData();
+    populateData(codes, fetchFn, getData, setLocalData);
   }, [codes, fetchFn, getData]);
 
-  const districtSelectProps = {
-    ...{
-      data: localData,
-      labelField: 'name' as const,
-      valueField: 'code' as const,
-      placeholder: 'Select district',
-      renderItem: renderLocationItem,
-    },
-  };
-
   return (
-    <FormSelectInput
-      {...props}
-      selectProps={{...districtSelectProps}}
+    <RenderLocationSelectInput
+      data={localData}
+      placeholder="Select district"
+      otherProps={{...props}}
       loading={isLoading}
     />
   );
@@ -113,32 +136,14 @@ const BlockSelect = <TFieldValues extends FieldValues>({
   const [localData, setLocalData] = useState<Location[]>([]);
 
   useEffect(() => {
-    const populateData = async () => {
-      try {
-        await fetchFn(codes);
-        const tempData = getData(codes);
-        setLocalData(tempData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    populateData();
+    populateData(codes, fetchFn, getData, setLocalData);
   }, [codes, fetchFn, getData]);
 
-  const blockSelectProps = {
-    ...{
-      data: localData,
-      labelField: 'name' as const,
-      valueField: 'code' as const,
-      placeholder: 'Select block',
-      renderItem: renderLocationItem,
-    },
-  };
-
   return (
-    <FormSelectInput
-      {...props}
-      selectProps={{...blockSelectProps}}
+    <RenderLocationSelectInput
+      data={localData}
+      placeholder="Select block"
+      otherProps={{...props}}
       loading={isLoading}
     />
   );
@@ -154,32 +159,14 @@ const VillageSelect = <TFieldValues extends FieldValues>({
   const [localData, setLocalData] = useState<Location[]>([]);
 
   useEffect(() => {
-    const populateData = async () => {
-      try {
-        await fetchFn(codes);
-        const tempData = getData(codes);
-        setLocalData(tempData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    populateData();
+    populateData(codes, fetchFn, getData, setLocalData);
   }, [codes, fetchFn, getData]);
 
-  const villageSelectProps = {
-    ...{
-      data: localData,
-      labelField: 'name' as const,
-      valueField: 'code' as const,
-      placeholder: 'Select village',
-      renderItem: renderLocationItem,
-    },
-  };
-
   return (
-    <FormSelectInput
-      {...props}
-      selectProps={{...villageSelectProps}}
+    <RenderLocationSelectInput
+      data={localData}
+      placeholder="Select village"
+      otherProps={{...props}}
       loading={isLoading}
     />
   );
