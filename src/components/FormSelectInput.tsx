@@ -1,7 +1,13 @@
 // FormSelectInput.tsx
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {ActivityIndicator, Chip, Text, useTheme} from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Chip,
+  Text,
+  useTheme,
+  // MD3Theme,
+} from 'react-native-paper';
 import {Dropdown, MultiSelect} from 'react-native-element-dropdown';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {DropdownProps} from 'react-native-element-dropdown/lib/typescript/components/Dropdown/model';
@@ -38,15 +44,20 @@ interface RenderSelectedItemProps<T> {
   item: T;
   unSelect?: (item: T) => void;
   labelField?: keyof T;
+  // theme: MD3Theme;
 }
 
 const RenderSelectedItem = <T extends any>({
   item,
   unSelect,
   labelField,
-}: RenderSelectedItemProps<T>) => {
+}: // theme,
+RenderSelectedItemProps<T>) => {
   return (
     <Chip
+      style={styles.chip}
+      // style={[styles.chip, {backgroundColor: theme.colors.secondaryContainer}]}
+      // textStyle={{color: theme.colors.onSecondaryContainer}}
       onPress={() => unSelect && unSelect(item)}
       onClose={() => unSelect && unSelect(item)}
       ellipsizeMode="middle">
@@ -104,6 +115,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     flatListProps,
     search,
     searchPlaceholder,
+    backgroundColor,
     ...remainingSelectProps
   } = selectProps;
 
@@ -112,6 +124,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
   }, [ctrlValue]);
 
   let computedProps = {
+    backgroundColor: backgroundColor ?? 'rgba(0,0,0,0.2)',
     style: [
       styles.dropdown,
       {
@@ -120,6 +133,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
         borderRadius: theme.roundness,
       },
       isFocus && styles.dropdownFocusStyle,
+      // isFocus && {borderColor: theme.colors.primary, borderWidth: 2},
       style ?? null,
     ],
     containerStyle: [styles.containerStyle, containerStyle ?? null],
@@ -168,6 +182,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
               item,
               unSelect,
               labelField: remainingSelectProps.labelField,
+              // theme,
             });
           },
   };
@@ -195,22 +210,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     // borderRadius: 12,
-    borderWidth: 1,
+    // borderWidth: 1,
     padding: 12,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 1,
-    // },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 1.41,
-    // elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   dropdownFocusStyle: {
-    borderColor: 'pink',
+    // borderColor: 'pink',
   },
   containerStyle: {
     borderRadius: 12,
+    paddingVertical: 12,
     // borderTopLeftRadius: 0,
     // borderTopRightRadius: 0,
     // borderBottomLeftRadius: 12,
@@ -275,5 +291,8 @@ const styles = StyleSheet.create({
   footerContainer: {
     padding: 16,
     alignItems: 'center',
+  },
+  chip: {
+    margin: 4,
   },
 });
