@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {api} from '@api/axios';
 
-interface Location {
+export interface Location {
   code: number;
   name: string;
 }
