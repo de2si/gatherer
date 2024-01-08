@@ -15,6 +15,12 @@ interface Block {
   code: number;
   name: string;
 }
+
+interface Village {
+  code: number;
+  name: string;
+}
+
 interface StateStore {
   stateData: State[];
   loadingState: boolean;
@@ -22,15 +28,24 @@ interface StateStore {
 }
 
 interface DistrictStore {
-  districtData: District[];
+  districtData: {[stateCode: number]: District[]};
   loadingDistrict: boolean;
   fetchDistrictData: (stateCodes: number[] | undefined) => Promise<void>;
+  getDistrictsByStateCodes: (stateCodes: number[]) => District[];
 }
 
 interface BlockStore {
-  blockData: Block[];
+  blockData: {[districtCode: number]: Block[]};
   loadingBlock: boolean;
   fetchBlockData: (districtCodes: number[] | undefined) => Promise<void>;
+  getBlocksByDistrictCodes: (districtCodes: number[]) => Block[];
+}
+
+interface VillageStore {
+  villageData: {[blockCode: number]: Village[]};
+  loadingVillage: boolean;
+  fetchVillageData: (blockCodes: number[] | undefined) => Promise<void>;
+  getVillagesByBlockCodes: (blockCodes: number[]) => Village[];
 }
 
 export const useStateStore = create<StateStore>(set => ({
@@ -50,24 +65,39 @@ export const useStateStore = create<StateStore>(set => ({
   },
 }));
 
-export const useDistrictStore = create<DistrictStore>(set => ({
-  districtData: [],
+export const useDistrictStore = create<DistrictStore>((set, get) => ({
+  districtData: {},
   loadingDistrict: false,
   fetchDistrictData: async (stateCodes: number[] | undefined) => {
     try {
       set({loadingDistrict: true});
+
       if (stateCodes && stateCodes.length > 0) {
-        const promises = stateCodes.map(async stateCode => {
-          const response = await api.get(
-            `states-directory/${stateCode}/districts-directory/`,
-          );
-          return response.data.districtsDirectory;
+        const existingDistrictData = get().districtData;
+
+        const missingStateCodes = stateCodes.filter(
+          stateCode =>
+            !(stateCode in existingDistrictData) ||
+            existingDistrictData[stateCode].length === 0,
+        );
+
+        const updates: {[stateCode: number]: District[]} = {};
+
+        await Promise.all(
+          missingStateCodes.map(async stateCode => {
+            const response = await api.get(
+              `states-directory/${stateCode}/districts-directory/`,
+            );
+            updates[stateCode] = response.data.districtsDirectory;
+          }),
+        );
+
+        set({
+          districtData: {
+            ...existingDistrictData,
+            ...updates,
+          },
         });
-
-        const districtDataList = await Promise.all(promises);
-        const mergedDistrictData = districtDataList.flat(); // Flatten the array
-
-        set({districtData: mergedDistrictData});
       }
     } catch (error) {
       console.error('Error fetching districts:', error);
@@ -75,31 +105,100 @@ export const useDistrictStore = create<DistrictStore>(set => ({
       set({loadingDistrict: false});
     }
   },
+  getDistrictsByStateCodes: (stateCodes: number[]) => {
+    const districtData = get().districtData;
+    return stateCodes.flatMap(stateCode => districtData[stateCode] || []);
+  },
 }));
 
-export const useBlockStore = create<BlockStore>(set => ({
-  blockData: [],
+export const useBlockStore = create<BlockStore>((set, get) => ({
+  blockData: {},
   loadingBlock: false,
   fetchBlockData: async (districtCodes: number[] | undefined) => {
     try {
       set({loadingBlock: true});
+
       if (districtCodes && districtCodes.length > 0) {
-        const promises = districtCodes.map(async districtCode => {
-          const response = await api.get(
-            `districts-directory/${districtCode}/blocks-directory/`,
-          );
-          return response.data.blocksDirectory;
+        const existingBlockData = get().blockData;
+
+        const missingDistrictCodes = districtCodes.filter(
+          districtCode =>
+            !(districtCode in existingBlockData) ||
+            existingBlockData[districtCode].length === 0,
+        );
+
+        const updates: {[districtCode: number]: Block[]} = {};
+
+        await Promise.all(
+          missingDistrictCodes.map(async districtCode => {
+            const response = await api.get(
+              `districts-directory/${districtCode}/blocks-directory/`,
+            );
+            updates[districtCode] = response.data.blocksDirectory;
+          }),
+        );
+
+        set({
+          blockData: {
+            ...existingBlockData,
+            ...updates,
+          },
         });
-
-        const blockDataList = await Promise.all(promises);
-        const mergedBlockData = blockDataList.flat(); // Flatten the array
-
-        set({blockData: mergedBlockData});
       }
     } catch (error) {
       console.error('Error fetching blocks:', error);
     } finally {
       set({loadingBlock: false});
     }
+  },
+  getBlocksByDistrictCodes: (districtCodes: number[]) => {
+    const blockData = get().blockData;
+    return districtCodes.flatMap(districtCode => blockData[districtCode] || []);
+  },
+}));
+
+export const useVillageStore = create<VillageStore>((set, get) => ({
+  villageData: {},
+  loadingVillage: false,
+  fetchVillageData: async (blockCodes: number[] | undefined) => {
+    try {
+      set({loadingVillage: true});
+
+      if (blockCodes && blockCodes.length > 0) {
+        const existingVillageData = get().villageData;
+
+        const missingBlockCodes = blockCodes.filter(
+          blockCode =>
+            !(blockCode in existingVillageData) ||
+            existingVillageData[blockCode].length === 0,
+        );
+
+        const updates: {[blockCode: number]: Village[]} = {};
+
+        await Promise.all(
+          missingBlockCodes.map(async blockCode => {
+            const response = await api.get(
+              `blocks-directory/${blockCode}/villages-directory/`,
+            );
+            updates[blockCode] = response.data.villagesDirectory;
+          }),
+        );
+
+        set({
+          villageData: {
+            ...existingVillageData,
+            ...updates,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching villages:', error);
+    } finally {
+      set({loadingVillage: false});
+    }
+  },
+  getVillagesByBlockCodes: (blockCodes: number[]) => {
+    const villageData = get().villageData;
+    return blockCodes.flatMap(blockCode => villageData[blockCode] || []);
   },
 }));
