@@ -81,7 +81,7 @@ const populateData = async (
   }
 };
 
-const StateSelect = <TFieldValues extends FieldValues>({
+const FormStateSelectInput = <TFieldValues extends FieldValues>({
   codes: _codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
@@ -103,7 +103,7 @@ const StateSelect = <TFieldValues extends FieldValues>({
   );
 };
 
-const DistrictSelect = <TFieldValues extends FieldValues>({
+const FormDistrictSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
@@ -126,7 +126,7 @@ const DistrictSelect = <TFieldValues extends FieldValues>({
   );
 };
 
-const BlockSelect = <TFieldValues extends FieldValues>({
+const FormBlockSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
@@ -149,7 +149,7 @@ const BlockSelect = <TFieldValues extends FieldValues>({
   );
 };
 
-const VillageSelect = <TFieldValues extends FieldValues>({
+const FormVillageSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
@@ -181,4 +181,9 @@ let styles = StyleSheet.create({
   },
 });
 
-export {StateSelect, DistrictSelect, BlockSelect, VillageSelect};
+export {
+  FormStateSelectInput,
+  FormDistrictSelectInput,
+  FormBlockSelectInput,
+  FormVillageSelectInput,
+};

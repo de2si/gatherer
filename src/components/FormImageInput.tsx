@@ -28,7 +28,7 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 import {Control, FieldValues, useController} from 'react-hook-form';
-import {calculateImageHash} from '@helpers/cryptoHelpers';
+import {calculateHash} from '@helpers/cryptoHelpers';
 
 interface FormImageInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name']; // form field name
@@ -126,9 +126,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       setSnackbarVisible(true);
     } else if (response.assets) {
       const {uri, base64} = response.assets[0];
-      onChange(
-        uri ? {uri: uri, hash: calculateImageHash(base64 ?? null)} : null,
-      );
+      onChange(uri ? {uri: uri, hash: calculateHash(base64 ?? null)} : null);
       setBottomSheetVisible(false);
       // setSnackbarVisible(true);
       // setSnackbarMessage('Image selected');

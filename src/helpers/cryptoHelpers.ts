@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 
-const calculateImageHash = (base64String: string | null): string | null => {
+const calculateHash = (base64String: string | null): string | null => {
   try {
     if (base64String) {
       const hash = CryptoJS.SHA256(base64String).toString(CryptoJS.enc.Hex);
@@ -13,4 +13,4 @@ const calculateImageHash = (base64String: string | null): string | null => {
   }
 };
 
-export {calculateImageHash};
+export {calculateHash};
