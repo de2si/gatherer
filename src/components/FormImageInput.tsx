@@ -91,6 +91,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
     const options = {
       mediaType: 'photo' as const,
       quality: 0.5 as const,
+      includeBase64: true,
     };
     let result: ImagePickerResponse;
     if (source === 'camera') {
@@ -123,8 +124,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       }
       setSnackbarVisible(true);
     } else if (response.assets) {
-      const {uri} = response.assets[0];
-      onChange(uri ? uri : null);
+      const {uri, base64} = response.assets[0];
+      onChange(uri ? {uri: uri, base64: base64 ?? null} : null);
       setBottomSheetVisible(false);
       // setSnackbarVisible(true);
       // setSnackbarMessage('Image selected');
@@ -144,8 +145,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   return (
     <View>
       <Pressable onPress={handleImageContainerPress}>
-        {value ? (
-          <Image source={{uri: value}} style={imageBoundaryStyle} />
+        {value && value.uri ? (
+          <Image source={{uri: value.uri}} style={imageBoundaryStyle} />
         ) : (
           <View
             style={[
