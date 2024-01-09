@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {
   Button,
+  HelperText,
   Icon,
   Portal,
   Snackbar,
@@ -54,6 +55,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
 
   const {
     field: {value, onChange},
+    fieldState: {error},
   } = useController({
     name,
     control,
@@ -126,7 +128,9 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       setSnackbarVisible(true);
     } else if (response.assets) {
       const {uri, base64} = response.assets[0];
-      onChange(uri ? {uri: uri, hash: calculateHash(base64 ?? null)} : null);
+      onChange(
+        uri ? {uri: uri, hash: calculateHash(base64 ?? null, 256)} : null,
+      );
       setBottomSheetVisible(false);
       // setSnackbarVisible(true);
       // setSnackbarMessage('Image selected');
@@ -145,7 +149,9 @@ const FormImageInput = <TFieldValues extends FieldValues>({
     border === 'dashed' ? styles.dashedBorder : null;
   return (
     <View>
-      <Pressable onPress={handleImageContainerPress}>
+      <Pressable
+        onPress={handleImageContainerPress}
+        style={styles.centeredContainer}>
         {value && value.uri ? (
           <Image source={{uri: value.uri}} style={imageBoundaryStyle} />
         ) : (
@@ -154,7 +160,11 @@ const FormImageInput = <TFieldValues extends FieldValues>({
               imageBoundaryStyle,
               placeholderBorderStyle,
               styles.imagePlaceholderContent,
-              {backgroundColor: theme.colors.tertiaryContainer},
+              {
+                backgroundColor: error
+                  ? theme.colors.errorContainer
+                  : theme.colors.tertiaryContainer,
+              },
               placeholderViewStyles,
             ]}>
             <Icon source="tray-arrow-up" size={24} />
@@ -162,6 +172,11 @@ const FormImageInput = <TFieldValues extends FieldValues>({
           </View>
         )}
       </Pressable>
+      <View style={styles.centeredContainer}>
+        <HelperText type="error" visible={error ? true : false}>
+          {error?.message ?? 'Image error'}
+        </HelperText>
+      </View>
 
       {bottomSheetVisible && (
         <Portal>
@@ -213,6 +228,10 @@ const FormImageInput = <TFieldValues extends FieldValues>({
 };
 
 const styles = StyleSheet.create({
+  centeredContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   imageBoundaryRound: {
     width: 100,
     height: 100,
