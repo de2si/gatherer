@@ -5,6 +5,7 @@ import {View, StyleSheet} from 'react-native';
 import {HelperText, IconButton, Text, useTheme} from 'react-native-paper';
 import DatePicker, {DatePickerProps} from 'react-native-date-picker';
 import {Control, Controller, FieldValues} from 'react-hook-form';
+import {formatDate} from '@helpers/formatters';
 
 interface FormDatePickerProps
   extends Omit<DatePickerProps, 'date' | 'onConfirm'> {
@@ -18,17 +19,6 @@ interface FormDateInputProps<TFieldValues extends FieldValues> {
   label?: string;
   datePickerProps?: FormDatePickerProps;
 }
-
-// Helper function to format DOB
-const formatDate = (dateToFormat: Date | undefined) => {
-  if (!dateToFormat) {
-    return '';
-  }
-  const day = dateToFormat.getDate().toString().padStart(2, '0');
-  const month = (dateToFormat.getMonth() + 1).toString().padStart(2, '0');
-  const year = dateToFormat.getFullYear();
-  return `${day}-${month}-${year}`;
-};
 
 const FormDateInput = <TFieldValues extends FieldValues>({
   name,
