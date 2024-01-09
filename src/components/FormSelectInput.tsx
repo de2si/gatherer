@@ -1,9 +1,10 @@
 // FormSelectInput.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {
   ActivityIndicator,
   Chip,
+  HelperText,
   Text,
   useTheme,
   // MD3Theme,
@@ -116,19 +117,18 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     search,
     searchPlaceholder,
     backgroundColor,
+    valueField,
     ...remainingSelectProps
   } = selectProps;
-
-  useEffect(() => {
-    console.log(ctrlValue);
-  }, [ctrlValue]);
 
   let computedProps = {
     backgroundColor: backgroundColor ?? 'rgba(0,0,0,0.2)',
     style: [
       styles.dropdown,
       {
-        backgroundColor: theme.colors.background,
+        backgroundColor: ctrlError
+          ? theme.colors.errorContainer
+          : theme.colors.background,
         borderColor: theme.colors.outline,
         borderRadius: theme.roundness,
       },
@@ -158,7 +158,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     search: search ?? remainingSelectProps.data.length > 5,
     searchPlaceholder: searchPlaceholder ?? 'Search...',
     value: ctrlValue,
-    onChange: ctrlOnChange,
+    valueField,
     onFocus: () => {
       setIsFocus(true);
     },
@@ -172,8 +172,14 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
       ...(flatListProps ?? {}),
     },
   };
+  let singleSelectProps = {
+    onChange: (item: T) => {
+      valueField ? ctrlOnChange(item[valueField]) : ctrlOnChange(item);
+    },
+  };
   let multiSelectProps = {
     // inside: true,
+    onChange: ctrlOnChange,
     renderSelectedItem:
       'renderSelectedItem' in remainingSelectProps
         ? remainingSelectProps.renderSelectedItem
@@ -189,17 +195,22 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
   return (
     <View style={styles.container}>
       {variant === 'single' && (
-        <Dropdown {...computedProps} {...remainingSelectProps} />
+        <Dropdown<T>
+          {...computedProps}
+          {...remainingSelectProps}
+          {...singleSelectProps}
+        />
       )}
       {variant === 'multiple' && (
-        <MultiSelect
+        <MultiSelect<T>
           {...computedProps}
           {...remainingSelectProps}
           {...multiSelectProps}
         />
       )}
-
-      {ctrlError && <Text>{ctrlError.message}</Text>}
+      <HelperText type="error" visible={ctrlError ? true : false}>
+        {ctrlError?.message ?? 'Error'}
+      </HelperText>
     </View>
   );
 };
