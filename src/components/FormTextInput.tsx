@@ -20,23 +20,19 @@ const FormTextInput = <TFieldValues extends FieldValues>({
       control={control}
       name={name}
       render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-        <>
-          <View style={[styles.container]}>
-            <TextInput
-              error={error ? true : false}
-              mode="outlined"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              {...inputProps}
-            />
-            {error && (
-              <HelperText type="error" visible={error ? true : false}>
-                {error.message || 'Error'}
-              </HelperText>
-            )}
-          </View>
-        </>
+        <View style={[styles.container]}>
+          <TextInput
+            error={error ? true : false}
+            mode="outlined"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            {...inputProps}
+          />
+          <HelperText type="error" visible={error ? true : false}>
+            {error?.message || 'Error'}
+          </HelperText>
+        </View>
       )}
     />
   );
