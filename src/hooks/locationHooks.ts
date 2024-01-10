@@ -11,6 +11,7 @@ interface LocationStore {
   loading: boolean;
   fetchData: (codes: number[]) => Promise<void>;
   getItemsByCodes: (codes: number[]) => Location[];
+  getFilteredCodes: (parentCodes: number[], childCodes: number[]) => number[];
 }
 
 interface StateStore {
@@ -61,6 +62,17 @@ function createLocationStore(baseWord: string, parentBaseWord: string) {
     getItemsByCodes: (codes: number[]) => {
       const data = get().data;
       return codes.flatMap(code => data[code] || []);
+    },
+    getFilteredCodes: (parentCodes: number[], childCodes: number[]) => {
+      const data = get().data;
+      return parentCodes
+        .map(parentCode => data[parentCode])
+        .filter(Boolean) // Remove undefined values
+        .flatMap(childList =>
+          childList
+            .filter(childItem => childCodes.includes(childItem.code))
+            .map(childItem => childItem.code),
+        );
     },
   }));
 }
