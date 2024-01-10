@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {api} from '@api/axios';
 
-interface ApiUserType {
+export interface ApiUserType {
   id: number;
   blocks: [];
   projects: {};
