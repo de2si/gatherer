@@ -1,13 +1,10 @@
 // FarmerStack.tsx
 
 import React from 'react';
-import {Button, IconButton, useTheme} from 'react-native-paper';
+import {useTheme} from 'react-native-paper';
 
 // navigation
-import {
-  NativeStackScreenProps,
-  createNativeStackNavigator,
-} from '@react-navigation/native-stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 // screens
 import FarmerListScreen from '@screens/Farmer/FarmerListScreen';
@@ -24,28 +21,6 @@ export type FarmerStackScreenProps = {
 // create navigation stack
 const Stack = createNativeStackNavigator<FarmerStackScreenProps>();
 
-const farmerListHeaderRight = ({
-  navigation,
-}: {
-  navigation: NativeStackScreenProps<
-    FarmerStackScreenProps,
-    'FarmerList'
-  >['navigation'];
-}) => {
-  const handleAddPress = () => {
-    navigation.navigate('FarmerAdd', {});
-  };
-  return (
-    <>
-      <IconButton icon="filter-outline" size={24} />
-      <IconButton icon="magnify" size={24} />
-      <Button mode="contained-tonal" onPress={handleAddPress}>
-        Add
-      </Button>
-    </>
-  );
-};
-
 const FarmerStack = (): React.JSX.Element => {
   const theme = useTheme();
   return (
@@ -60,10 +35,9 @@ const FarmerStack = (): React.JSX.Element => {
       <Stack.Screen
         name="FarmerList"
         component={FarmerListScreen}
-        options={({navigation}) => ({
+        options={{
           title: 'Farmers',
-          headerRight: () => farmerListHeaderRight({navigation}),
-        })}
+        }}
       />
       <Stack.Screen
         name="FarmerAdd"
