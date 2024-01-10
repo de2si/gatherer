@@ -20,3 +20,13 @@ export const formatDate = (
 export const add91Prefix = (phoneNo: string) => {
   return `+91-${phoneNo}`;
 };
+
+export const maskPhoneNumber = (phoneNumber: string) => {
+  // Remove the prefix "+91" if present
+  const cleanedNumber = phoneNumber.replace(/^\+91/, '');
+  // Extract the last 4 digits
+  const lastFourDigits = cleanedNumber.slice(-4);
+  // Create the masked phone number
+  const maskedPhoneNumber = `XXXXXX${lastFourDigits}`;
+  return maskedPhoneNumber;
+};

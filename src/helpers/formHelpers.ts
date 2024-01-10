@@ -82,3 +82,33 @@ export const getErrorMessage = (error: unknown): string => {
     return 'An unexpected error occurred.';
   }
 };
+
+export interface LocationFilterGroup {
+  stateCodes: number[];
+  districtCodes: number[];
+  blockCodes: number[];
+  villageCodes: number[];
+}
+interface LocationQueryParams {
+  states?: string;
+  districts?: string;
+  blocks?: string;
+  villages?: string;
+}
+export const buildLocationFilterQueryParams = (data: LocationFilterGroup) => {
+  const queryParams: LocationQueryParams = {};
+
+  for (const codeType of [
+    'villageCodes',
+    'blockCodes',
+    'districtCodes',
+    'stateCodes',
+  ] as (keyof LocationFilterGroup)[]) {
+    if (data[codeType]?.length) {
+      queryParams[codeType.replace(/Code/, '') as keyof LocationQueryParams] =
+        data[codeType].join(',');
+      break;
+    }
+  }
+  return queryParams;
+};
