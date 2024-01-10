@@ -23,7 +23,7 @@ interface ApiImage {
   hash: string;
 }
 
-interface APiFarmer {
+export interface APiFarmer {
   farmer_id: number;
   profile_photo: ApiImage;
   id_front_image: ApiImage;
@@ -107,7 +107,6 @@ export const useFarmerStore = create<FarmerStore>(set => ({
     const response = await api.get('farmers/', {
       params: queryParams,
     });
-    console.log(queryParams);
     set({data: response.data.map(transformApiFarmer), loading: false});
   },
 }));

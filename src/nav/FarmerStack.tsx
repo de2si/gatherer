@@ -8,12 +8,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 // screens
 import FarmerListScreen from '@screens/Farmer/FarmerListScreen';
+import FarmerDetailScreen from '@screens/Farmer/FarmerDetailScreen';
 import FarmerAddScreen from '@screens/Farmer/FarmerAddScreen';
 import FarmerEditScreen from '@screens/Farmer/FarmerEditScreen';
 
 // define screen params
 export type FarmerStackScreenProps = {
   FarmerList: {};
+  FarmerDetail: {id: number};
   FarmerAdd: {};
   FarmerEdit: {};
 };
@@ -38,6 +40,11 @@ const FarmerStack = (): React.JSX.Element => {
         options={{
           title: 'Farmers',
         }}
+      />
+      <Stack.Screen
+        name="FarmerDetail"
+        component={FarmerDetailScreen}
+        options={{title: 'Farmer details'}}
       />
       <Stack.Screen
         name="FarmerAdd"

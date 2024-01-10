@@ -1,3 +1,5 @@
+// FarmerListScreen.tsx
+
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {FarmerPreview, useFarmerStore} from '@hooks/useFarmerStore';
@@ -54,13 +56,13 @@ const farmerListHeaderRight = ({
 };
 
 const Item = ({
-  data: {name, photo, code, village, guardian, phone},
+  data: {id, name, photo, code, village, guardian, phone},
   onPress,
 }: {
   data: FarmerPreview;
   onPress: any;
 }) => (
-  <Card mode="elevated" onPress={onPress}>
+  <Card mode="elevated" onPress={() => onPress(id)}>
     <Card.Content style={styles.row}>
       <Avatar.Image source={{uri: photo.url}} size={80} style={styles.avatar} />
       <View style={styles.cardTextContent}>
@@ -102,12 +104,12 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const handleSearchPress = () => {
     setSearchBottomSheetVisible(true);
   };
-  // const handleApplyFilters = data => {
-  //   fetchData(data);
-  // };
+
+  const showDetailScreen = (id: number) => {
+    navigation.navigate('FarmerDetail', {id});
+  };
 
   useEffect(() => {
-    console.log('Navigation change triggered');
     const handleAddPress = () => {
       navigation.navigate('FarmerAdd', {});
     };
@@ -155,7 +157,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     <View style={styles.container}>
       <FlatList
         data={farmers}
-        renderItem={({item}) => <Item data={item} onPress={() => {}} />}
+        renderItem={({item}) => <Item data={item} onPress={showDetailScreen} />}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
           <Text
