@@ -30,3 +30,17 @@ export const maskPhoneNumber = (phoneNumber: string) => {
   const maskedPhoneNumber = `XXXXXX${lastFourDigits}`;
   return maskedPhoneNumber;
 };
+
+export const formatPhoneNumber = (phoneNumber: string) => {
+  // Remove any non-digit characters from the phone number
+  const cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
+
+  // Check if the phone number starts with 0, which indicates a local number
+  if (cleanedPhoneNumber.startsWith('0')) {
+    // Format local number: 0-XXXXX-XXXXX
+    return cleanedPhoneNumber.replace(/(\d{1})(\d{5})(\d{5})/, '0-$2-$3');
+  } else {
+    // Format international number: +91 XXXXX-XXXXX
+    return cleanedPhoneNumber.replace(/(\d{2})(\d{5})(\d{5})/, '+$1 $2-$3');
+  }
+};
