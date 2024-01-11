@@ -30,6 +30,7 @@ import BottomSheet, {
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {calculateHash} from '@helpers/cryptoHelpers';
+import useSnackbar from '@hooks/useSnackbar';
 
 interface FormImageInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name']; // form field name
@@ -50,8 +51,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
 }: FormImageInputProps<TFieldValues>) => {
   const theme = useTheme();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
+    useSnackbar('');
 
   const {
     field: {value, onChange},
@@ -85,8 +86,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
     onChange(null);
 
     setBottomSheetVisible(false);
-    // setSnackbarVisible(true);
-    // setSnackbarMessage('Image cleared');
+    // showSnackbar('Image cleared');
   };
 
   const handleImagePickerAction = async (source: 'camera' | 'gallery') => {
@@ -107,38 +107,31 @@ const FormImageInput = <TFieldValues extends FieldValues>({
 
   const handleImagePickerResponse = (response: ImagePickerResponse) => {
     if (response.didCancel) {
-      setSnackbarVisible(true);
-      setSnackbarMessage('Image selection canceled');
+      showSnackbar('Image selection canceled');
     } else if (response.errorCode) {
       switch (response.errorCode) {
         case 'camera_unavailable':
-          setSnackbarMessage('Camera not available on device');
+          showSnackbar('Camera not available on device');
           break;
         case 'permission':
-          setSnackbarMessage('Permission not satisfied');
+          showSnackbar('Permission not satisfied');
           break;
         default:
-          setSnackbarMessage(
+          showSnackbar(
             response.errorMessage
               ? response.errorMessage
               : 'Unknown error occurred',
           );
           break;
       }
-      setSnackbarVisible(true);
     } else if (response.assets) {
       const {uri, base64} = response.assets[0];
       onChange(
         uri ? {uri: uri, hash: calculateHash(base64 ?? null, 256)} : null,
       );
       setBottomSheetVisible(false);
-      // setSnackbarVisible(true);
-      // setSnackbarMessage('Image selected');
+      // showSnackbar('Image selected');
     }
-  };
-
-  const handleSnackbarDismiss = () => {
-    setSnackbarVisible(false);
   };
 
   const imageBoundaryStyle =
@@ -218,7 +211,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       <Portal>
         <Snackbar
           visible={snackbarVisible}
-          onDismiss={handleSnackbarDismiss}
+          onDismiss={dismissSnackbar}
           duration={Snackbar.DURATION_SHORT}>
           {snackbarMessage}
         </Snackbar>

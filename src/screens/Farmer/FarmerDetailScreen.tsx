@@ -28,6 +28,10 @@ import {formatDate, formatPhoneNumber} from '@helpers/formatters';
 
 // types
 import {APiFarmer} from '@hooks/useFarmerStore';
+
+// hooks
+import useSnackbar from '@hooks/useSnackbar';
+
 type FarmerDetailScreenProps = NativeStackScreenProps<
   FarmerStackScreenProps,
   'FarmerDetail'
@@ -88,11 +92,8 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [farmer, setFarmer] = useState<APiFarmer>();
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('Farmer detail error');
-  const handleSnackbarDismiss = () => {
-    setSnackbarVisible(false);
-  };
+  const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
+    useSnackbar('Farmer detail error');
 
   useEffect(() => {
     const handleEditPress = () => {
@@ -115,14 +116,14 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
           setFarmer(response.data);
         }
       } catch (error) {
-        setSnackbarVisible(true);
-        setSnackbarMessage(getErrorMessage(error));
+        showSnackbar(getErrorMessage(error));
       } finally {
         setLoading(false);
       }
     };
     fetchFarmer();
-  }, [id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // intentionally removing showSnackbar from dependencies
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
@@ -233,7 +234,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
         )}
         <Snackbar
           visible={snackbarVisible}
-          onDismiss={handleSnackbarDismiss}
+          onDismiss={dismissSnackbar}
           duration={Snackbar.DURATION_SHORT}>
           {snackbarMessage}
         </Snackbar>

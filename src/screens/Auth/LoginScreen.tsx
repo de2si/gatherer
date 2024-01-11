@@ -1,6 +1,6 @@
 // LoginScreen.tsx
 
-import React, {useState} from 'react';
+import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {Text, Button, useTheme, Snackbar} from 'react-native-paper';
 
@@ -8,7 +8,8 @@ import {Text, Button, useTheme, Snackbar} from 'react-native-paper';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AuthStackScreenProps} from '@nav/AuthStack';
 
-// stores
+// hooks
+import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
 
 // form
@@ -33,11 +34,8 @@ type LoginScreenProps = NativeStackScreenProps<
 const LoginScreen: React.FC<LoginScreenProps> = () => {
   const theme = useTheme();
   const doLogin = useAuthStore(store => store.login);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('Login error');
-  const handleSnackbarDismiss = () => {
-    setSnackbarVisible(false);
-  };
+  const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
+    useSnackbar('Login error');
 
   // define validation schema
   const loginSchema = Yup.object().shape({
@@ -62,8 +60,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
   const onSubmit = async (data: LoginForm) => {
     let loginResult = await doLogin(data.phoneNumber, data.password);
     if (!loginResult.isSuccessful) {
-      setSnackbarVisible(true);
-      setSnackbarMessage(loginResult.errorMessage ?? 'Login error');
+      showSnackbar(loginResult.errorMessage ?? 'Login error');
     }
   };
 
@@ -97,7 +94,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
       </View>
       <Snackbar
         visible={snackbarVisible}
-        onDismiss={handleSnackbarDismiss}
+        onDismiss={dismissSnackbar}
         duration={Snackbar.DURATION_SHORT}>
         {snackbarMessage}
       </Snackbar>

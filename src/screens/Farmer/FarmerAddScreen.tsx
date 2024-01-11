@@ -1,6 +1,6 @@
 // FarmerAddScreen.tsx
 
-import React, {useState} from 'react';
+import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Button, Snackbar} from 'react-native-paper';
 
@@ -35,6 +35,9 @@ import {
   getErrorMessage,
   removeKeys,
 } from '@helpers/formHelpers';
+
+// hooks
+import useSnackbar from '@hooks/useSnackbar';
 
 // constants
 const gender = ['MALE', 'FEMALE'] as const;
@@ -75,11 +78,8 @@ type FarmerAddScreenProps = NativeStackScreenProps<
 >;
 
 const FarmerAddScreen: React.FC<FarmerAddScreenProps> = () => {
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('Farmer add error');
-  const handleSnackbarDismiss = () => {
-    setSnackbarVisible(false);
-  };
+  const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
+    useSnackbar('Farmer add error');
 
   // define validation schema
   const farmerSchema = Yup.object().shape({
@@ -235,13 +235,11 @@ const FarmerAddScreen: React.FC<FarmerAddScreenProps> = () => {
       const result = await api.post('farmers/', farmerPostData);
       if (result.status === 201) {
         reset(defaultValues);
-        setSnackbarVisible(true);
-        setSnackbarMessage('Farmer Added successfully');
+        showSnackbar('Farmer Added successfully');
       }
     } catch (error) {
       // console.log(data, error);
-      setSnackbarVisible(true);
-      setSnackbarMessage(getErrorMessage(error));
+      showSnackbar(getErrorMessage(error));
     }
   };
 
@@ -356,7 +354,7 @@ const FarmerAddScreen: React.FC<FarmerAddScreenProps> = () => {
         </View>
         <Snackbar
           visible={snackbarVisible}
-          onDismiss={handleSnackbarDismiss}
+          onDismiss={dismissSnackbar}
           duration={Snackbar.DURATION_SHORT}>
           {snackbarMessage}
         </Snackbar>
