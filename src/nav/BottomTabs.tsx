@@ -27,7 +27,7 @@ const BottomTabs = () => {
   let userType = useAuthStore(store => store.user.userType);
   const theme = useTheme();
   return (
-    <BottomTabNav.Navigator theme={theme}>
+    <BottomTabNav.Navigator theme={theme} initialRouteName="Project">
       <BottomTabNav.Screen
         name="Data"
         component={DataTabs}
