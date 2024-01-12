@@ -203,23 +203,22 @@ const prepareEditFormData = (
 ) => {
   const changedFields = Object.keys(formData).reduce((acc, key) => {
     let formKey = key as keyof FarmerBasicForm;
-    if (
-      formKey === 'date_of_birth' &&
-      !areDatesEqual(formData[formKey], initialValues[formKey])
-    ) {
-      acc[formKey] = formatDate(formData[formKey], 'YYYY-MM-DD');
+    if (formKey === 'date_of_birth') {
+      if (!areDatesEqual(formData[formKey], initialValues[formKey])) {
+        acc[formKey] = formatDate(formData[formKey], 'YYYY-MM-DD');
+      }
+    } else if (formKey === 'phone_number') {
+      if (formData[formKey] !== initialValues[formKey]) {
+        acc[formKey] = add91Prefix(formData[formKey]);
+      }
     } else if (
-      formKey === 'phone_number' &&
-      formData[formKey] !== initialValues[formKey]
+      formKey === 'profile_photo' ||
+      formKey === 'id_back_image' ||
+      formKey === 'id_front_image'
     ) {
-      acc[formKey] = add91Prefix(formData[formKey]);
-    } else if (
-      (formKey === 'profile_photo' ||
-        formKey === 'id_back_image' ||
-        formKey === 'id_front_image') &&
-      !areObjectsEqual(formData[formKey], initialValues[formKey])
-    ) {
-      acc[formKey] = formatToUrlKey(formData[formKey]);
+      if (!areObjectsEqual(formData[formKey], initialValues[formKey])) {
+        acc[formKey] = formatToUrlKey(formData[formKey]);
+      }
     } else if (formData[formKey] !== initialValues[formKey]) {
       acc[formKey] = formData[formKey];
     }
