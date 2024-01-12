@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Snackbar} from 'react-native-paper';
+import {Button, Snackbar, Text} from 'react-native-paper';
 
 // form and form components
 import * as Yup from 'yup';
@@ -29,11 +29,21 @@ import {
   removeKeys,
 } from '@helpers/formHelpers';
 import {CATEGORY, GENDER, INCOME_LEVELS} from '@helpers/constants';
+import {areDatesEqual, areObjectsEqual} from '@helpers/comparators';
+
+// hooks
 import useSnackbar from '@hooks/useSnackbar';
 import {APiFarmer} from '@hooks/useFarmerStore';
+
+// api
 import {api} from '@api/axios';
+
+// types
 import {FormImage} from '@typedefs/common';
-import {areObjectsEqual} from '@helpers/comparators';
+
+// nav
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {FarmerStackScreenProps} from '@nav/FarmerStack';
 
 const transformToLabelValuePair = (
   originalArray: readonly string[],
@@ -120,13 +130,7 @@ const farmerAddSchema: Yup.ObjectSchema<FarmerAddForm> =
 
 // define default values
 const farmerAddDefaultValues: Partial<FarmerAddForm> = {
-  // profile_photo: null,
-  // id_front_image: null,
-  // id_back_image: null,
   state: 23,
-  // district: null,
-  // block: null,
-  // village: null,
   aadhaar: '',
   confirm_aadhaar: '',
   name: '',
@@ -199,43 +203,40 @@ const prepareEditFormData = (
 ) => {
   const changedFields = Object.keys(formData).reduce((acc, key) => {
     let formKey = key as keyof FarmerBasicForm;
-    if (formKey === 'date_of_birth') {
-      // Compare Date objects by their values
-      if (formData[formKey].getTime() !== initialValues[formKey].getTime()) {
-        acc[formKey] = formatDate(formData[formKey], 'YYYY-MM-DD');
-      }
+    if (
+      formKey === 'date_of_birth' &&
+      !areDatesEqual(formData[formKey], initialValues[formKey])
+    ) {
+      acc[formKey] = formatDate(formData[formKey], 'YYYY-MM-DD');
     } else if (
       formKey === 'phone_number' &&
       formData[formKey] !== initialValues[formKey]
     ) {
       acc[formKey] = add91Prefix(formData[formKey]);
     } else if (
-      formKey === 'profile_photo' ||
-      formKey === 'id_back_image' ||
-      formKey === 'id_front_image'
+      (formKey === 'profile_photo' ||
+        formKey === 'id_back_image' ||
+        formKey === 'id_front_image') &&
+      !areObjectsEqual(formData[formKey], initialValues[formKey])
     ) {
-      // Deep comparison for objects
-      // const areObjectsEqual =
-      //   JSON.stringify(formData[formKey]) ===
-      //   JSON.stringify(initialValues[formKey]);
-      if (!areObjectsEqual(formData[formKey], initialValues[formKey])) {
-        acc[formKey] = formatToUrlKey(formData[formKey]);
-      }
+      acc[formKey] = formatToUrlKey(formData[formKey]);
     } else if (formData[formKey] !== initialValues[formKey]) {
       acc[formKey] = formData[formKey];
     }
     return acc;
   }, {} as Record<string, any>);
-  console.log(changedFields);
   return changedFields;
 };
 
-interface FarmerFormProps {
-  variant: 'add' | 'edit';
-  farmer?: APiFarmer; // For edit form, you need to pass data
-}
+type FarmerFormScreenProps = NativeStackScreenProps<
+  FarmerStackScreenProps,
+  'FarmerAdd' | 'FarmerEdit'
+>;
 
-const FarmerForm = ({variant, farmer}: FarmerFormProps) => {
+const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
+  const {variant} = route.params;
+  const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
+
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Error');
   type FarmerFormType = FarmerBasicForm &
@@ -254,11 +255,14 @@ const FarmerForm = ({variant, farmer}: FarmerFormProps) => {
   });
 
   if (variant === 'edit' && !farmer) {
-    return <></>;
+    return (
+      <View style={styles.container}>
+        <Text variant="titleLarge">Farmer not found error</Text>
+      </View>
+    );
   }
 
   const onSubmit = async (formData: FarmerFormType) => {
-    console.log('Form Data:', formData);
     try {
       if (variant === 'add') {
         const result = await api.post(
@@ -408,7 +412,7 @@ const FarmerForm = ({variant, farmer}: FarmerFormProps) => {
   );
 };
 
-export {FarmerForm};
+export default FarmerFormScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -123,7 +123,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
 
   useEffect(() => {
     const handleAddPress = () => {
-      navigation.navigate('FarmerAdd', {});
+      navigation.navigate('FarmerAdd', {variant: 'add'});
     };
     navigation.setOptions({
       headerRight: () =>

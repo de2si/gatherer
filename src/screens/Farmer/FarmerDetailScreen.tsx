@@ -97,7 +97,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
 
   useEffect(() => {
     const handleEditPress = () => {
-      navigation.navigate('FarmerEdit', {});
+      farmer && navigation.navigate('FarmerEdit', {variant: 'edit', farmer});
     };
     navigation.setOptions({
       headerRight: () =>
@@ -105,7 +105,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
           handleEditPress,
         }),
     });
-  }, [navigation]);
+  }, [farmer, navigation]);
 
   useEffect(() => {
     const fetchFarmer = async () => {

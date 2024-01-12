@@ -9,15 +9,17 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 // screens
 import FarmerListScreen from '@screens/Farmer/FarmerListScreen';
 import FarmerDetailScreen from '@screens/Farmer/FarmerDetailScreen';
-import FarmerAddScreen from '@screens/Farmer/FarmerAddScreen';
-import FarmerEditScreen from '@screens/Farmer/FarmerEditScreen';
+import FarmerFormScreen from '@screens/Farmer/FarmerFormScreen';
+
+// types
+import {APiFarmer} from '@hooks/useFarmerStore';
 
 // define screen params
 export type FarmerStackScreenProps = {
   FarmerList: {};
   FarmerDetail: {id: number};
-  FarmerAdd: {};
-  FarmerEdit: {};
+  FarmerAdd: {variant: 'add'};
+  FarmerEdit: {variant: 'edit'; farmer: APiFarmer};
 };
 
 // create navigation stack
@@ -48,13 +50,14 @@ const FarmerStack = (): React.JSX.Element => {
       />
       <Stack.Screen
         name="FarmerAdd"
-        component={FarmerAddScreen}
+        component={FarmerFormScreen}
+        initialParams={{variant: 'add'}}
         options={{title: 'Add farmer'}}
       />
       <Stack.Screen
         name="FarmerEdit"
-        component={FarmerEditScreen}
-        options={{title: 'Update farmer details'}}
+        component={FarmerFormScreen}
+        options={{title: 'Update farmer'}}
       />
     </Stack.Navigator>
   );
