@@ -122,7 +122,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
   } = selectProps;
 
   let computedProps = {
-    backgroundColor: backgroundColor ?? 'rgba(0,0,0,0.2)',
+    backgroundColor: backgroundColor ?? theme.colors.backdrop,
     style: [
       styles.dropdown,
       {
