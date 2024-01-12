@@ -1,8 +1,15 @@
 // FarmerForm.tsx
 
-import React from 'react';
+import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Snackbar, Text} from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Button,
+  Portal,
+  Snackbar,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 
 // form and form components
 import * as Yup from 'yup';
@@ -236,6 +243,8 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
   const {variant} = route.params;
   const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
 
+  const theme = useTheme();
+  const [loading, setLoading] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Error');
   type FarmerFormType = FarmerBasicForm &
@@ -263,6 +272,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
 
   const onSubmit = async (formData: FarmerFormType) => {
     try {
+      setLoading(true);
       if (variant === 'add') {
         const result = await api.post(
           'farmers/',
@@ -284,6 +294,8 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
       }
     } catch (error) {
       showSnackbar(getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -401,10 +413,25 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
           <Button
             onPress={handleSubmit(onSubmit)}
             mode="contained-tonal"
-            style={styles.button}>
+            style={styles.button}
+            disabled={loading}>
             Submit
           </Button>
         </View>
+        <Portal>
+          {loading && (
+            <View style={StyleSheet.absoluteFill}>
+              <ActivityIndicator
+                style={[
+                  styles.loadingIndicator,
+                  {backgroundColor: theme.colors.backdrop},
+                ]}
+                size="large"
+                animating={true}
+              />
+            </View>
+          )}
+        </Portal>
         <Snackbar
           visible={snackbarVisible}
           onDismiss={dismissSnackbar}
@@ -436,5 +463,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 48,
     marginTop: 20,
     marginBottom: 60,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
