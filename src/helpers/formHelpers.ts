@@ -1,4 +1,5 @@
 import {AxiosError} from 'axios';
+import {FormImage, LocationFilterGroup} from '@typedefs/common';
 
 // Function to remove specified keys from an object
 export const removeKeys = (obj: any, keysToRemove: (string | number)[]) => {
@@ -8,7 +9,7 @@ export const removeKeys = (obj: any, keysToRemove: (string | number)[]) => {
 };
 
 // Function to generate nested image object
-export const formatToUrlKey = (imageData: {uri: string; hash: string}) => ({
+export const formatToUrlKey = (imageData: FormImage) => ({
   url: imageData.uri,
   hash: imageData.hash,
 });
@@ -83,12 +84,6 @@ export const getErrorMessage = (error: unknown): string => {
   }
 };
 
-export interface LocationFilterGroup {
-  stateCodes: number[];
-  districtCodes: number[];
-  blockCodes: number[];
-  villageCodes: number[];
-}
 interface LocationQueryParams {
   states?: string;
   districts?: string;

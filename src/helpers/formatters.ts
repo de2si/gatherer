@@ -21,6 +21,10 @@ export const add91Prefix = (phoneNo: string) => {
   return `+91-${phoneNo}`;
 };
 
+export const remove91Prefix = (phoneNo: string) => {
+  return phoneNo.replace(/^\+91/, '');
+};
+
 export const maskPhoneNumber = (phoneNumber: string) => {
   // Remove the prefix "+91" if present
   const cleanedNumber = phoneNumber.replace(/^\+91/, '');
