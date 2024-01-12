@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 2,
-    rowGap: 24,
+    rowGap: 4,
     marginTop: 48,
     marginHorizontal: 24,
   },
