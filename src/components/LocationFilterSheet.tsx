@@ -23,10 +23,9 @@ import {
   useDistrictStore,
   useVillageStore,
 } from '@hooks/locationHooks';
-import {LocationFilterGroup} from '@helpers/formHelpers';
 
 // types
-
+import {LocationFilterGroup} from '@typedefs/common';
 interface LocationFilterSheetProps {
   visible: boolean;
   filterValues: LocationFilterGroup;
