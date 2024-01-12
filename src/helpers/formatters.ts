@@ -48,3 +48,9 @@ export const formatPhoneNumber = (phoneNumber: string) => {
     return cleanedPhoneNumber.replace(/(\d{2})(\d{5})(\d{5})/, '+$1 $2-$3');
   }
 };
+
+export const convertToSentenceCase = (input: string) => {
+  return input
+    .toLowerCase()
+    .replace(/^(.)|\s+(.)/g, match => match.toUpperCase());
+};

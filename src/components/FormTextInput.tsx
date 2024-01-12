@@ -3,16 +3,19 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {HelperText, TextInput, TextInputProps} from 'react-native-paper';
 import {Controller, Control, FieldValues} from 'react-hook-form';
+import {convertToSentenceCase} from '@helpers/formatters';
 
 interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   name: FieldValues['name'];
+  sentenceCase?: boolean;
   inputProps?: TextInputProps; // Pass TextInputProps directly
 }
 
 const FormTextInput = <TFieldValues extends FieldValues>({
   control,
   name,
+  sentenceCase = false,
   inputProps = {},
 }: FormTextInputProps<TFieldValues>) => {
   return (
@@ -25,7 +28,9 @@ const FormTextInput = <TFieldValues extends FieldValues>({
             error={error ? true : false}
             mode="outlined"
             onBlur={onBlur}
-            onChangeText={onChange}
+            onChangeText={text =>
+              onChange(sentenceCase ? convertToSentenceCase(text) : text)
+            }
             value={value}
             {...inputProps}
           />

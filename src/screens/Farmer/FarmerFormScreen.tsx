@@ -295,12 +295,17 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
           <FormTextInput
             name="name"
             control={control}
-            inputProps={{placeholder: 'Name'}}
+            sentenceCase
+            inputProps={{placeholder: 'Name', autoCapitalize: 'words'}}
           />
           <FormTextInput
             name="guardian_name"
             control={control}
-            inputProps={{placeholder: 'Father/Spouse Name'}}
+            sentenceCase
+            inputProps={{
+              placeholder: 'Father/Spouse Name',
+              autoCapitalize: 'words',
+            }}
           />
           {variant === 'add' && (
             <FormTextInput
@@ -347,7 +352,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
           <FormTextInput
             name="address"
             control={control}
-            inputProps={{placeholder: 'Home address'}}
+            inputProps={{placeholder: 'Home address', autoCapitalize: 'words'}}
           />
           <FormRadioInput
             name="category"
