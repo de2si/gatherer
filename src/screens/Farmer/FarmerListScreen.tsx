@@ -2,7 +2,7 @@
 
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {FarmerPreview, useFarmerStore} from '@hooks/useFarmerStore';
+import {RefreshControl} from 'react-native-gesture-handler';
 import {
   Avatar,
   Button,
@@ -11,13 +11,22 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
+
+// nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
+
+// store
+import {FarmerPreview, useFarmerStore} from '@hooks/useFarmerStore';
+
+// helpers
+import {areLocationFiltersEqual} from '@helpers/comparators';
+
+// components
 import LocationFilterSheet, {
   locationFilterDefaultValues,
 } from '@components/LocationFilterSheet';
 import SearchSheet from '@components/SearchSheet';
-import {areLocationFiltersEqual} from '@helpers/comparators';
 
 const farmerListHeaderRight = ({
   isFilterApplied,
@@ -79,6 +88,7 @@ const Item = ({
     </Card.Content>
   </Card>
 );
+
 type FarmerListScreenProps = NativeStackScreenProps<
   FarmerStackScreenProps,
   'FarmerList'
@@ -127,37 +137,28 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     });
   }, [isFilterApplied, isSearchApplied, navigation]);
 
-  useEffect(() => {
-    setIsSearchApplied(!!searchText.length);
-  }, [searchText]);
-
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);
   const prevFilters = useRef({...filters});
   useEffect(() => {
     const fetchProcessing = async () => {
       await fetchData(filters, searchText);
-      setIsFilterApplied(
-        !!(
-          filters.stateCodes.length ||
-          filters.districtCodes.length ||
-          filters.blockCodes.length ||
-          filters.villageCodes.length
-        ),
-        // Object.values(filters).some(arr => arr.length > 0)
-      );
+      setIsSearchApplied(!!searchText.length);
+      setIsFilterApplied(Object.values(filters).some(arr => arr.length > 0));
+
+      // Update previous values for comparison in the next render
+      prevSearchText.current = searchText;
+      prevFilters.current = {...filters};
     };
 
     // Call fetchProcessing on the first run
     if (!initialLoad.current) {
       initialLoad.current = true;
-      console.log('Loading initially...');
       fetchProcessing();
     }
 
     // Call fetchProcessing when refresh is set to true
     if (refresh) {
-      console.log('Loading refresh...');
       fetchProcessing();
     }
 
@@ -166,40 +167,17 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
       searchText !== prevSearchText.current ||
       !areLocationFiltersEqual(filters, prevFilters.current)
     ) {
-      console.log('Loading filter change...');
       fetchProcessing();
     }
-
-    // Update previous values for comparison in the next render
-    prevSearchText.current = searchText;
-    prevFilters.current = {...filters};
   }, [fetchData, filters, searchText, refresh]);
 
   return (
     <View style={styles.container}>
-      {/* RefreshControl shows loader IOS style and ANdroid style depending on platform.
-          Can show Activity Indicator for uniformity and hide RefreshControl either by
-          setting refresh to always false or colors as transparent.
-       {loading && (
-        <View
-          style={{
-            position: 'absolute',
-            top: 50,
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <ActivityIndicator />
-        </View>
-      )} */}
       <FlatList
         data={farmers}
         renderItem={({item}) => <Item data={item} onPress={showDetailScreen} />}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
-          /*Can modify to display the no text message only when not loading */
           <Text
             style={[
               theme.fonts.titleLarge,
@@ -209,8 +187,13 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
           </Text>
         }
         contentContainerStyle={!farmers.length && styles.noData}
-        refreshing={loading}
-        onRefresh={setRefresh}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={setRefresh}
+            colors={[theme.colors.primary]}
+          />
+        }
       />
       <LocationFilterSheet
         visible={filterBottomSheetVisible}

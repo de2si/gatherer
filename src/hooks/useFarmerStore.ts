@@ -57,7 +57,6 @@ interface FarmerStore {
     filters?: LocationFilterGroup,
     searchText?: string,
   ) => Promise<void>;
-  updateData: (farmer: APiFarmer, isExisting?: boolean) => void;
 }
 
 // Function to transform API response to match Farmer Preview interface
@@ -110,21 +109,6 @@ export const useFarmerStore = create<FarmerStore>((set, get) => ({
     set({data: response.data.map(transformApiFarmer), loading: false});
     if (get().refresh) {
       set({refresh: false});
-    }
-  },
-  updateData(farmer, isOldFarmer = false) {
-    let existingData = get().data;
-    if (isOldFarmer) {
-      const indexToUpdate = existingData.findIndex(
-        element => element.id === farmer.farmer_id,
-      );
-      if (indexToUpdate !== -1) {
-        existingData[indexToUpdate] = transformApiFarmer(farmer);
-        set({data: existingData});
-      }
-    } else {
-      existingData.push(transformApiFarmer(farmer));
-      set({data: existingData});
     }
   },
 }));
