@@ -1,10 +1,9 @@
 // FarmerListScreen.tsx
 
 import {FlatList, StyleSheet, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FarmerPreview, useFarmerStore} from '@hooks/useFarmerStore';
 import {
-  ActivityIndicator,
   Avatar,
   Button,
   Card,
@@ -18,6 +17,7 @@ import LocationFilterSheet, {
   locationFilterDefaultValues,
 } from '@components/LocationFilterSheet';
 import SearchSheet from '@components/SearchSheet';
+import {areLocationFiltersEqual} from '@helpers/comparators';
 
 const farmerListHeaderRight = ({
   isFilterApplied,
@@ -88,6 +88,8 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const farmers = useFarmerStore(store => store.data);
   const loading = useFarmerStore(store => store.loading);
   const fetchData = useFarmerStore(store => store.fetchData);
+  const refresh = useFarmerStore(store => store.refresh);
+  const setRefresh = useFarmerStore(store => store.setRefresh);
   const theme = useTheme();
   const [filterBottomSheetVisible, setFilterBottomSheetVisible] =
     useState(false);
@@ -129,6 +131,9 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     setIsSearchApplied(!!searchText.length);
   }, [searchText]);
 
+  const initialLoad = useRef(false);
+  const prevSearchText = useRef(searchText);
+  const prevFilters = useRef({...filters});
   useEffect(() => {
     const fetchProcessing = async () => {
       await fetchData(filters, searchText);
@@ -142,24 +147,59 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
         // Object.values(filters).some(arr => arr.length > 0)
       );
     };
-    fetchProcessing();
-  }, [fetchData, filters, searchText]);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
+    // Call fetchProcessing on the first run
+    if (!initialLoad.current) {
+      initialLoad.current = true;
+      console.log('Loading initially...');
+      fetchProcessing();
+    }
+
+    // Call fetchProcessing when refresh is set to true
+    if (refresh) {
+      console.log('Loading refresh...');
+      fetchProcessing();
+    }
+
+    // Call fetchProcessing when searchText or filters change
+    if (
+      searchText !== prevSearchText.current ||
+      !areLocationFiltersEqual(filters, prevFilters.current)
+    ) {
+      console.log('Loading filter change...');
+      fetchProcessing();
+    }
+
+    // Update previous values for comparison in the next render
+    prevSearchText.current = searchText;
+    prevFilters.current = {...filters};
+  }, [fetchData, filters, searchText, refresh]);
 
   return (
     <View style={styles.container}>
+      {/* RefreshControl shows loader IOS style and ANdroid style depending on platform.
+          Can show Activity Indicator for uniformity and hide RefreshControl either by
+          setting refresh to always false or colors as transparent.
+       {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 50,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator />
+        </View>
+      )} */}
       <FlatList
         data={farmers}
         renderItem={({item}) => <Item data={item} onPress={showDetailScreen} />}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
+          /*Can modify to display the no text message only when not loading */
           <Text
             style={[
               theme.fonts.titleLarge,
@@ -169,6 +209,8 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
           </Text>
         }
         contentContainerStyle={!farmers.length && styles.noData}
+        refreshing={loading}
+        onRefresh={setRefresh}
       />
       <LocationFilterSheet
         visible={filterBottomSheetVisible}

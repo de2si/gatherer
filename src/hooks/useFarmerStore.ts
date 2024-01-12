@@ -2,26 +2,18 @@
 
 import {create} from 'zustand';
 import {api} from '@api/axios';
-import {Location} from './locationHooks';
-import {ApiUserType} from './useAuthStore';
-import {maskPhoneNumber} from '@helpers/formatters';
 import {locationFilterDefaultValues} from '@components/LocationFilterSheet';
-import {
-  LocationFilterGroup,
-  buildLocationFilterQueryParams,
-} from '@helpers/formHelpers';
+
+// helpers
+import {maskPhoneNumber} from '@helpers/formatters';
 import {calculateHash} from '@helpers/cryptoHelpers';
+import {CATEGORY, GENDER, INCOME_LEVELS} from '@helpers/constants';
+import {buildLocationFilterQueryParams} from '@helpers/formHelpers';
 
-// constants
-const gender = ['MALE', 'FEMALE'] as const;
-const category = ['GENERAL', 'OBC', 'SC', 'ST', 'MINORITIES'] as const;
-const incomeLevels = ['<30k', '30-50k', '50-80k', '>80k'] as const;
-
-interface ApiImage {
-  id: number;
-  url: string;
-  hash: string;
-}
+// types
+import {Location} from '@hooks/locationHooks';
+import {ApiUserType} from '@hooks/useAuthStore';
+import {ApiImage, LocationFilterGroup} from '@typedefs/common';
 
 export interface APiFarmer {
   farmer_id: number;
@@ -37,10 +29,10 @@ export interface APiFarmer {
   guardian_name: string;
   date_of_birth: string;
   phone_number: string;
-  gender: (typeof gender)[number];
+  gender: (typeof GENDER)[number];
   address: string;
-  income_level: (typeof incomeLevels)[number];
-  category: (typeof category)[number];
+  income_level: (typeof INCOME_LEVELS)[number];
+  category: (typeof CATEGORY)[number];
   added_on: string;
   last_edited_on: string;
 }
@@ -59,10 +51,13 @@ export interface FarmerPreview {
 interface FarmerStore {
   data: FarmerPreview[];
   loading: boolean;
+  refresh: boolean;
+  setRefresh: () => void;
   fetchData: (
     filters?: LocationFilterGroup,
     searchText?: string,
   ) => Promise<void>;
+  updateData: (farmer: APiFarmer, isExisting?: boolean) => void;
 }
 
 // Function to transform API response to match Farmer Preview interface
@@ -92,9 +87,13 @@ const buildSearchQueryParams = (searchText: string) => {
 };
 
 // Create the store
-export const useFarmerStore = create<FarmerStore>(set => ({
+export const useFarmerStore = create<FarmerStore>((set, get) => ({
   data: [],
   loading: false,
+  refresh: false,
+  setRefresh: () => {
+    set({refresh: true});
+  },
   fetchData: async (
     locationFilters: LocationFilterGroup = locationFilterDefaultValues,
     searchText: string = '',
@@ -104,9 +103,28 @@ export const useFarmerStore = create<FarmerStore>(set => ({
       ...buildLocationFilterQueryParams(locationFilters),
       ...buildSearchQueryParams(searchText),
     };
+
     const response = await api.get('farmers/', {
       params: queryParams,
     });
     set({data: response.data.map(transformApiFarmer), loading: false});
+    if (get().refresh) {
+      set({refresh: false});
+    }
+  },
+  updateData(farmer, isOldFarmer = false) {
+    let existingData = get().data;
+    if (isOldFarmer) {
+      const indexToUpdate = existingData.findIndex(
+        element => element.id === farmer.farmer_id,
+      );
+      if (indexToUpdate !== -1) {
+        existingData[indexToUpdate] = transformApiFarmer(farmer);
+        set({data: existingData});
+      }
+    } else {
+      existingData.push(transformApiFarmer(farmer));
+      set({data: existingData});
+    }
   },
 }));
