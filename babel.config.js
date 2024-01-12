@@ -19,6 +19,7 @@ module.exports = {
           '@api': './src/api',
           '@hooks': './src/hooks',
           '@helpers': './src/helpers',
+          '@typedefs': './src/types',
         },
       },
     ],
