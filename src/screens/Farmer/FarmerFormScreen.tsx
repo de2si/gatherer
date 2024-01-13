@@ -130,10 +130,7 @@ const farmerAddSchema: Yup.ObjectSchema<FarmerAddForm> =
       .required('Aadhaar number is required'),
     confirm_aadhaar: Yup.string()
       .required('Confirm aadhaar number is required')
-      .oneOf(
-        [Yup.ref('confirm_aadhaar')],
-        'Aadhaar and Confirm aadhaar must match',
-      ),
+      .oneOf([Yup.ref('aadhaar')], 'Aadhaar and Confirm aadhaar must match'),
   });
 
 // define default values
@@ -401,7 +398,11 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             <FormTextInput
               name="aadhaar"
               control={control}
-              inputProps={{placeholder: 'Aadhaar'}}
+              inputProps={{
+                placeholder: 'Aadhaar',
+                keyboardType: 'numeric',
+                secureTextEntry: true,
+              }}
               onLayout={handleLayout}
             />
           )}
@@ -409,7 +410,10 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             <FormTextInput
               name="confirm_aadhaar"
               control={control}
-              inputProps={{placeholder: 'Confirm Aadhaar'}}
+              inputProps={{
+                placeholder: 'Confirm Aadhaar',
+                keyboardType: 'numeric',
+              }}
               onLayout={handleLayout}
             />
           )}
@@ -443,7 +447,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
           <FormTextInput
             name="phone_number"
             control={control}
-            inputProps={{placeholder: 'Phone number'}}
+            inputProps={{placeholder: 'Phone number', keyboardType: 'numeric'}}
             onLayout={handleLayout}
           />
           <FormRadioInput
