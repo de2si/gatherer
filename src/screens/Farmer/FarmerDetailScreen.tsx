@@ -144,19 +144,22 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
         {farmer && (
           <>
             <List.Section>
-              <List.Subheader>Basic</List.Subheader>
-              <View style={styles.headerRow}>
+              <View
+                style={[
+                  styles.headerRow,
+                  {backgroundColor: theme.colors.primary},
+                ]}>
                 <View style={styles.col}>
                   <List.Item
                     title={farmer.guardian_name}
                     description="Father/Spouse"
                     titleStyle={[
                       theme.fonts.titleMedium,
-                      {color: theme.colors.onSurfaceVariant},
+                      {color: theme.colors.onPrimary},
                     ]}
                     descriptionStyle={[
                       theme.fonts.labelLarge,
-                      {color: theme.colors.outline},
+                      {color: theme.colors.inverseOnSurface},
                     ]}
                   />
                   <List.Item
@@ -164,11 +167,11 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                     description="Date of birth"
                     titleStyle={[
                       theme.fonts.titleMedium,
-                      {color: theme.colors.onSurfaceVariant},
+                      {color: theme.colors.onPrimary},
                     ]}
                     descriptionStyle={[
                       theme.fonts.labelLarge,
-                      {color: theme.colors.outline},
+                      {color: theme.colors.inverseOnSurface},
                     ]}
                   />
                 </View>
@@ -179,15 +182,13 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                   />
                   <Text
                     variant="titleLarge"
-                    style={{color: theme.colors.onSurface}}>
+                    style={{color: theme.colors.onPrimary}}>
                     {farmer.name}
                   </Text>
                 </View>
               </View>
             </List.Section>
-            <Divider />
             <List.Section>
-              <List.Subheader>Identification</List.Subheader>
               <View style={styles.row}>
                 <Text
                   style={[styles.labelText, {color: theme.colors.outline}]}
@@ -206,7 +207,6 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
             </List.Section>
             <Divider />
             <List.Section>
-              <List.Subheader>Address</List.Subheader>
               <FieldItem
                 label="Village"
                 value={farmer.village.name}
@@ -216,16 +216,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
             </List.Section>
             <Divider />
             <List.Section>
-              <List.Subheader>Land</List.Subheader>
-              <FieldItem label="Total Land" value="167" theme={theme} />
-            </List.Section>
-            <Divider />
-            <List.Section>
-              <List.Subheader>Member</List.Subheader>
-            </List.Section>
-            <Divider />
-            <List.Section>
-              <List.Subheader>Others</List.Subheader>
+              <FieldItem label="Gender" value={farmer.gender} theme={theme} />
               <FieldItem
                 label="Category"
                 value={farmer.category}
@@ -236,6 +227,15 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                 value={farmer.income_level}
                 theme={theme}
               />
+            </List.Section>
+            <Divider />
+            <List.Section>
+              {/* <List.Subheader>Land</List.Subheader> */}
+              <FieldItem label="Total Land" value="167" theme={theme} />
+            </List.Section>
+            <Divider />
+            <List.Section>
+              <FieldItem label="Member" value="" theme={theme} />
             </List.Section>
           </>
         )}
@@ -255,10 +255,16 @@ export default FarmerDetailScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 12,
   },
   centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  headerRow: {flexDirection: 'row'},
+  headerRow: {
+    flex: 1,
+    flexDirection: 'row',
+    paddingVertical: 24,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   col: {
     justifyContent: 'center',
     alignItems: 'center',
