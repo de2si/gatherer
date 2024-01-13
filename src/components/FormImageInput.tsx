@@ -145,7 +145,6 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   return (
     <View
       onLayout={event => {
-        console.log(event.nativeEvent.layout);
         onLayout({name, y: event.nativeEvent.layout.y});
       }}>
       <Pressable
