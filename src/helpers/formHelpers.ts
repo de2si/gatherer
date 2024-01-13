@@ -29,7 +29,7 @@ const flattenNestedErrors = (nestedErrors: NestedErrors): string[] => {
     } else if (typeof errorValue === 'object' && errorValue !== null) {
       const nestedErrorsArray = flattenNestedErrors(errorValue as NestedErrors);
       flattenedErrors.push(
-        ...nestedErrorsArray.map(nestedError => `${key}-${nestedError}`),
+        ...nestedErrorsArray.map(nestedError => `${key}: ${nestedError}`),
       );
     } else {
       flattenedErrors.push(`${key}: ${String(errorValue)}`);
@@ -39,7 +39,7 @@ const flattenNestedErrors = (nestedErrors: NestedErrors): string[] => {
   return flattenedErrors;
 };
 
-export const getErrorMessage = (error: unknown): string => {
+export const getErrorMessage = (error: unknown): string | string[] => {
   const isAxiosError = (err: any): err is AxiosError => {
     return err.isAxiosError || (err.response && err.response instanceof Object);
   };
@@ -51,7 +51,7 @@ export const getErrorMessage = (error: unknown): string => {
         const nestedErrors = flattenNestedErrors(
           error.response.data as NestedErrors,
         );
-        return nestedErrors.join('\n');
+        return nestedErrors;
       }
       // The request was made, but the server responded with a status code outside the range of 2xx
       const statusCode = error.response.status;
@@ -82,6 +82,18 @@ export const getErrorMessage = (error: unknown): string => {
   } else {
     return 'An unexpected error occurred.';
   }
+};
+
+export const getFieldErrors = (
+  errorsArray: string[],
+): {fieldName: string; fieldErrorMessage: string}[] => {
+  return errorsArray.map(line => {
+    const [fieldName, ...errorMessageParts] = line
+      .split(':')
+      .map(str => str.trim());
+    const fieldErrorMessage = errorMessageParts.join(':').trim();
+    return {fieldName, fieldErrorMessage};
+  });
 };
 
 interface LocationQueryParams {
