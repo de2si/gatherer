@@ -1,6 +1,6 @@
 // FarmerForm.tsx
 
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {
   ActivityIndicator,
@@ -255,12 +255,43 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
       ? getFarmerEditDefaultValues(farmer)
       : farmerAddDefaultValues;
 
-  const {handleSubmit, control, watch, reset} = useForm<FarmerFormType>({
+  const {
+    handleSubmit,
+    control,
+    watch,
+    reset,
+    formState: {errors},
+  } = useForm<FarmerFormType>({
     defaultValues,
     resolver: yupResolver(
       variant === 'add' ? farmerAddSchema : farmerBasicSchema,
     ),
   });
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const layoutPosY = useRef<Record<string, number>>({});
+  const fieldOrder = useRef<string[]>([]);
+  const handleLayout = ({name, y}: {name: string; y: number}) => {
+    layoutPosY.current[name] = y;
+    if (!fieldOrder.current.includes(name)) {
+      fieldOrder.current.push(name);
+    }
+  };
+
+  useEffect(() => {
+    const scrollToFirstError = () => {
+      for (let fieldName of fieldOrder.current) {
+        if (fieldName in errors) {
+          scrollViewRef.current?.scrollTo({
+            y: layoutPosY.current[fieldName],
+            animated: true,
+          });
+          break;
+        }
+      }
+    };
+    scrollToFirstError();
+  }, [errors]);
 
   if (variant === 'edit' && !farmer) {
     return (
@@ -300,15 +331,20 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView ref={scrollViewRef}>
       <View style={styles.container}>
         <View style={styles.formContainer}>
-          <FormImageInput name="profile_photo" control={control} />
+          <FormImageInput
+            name="profile_photo"
+            control={control}
+            onLayout={handleLayout}
+          />
           <FormTextInput
             name="name"
             control={control}
             sentenceCase
             inputProps={{placeholder: 'Name', autoCapitalize: 'words'}}
+            onLayout={handleLayout}
           />
           <FormTextInput
             name="guardian_name"
@@ -318,12 +354,14 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
               placeholder: 'Father/Spouse Name',
               autoCapitalize: 'words',
             }}
+            onLayout={handleLayout}
           />
           {variant === 'add' && (
             <FormTextInput
               name="aadhaar"
               control={control}
               inputProps={{placeholder: 'Aadhaar'}}
+              onLayout={handleLayout}
             />
           )}
           {variant === 'add' && (
@@ -331,9 +369,21 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
               name="confirm_aadhaar"
               control={control}
               inputProps={{placeholder: 'Confirm Aadhaar'}}
+              onLayout={handleLayout}
             />
           )}
-          <View style={styles.imgRow}>
+          <View
+            style={styles.imgRow}
+            onLayout={event => {
+              handleLayout({
+                name: 'id_front_image',
+                y: event.nativeEvent.layout.y,
+              });
+              handleLayout({
+                name: 'id_back_image',
+                y: event.nativeEvent.layout.y,
+              });
+            }}>
             <FormImageInput
               name="id_front_image"
               control={control}
@@ -353,35 +403,46 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             name="phone_number"
             control={control}
             inputProps={{placeholder: 'Phone number'}}
+            onLayout={handleLayout}
           />
           <FormRadioInput
             name="gender"
             control={control}
             label="Gender"
             options={transformToLabelValuePair(GENDER)}
+            onLayout={handleLayout}
           />
-          <FormDateInput name="date_of_birth" control={control} label="DOB" />
+          <FormDateInput
+            name="date_of_birth"
+            control={control}
+            label="DOB"
+            onLayout={handleLayout}
+          />
           <FormTextInput
             name="address"
             control={control}
             inputProps={{placeholder: 'Home address', autoCapitalize: 'words'}}
+            onLayout={handleLayout}
           />
           <FormRadioInput
             name="category"
             control={control}
             label="Category"
             options={transformToLabelValuePair(CATEGORY)}
+            onLayout={handleLayout}
           />
           <FormRadioInput
             name="income_level"
             control={control}
             label="Income level"
             options={transformToLabelValuePair(INCOME_LEVELS)}
+            onLayout={handleLayout}
           />
           <FormStateSelectInput
             name="state"
             control={control}
             variant="single"
+            onLayout={handleLayout}
           />
           <FormDistrictSelectInput
             name="district"
@@ -390,6 +451,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             codes={
               watch('state') ? [watch('state') as number] : ([] as number[])
             }
+            onLayout={handleLayout}
           />
           <FormBlockSelectInput
             name="block"
@@ -400,6 +462,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
                 ? [watch('district') as number]
                 : ([] as number[])
             }
+            onLayout={handleLayout}
           />
           <FormVillageSelectInput
             name="village"
@@ -408,6 +471,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             codes={
               watch('block') ? [watch('block') as number] : ([] as number[])
             }
+            onLayout={handleLayout}
           />
 
           <Button
