@@ -41,7 +41,7 @@ import {areDatesEqual, areObjectsEqual} from '@helpers/comparators';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
-import {APiFarmer} from '@hooks/useFarmerStore';
+import {APiFarmer, useFarmerStore} from '@hooks/useFarmerStore';
 
 // api
 import {api} from '@api/axios';
@@ -237,7 +237,10 @@ type FarmerFormScreenProps = NativeStackScreenProps<
   'FarmerAdd' | 'FarmerEdit'
 >;
 
-const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
+const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
+  route,
+  navigation,
+}) => {
   const {variant} = route.params;
   const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
 
@@ -245,6 +248,8 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
   const [loading, setLoading] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Error');
+  const setRefresh = useFarmerStore(store => store.setRefresh);
+
   type FarmerFormType = FarmerBasicForm &
     (typeof variant extends 'add' ? FarmerAddForm : {});
 
@@ -320,6 +325,13 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
         if (result.status === 201) {
           reset(farmerAddDefaultValues);
           showSnackbar('Farmer added successfully');
+          setRefresh();
+          setTimeout(() => {
+            navigation.replace('FarmerDetail', {
+              id: result.data.farmer_id,
+              farmer: result.data,
+            });
+          }, 2000);
         }
       } else if (variant === 'edit' && farmer) {
         const result = await api.patch(
@@ -327,8 +339,14 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
           prepareEditFormData(formData, defaultValues as FarmerBasicForm),
         );
         if (result.status === 200) {
-          reset(farmerAddDefaultValues);
           showSnackbar('Farmer updated successfully');
+          setRefresh();
+          setTimeout(() => {
+            navigation.navigate('FarmerDetail', {
+              id: result.data.farmer_id,
+              farmer: result.data,
+            });
+          }, 2000);
         }
       }
     } catch (error) {
@@ -463,12 +481,6 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             label="DOB"
             onLayout={handleLayout}
           />
-          <FormTextInput
-            name="address"
-            control={control}
-            inputProps={{placeholder: 'Home address', autoCapitalize: 'words'}}
-            onLayout={handleLayout}
-          />
           <FormRadioInput
             name="category"
             control={control}
@@ -516,6 +528,12 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             codes={
               watch('block') ? [watch('block') as number] : ([] as number[])
             }
+            onLayout={handleLayout}
+          />
+          <FormTextInput
+            name="address"
+            control={control}
+            inputProps={{placeholder: 'Home address', autoCapitalize: 'words'}}
             onLayout={handleLayout}
           />
 
