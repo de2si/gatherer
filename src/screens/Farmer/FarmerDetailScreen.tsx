@@ -116,7 +116,10 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
           setFarmer(response.data);
         }
       } catch (error) {
-        showSnackbar(getErrorMessage(error));
+        const errorMessage = getErrorMessage(error);
+        typeof errorMessage === 'string'
+          ? showSnackbar(errorMessage)
+          : showSnackbar('Error in fetching farmer details');
       } finally {
         setLoading(false);
       }
