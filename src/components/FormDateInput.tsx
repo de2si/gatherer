@@ -18,6 +18,7 @@ interface FormDateInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   label?: string;
   datePickerProps?: FormDatePickerProps;
+  onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
 const FormDateInput = <TFieldValues extends FieldValues>({
@@ -25,6 +26,7 @@ const FormDateInput = <TFieldValues extends FieldValues>({
   control,
   label = 'Date',
   datePickerProps = {},
+  onLayout = () => {},
 }: FormDateInputProps<TFieldValues>) => {
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const theme = useTheme();
@@ -34,7 +36,10 @@ const FormDateInput = <TFieldValues extends FieldValues>({
       control={control}
       name={name}
       render={({field: {value, onChange}, fieldState: {error}}) => (
-        <View>
+        <View
+          onLayout={event => {
+            onLayout({name, y: event.nativeEvent.layout.y});
+          }}>
           <View style={[styles.container, styles.rowContainer]}>
             <Text style={[styles.dateInputLabel, theme.fonts.labelLarge]}>
               {label}

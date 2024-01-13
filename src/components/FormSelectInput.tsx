@@ -71,6 +71,7 @@ interface FormSelectInputBaseProps<TForm extends FieldValues> {
   name: FieldValues['name'];
   control: Control<TForm>;
   loading: boolean;
+  onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
 interface FormSingleSelectInputProps<T = any, TForm extends FieldValues = any>
@@ -93,6 +94,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
   name,
   control,
   loading = false,
+  onLayout = () => {},
   variant = 'single',
   selectProps,
 }: FormSelectInputProps<T, TForm>) => {
@@ -193,7 +195,11 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
           },
   };
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={event => {
+        onLayout({name, y: event.nativeEvent.layout.y});
+      }}>
       {variant === 'single' && (
         <Dropdown<T>
           {...computedProps}

@@ -10,6 +10,7 @@ interface FormRadioInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   label: string;
   options: {label: string; value: string}[];
+  onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
 const FormRadioInput = <TFieldValues extends FieldValues>({
@@ -17,6 +18,7 @@ const FormRadioInput = <TFieldValues extends FieldValues>({
   control,
   label,
   options,
+  onLayout = () => {},
 }: FormRadioInputProps<TFieldValues>) => {
   const theme = useTheme();
   return (
@@ -24,7 +26,11 @@ const FormRadioInput = <TFieldValues extends FieldValues>({
       control={control}
       name={name}
       render={({field: {value, onChange}, fieldState: {error}}) => (
-        <View style={styles.container}>
+        <View
+          style={styles.container}
+          onLayout={event => {
+            onLayout({name, y: event.nativeEvent.layout.y});
+          }}>
           <Text style={[styles.radioLabel, theme.fonts.labelLarge]}>
             {label}
           </Text>

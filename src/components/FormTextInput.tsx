@@ -10,6 +10,7 @@ interface FormTextInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name'];
   sentenceCase?: boolean;
   inputProps?: TextInputProps; // Pass TextInputProps directly
+  onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
 const FormTextInput = <TFieldValues extends FieldValues>({
@@ -17,13 +18,18 @@ const FormTextInput = <TFieldValues extends FieldValues>({
   name,
   sentenceCase = false,
   inputProps = {},
+  onLayout = () => {},
 }: FormTextInputProps<TFieldValues>) => {
   return (
     <Controller
       control={control}
       name={name}
       render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-        <View style={[styles.container]}>
+        <View
+          style={[styles.container]}
+          onLayout={event => {
+            onLayout({name, y: event.nativeEvent.layout.y});
+          }}>
           <TextInput
             error={error ? true : false}
             mode="outlined"

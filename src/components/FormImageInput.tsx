@@ -39,6 +39,7 @@ interface FormImageInputProps<TFieldValues extends FieldValues> {
   variant?: 'round' | 'square';
   border?: 'none' | 'dashed';
   placeholderViewStyles?: StyleProp<ViewStyle>;
+  onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
 const FormImageInput = <TFieldValues extends FieldValues>({
@@ -48,6 +49,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   variant = 'round',
   border = 'none',
   placeholderViewStyles = {},
+  onLayout = () => {},
 }: FormImageInputProps<TFieldValues>) => {
   const theme = useTheme();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
@@ -141,7 +143,11 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   const placeholderBorderStyle =
     border === 'dashed' ? styles.dashedBorder : null;
   return (
-    <View>
+    <View
+      onLayout={event => {
+        console.log(event.nativeEvent.layout);
+        onLayout({name, y: event.nativeEvent.layout.y});
+      }}>
       <Pressable
         onPress={handleImageContainerPress}
         style={styles.centeredContainer}>
