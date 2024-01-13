@@ -15,7 +15,7 @@ import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useAuthStore';
 import {ApiImage, LocationFilterGroup} from '@typedefs/common';
 
-export interface APiFarmer {
+export interface ApiFarmer {
   farmer_id: number;
   profile_photo: ApiImage;
   id_front_image: ApiImage;
@@ -60,7 +60,7 @@ interface FarmerStore {
 }
 
 // Function to transform API response to match Farmer Preview interface
-const transformApiFarmer = (apiResponse: APiFarmer): FarmerPreview => {
+const transformApiFarmer = (apiResponse: ApiFarmer): FarmerPreview => {
   return {
     id: apiResponse.farmer_id,
     name: apiResponse.name,

@@ -27,7 +27,7 @@ import {getErrorMessage} from '@helpers/formHelpers';
 import {formatDate, formatPhoneNumber} from '@helpers/formatters';
 
 // types
-import {APiFarmer} from '@hooks/useFarmerStore';
+import {ApiFarmer} from '@hooks/useFarmerStore';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
@@ -91,7 +91,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
 }) => {
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
-  const [farmer, setFarmer] = useState<APiFarmer>();
+  const [farmer, setFarmer] = useState<ApiFarmer>();
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Farmer detail error');
 

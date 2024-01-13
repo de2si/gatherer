@@ -12,14 +12,14 @@ import FarmerDetailScreen from '@screens/Farmer/FarmerDetailScreen';
 import FarmerFormScreen from '@screens/Farmer/FarmerFormScreen';
 
 // types
-import {APiFarmer} from '@hooks/useFarmerStore';
+import {ApiFarmer} from '@hooks/useFarmerStore';
 
 // define screen params
 export type FarmerStackScreenProps = {
   FarmerList: {};
-  FarmerDetail: {id: number; farmer?: APiFarmer};
+  FarmerDetail: {id: number; farmer?: ApiFarmer};
   FarmerAdd: {variant: 'add'};
-  FarmerEdit: {variant: 'edit'; farmer: APiFarmer};
+  FarmerEdit: {variant: 'edit'; farmer: ApiFarmer};
 };
 
 // create navigation stack

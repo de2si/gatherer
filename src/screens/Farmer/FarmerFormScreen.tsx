@@ -41,7 +41,7 @@ import {areDatesEqual, areObjectsEqual} from '@helpers/comparators';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
-import {APiFarmer, useFarmerStore} from '@hooks/useFarmerStore';
+import {ApiFarmer, useFarmerStore} from '@hooks/useFarmerStore';
 
 // api
 import {api} from '@api/axios';
@@ -160,7 +160,7 @@ const getFarmerEditDefaultValues = ({
   address,
   income_level,
   category,
-}: APiFarmer): FarmerBasicForm => {
+}: ApiFarmer): FarmerBasicForm => {
   return {
     profile_photo: {uri: profile_photo.url, hash: profile_photo.hash},
     id_front_image: {uri: id_front_image.url, hash: id_front_image.hash},
