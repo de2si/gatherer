@@ -1,6 +1,6 @@
-// FarmerForm.tsx
+// FarmerFormScreen.tsx
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {
   ActivityIndicator,
@@ -33,6 +33,7 @@ import {add91Prefix, formatDate, remove91Prefix} from '@helpers/formatters';
 import {
   formatToUrlKey,
   getErrorMessage,
+  getFieldErrors,
   removeKeys,
 } from '@helpers/formHelpers';
 import {CATEGORY, GENDER, INCOME_LEVELS} from '@helpers/constants';
@@ -260,6 +261,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
     control,
     watch,
     reset,
+    setError,
     formState: {errors},
   } = useForm<FarmerFormType>({
     defaultValues,
@@ -278,20 +280,29 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
     }
   };
 
-  useEffect(() => {
-    const scrollToFirstError = () => {
-      for (let fieldName of fieldOrder.current) {
-        if (fieldName in errors) {
-          scrollViewRef.current?.scrollTo({
-            y: layoutPosY.current[fieldName],
-            animated: true,
-          });
-          break;
-        }
+  const scrollToFirstError = useCallback(() => {
+    for (let fieldName of fieldOrder.current) {
+      if (fieldName in errors) {
+        scrollViewRef.current?.scrollTo({
+          y: layoutPosY.current[fieldName],
+          animated: true,
+        });
+        break;
       }
-    };
-    scrollToFirstError();
+    }
   }, [errors]);
+
+  useEffect(() => {
+    scrollToFirstError();
+  }, [errors, scrollToFirstError]);
+
+  const [manualScroll, setManualScroll] = useState(false);
+  useEffect(() => {
+    if (manualScroll) {
+      scrollToFirstError();
+      setManualScroll(false);
+    }
+  }, [errors, manualScroll, scrollToFirstError]);
 
   if (variant === 'edit' && !farmer) {
     return (
@@ -324,7 +335,37 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
         }
       }
     } catch (error) {
-      showSnackbar(getErrorMessage(error));
+      const errorMessage = getErrorMessage(error);
+      if (typeof errorMessage === 'string') {
+        showSnackbar(errorMessage);
+      } else {
+        getFieldErrors(errorMessage).forEach(
+          ({fieldName, fieldErrorMessage}) => {
+            type FormFieldName = keyof FarmerFormType;
+            if (fieldName === 'id_hash') {
+              fieldErrorMessage.includes('already exists')
+                ? setError('aadhaar' as FormFieldName, {
+                    message: 'Farmer with this Aadhaar id already exists',
+                  })
+                : setError('aadhaar' as FormFieldName, {
+                    message: fieldErrorMessage,
+                  });
+            } else if (
+              (fieldName === 'profile_photo' ||
+                fieldName === 'id_back_image' ||
+                fieldName === 'id_front_image') &&
+              fieldErrorMessage.includes('already exists')
+            ) {
+              setError(fieldName, {message: 'Image file already exists'});
+            } else if (fieldOrder.current.includes(fieldName)) {
+              setError(fieldName as FormFieldName, {
+                message: fieldErrorMessage,
+              });
+            }
+          },
+        );
+        setManualScroll(true);
+      }
     } finally {
       setLoading(false);
     }
