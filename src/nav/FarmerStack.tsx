@@ -17,7 +17,7 @@ import {APiFarmer} from '@hooks/useFarmerStore';
 // define screen params
 export type FarmerStackScreenProps = {
   FarmerList: {};
-  FarmerDetail: {id: number};
+  FarmerDetail: {id: number; farmer?: APiFarmer};
   FarmerAdd: {variant: 'add'};
   FarmerEdit: {variant: 'edit'; farmer: APiFarmer};
 };

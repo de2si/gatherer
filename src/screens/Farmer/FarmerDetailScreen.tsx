@@ -85,7 +85,7 @@ const FieldThumbnail = ({url, theme}: {url: string; theme: MD3Theme}) => (
 
 const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
   route: {
-    params: {id},
+    params: {id, farmer: propFarmer},
   },
   navigation,
 }) => {
@@ -109,6 +109,10 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
 
   useEffect(() => {
     const fetchFarmer = async () => {
+      if (propFarmer) {
+        setFarmer(propFarmer);
+        return;
+      }
       setLoading(true);
       try {
         const response = await api.get(`farmers/${id}/`);
@@ -126,7 +130,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
     };
     fetchFarmer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]); // intentionally removing showSnackbar from dependencies
+  }, [id, propFarmer]); // intentionally removing showSnackbar from dependencies
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
