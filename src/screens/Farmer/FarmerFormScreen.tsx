@@ -537,12 +537,14 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({route}) => {
             </View>
           )}
         </Portal>
-        <Snackbar
-          visible={snackbarVisible}
-          onDismiss={dismissSnackbar}
-          duration={Snackbar.DURATION_SHORT}>
-          {snackbarMessage}
-        </Snackbar>
+        <Portal>
+          <Snackbar
+            visible={snackbarVisible}
+            onDismiss={dismissSnackbar}
+            duration={Snackbar.DURATION_SHORT}>
+            {snackbarMessage}
+          </Snackbar>
+        </Portal>
       </View>
     </ScrollView>
   );
