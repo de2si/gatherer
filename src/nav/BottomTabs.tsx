@@ -6,10 +6,12 @@ import {useTheme} from 'react-native-paper';
 // navigation
 import {createMaterialBottomTabNavigator} from 'react-native-paper/react-navigation';
 import DataTabs from '@nav/DataTabs';
+import MoreStack from '@nav/MoreStack';
 
 // screens
 import PlaceholderScreen from '@screens/PlaceholderScreen';
-import ProfileStack from '@nav/ProfileStack';
+
+// hooks
 import {useAuthStore} from '@hooks/useAuthStore';
 
 // define screen params
@@ -17,7 +19,7 @@ export type BottomTabsNavProps = {
   Data: undefined;
   Project: {name: string};
   User: {name: string};
-  Profile: {};
+  More: {};
 };
 
 // create navigation tab
@@ -27,7 +29,10 @@ const BottomTabs = () => {
   let userType = useAuthStore(store => store.user.userType);
   const theme = useTheme();
   return (
-    <BottomTabNav.Navigator theme={theme} initialRouteName="Project">
+    <BottomTabNav.Navigator
+      theme={theme}
+      initialRouteName="Project"
+      safeAreaInsets={{bottom: 0}}>
       <BottomTabNav.Screen
         name="Data"
         component={DataTabs}
@@ -48,9 +53,9 @@ const BottomTabs = () => {
         />
       )}
       <BottomTabNav.Screen
-        name="Profile"
-        component={ProfileStack}
-        options={{tabBarIcon: 'account-details', title: 'Profile'}}
+        name="More"
+        component={MoreStack}
+        options={{tabBarIcon: 'account-details', title: 'More'}}
       />
     </BottomTabNav.Navigator>
   );
