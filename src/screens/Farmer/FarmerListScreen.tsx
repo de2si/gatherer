@@ -11,6 +11,7 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -33,12 +34,14 @@ const farmerListHeaderRight = ({
   isSearchApplied,
   handleFilterPress,
   handleSearchPress,
+  handleSearchClearPress,
   handleAddPress,
 }: {
   isFilterApplied: boolean;
   isSearchApplied: boolean;
   handleFilterPress: () => void;
   handleSearchPress: () => void;
+  handleSearchClearPress: () => void;
   handleAddPress: () => void;
 }) => {
   return (
@@ -57,6 +60,14 @@ const farmerListHeaderRight = ({
         selected={isSearchApplied}
         mode={isSearchApplied ? 'contained' : undefined}
       />
+      {isSearchApplied && (
+        <IconButton
+          icon={props => <MaterialIcon name="search-off" {...props} />}
+          size={24}
+          onPress={handleSearchClearPress}
+          mode="contained-tonal"
+        />
+      )}
       <Button mode="contained-tonal" onPress={handleAddPress}>
         Add
       </Button>
@@ -116,6 +127,9 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const handleSearchPress = () => {
     setSearchBottomSheetVisible(true);
   };
+  const handleSearchClearPress = () => {
+    setSearchText('');
+  };
 
   const showDetailScreen = (id: number) => {
     navigation.navigate('FarmerDetail', {id});
@@ -132,6 +146,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
           isSearchApplied,
           handleFilterPress,
           handleSearchPress,
+          handleSearchClearPress,
           handleAddPress,
         }),
     });
