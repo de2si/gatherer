@@ -1,125 +1,153 @@
 // useAuthStore.ts
 
+import {useEffect, useState} from 'react';
+
 import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+
+import {isAxiosError} from 'axios';
 import {api} from '@api/axios';
 
-export interface ApiUserType {
-  id: number;
-  blocks: [];
-  projects: {};
-  user_type: 'ADMIN' | 'SUPERVISOR' | 'SURVEYOR';
-  name: string;
-  gender: string;
-  phone_number: string;
-  email: string;
-  is_active: boolean;
-  date_joined: string;
+interface AuthState {
+  loading: boolean;
+  data: {
+    access: string;
+    refresh: string;
+  };
+  authenticated: boolean;
 }
 
-interface User {
-  id: number;
-  blocks: []; // TODO: Update type
-  projects: {}; // TODO: Update type
-  userType: 'ADMIN' | 'SUPERVISOR' | 'SURVEYOR';
-  name: string;
-  gender: string; // TODO: Update type
-  phoneNumber: string;
-  email: string;
-}
+// Define initial auth state
+const initialState: AuthState = {
+  loading: false,
+  data: {
+    access: '',
+    refresh: '',
+  },
+  authenticated: false,
+};
 
 // Define the shape of the store
-interface State {
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  token: string;
-  user: User;
-}
-interface AuthStore extends State {
-  login: (
-    phoneNumber: string,
-    password: string,
-  ) => Promise<{isSuccessful: boolean; errorMessage?: string}>;
+interface AuthStore extends AuthState {
+  getToken: (phone_number: string, password: string) => Promise<void>;
+  verifyToken: () => Promise<boolean>;
+  refreshToken: () => Promise<void>;
+  login: (phone_number: string, password: string) => Promise<void>;
   logout: () => void;
-  initializeAxios: () => void;
+  setApiAuthHeader: () => void;
+  withAuth: (apiCallback: () => any) => Promise<any>;
 }
-
-// Function to transform API response to match User interface
-const transformApiUser = (apiResponse: ApiUserType): User => {
-  return {
-    id: apiResponse.id,
-    blocks: apiResponse.blocks,
-    projects: apiResponse.projects,
-    userType: apiResponse.user_type,
-    name: apiResponse.name,
-    gender: apiResponse.gender,
-    phoneNumber: apiResponse.phone_number,
-    email: apiResponse.email,
-  };
-};
-
-const initialState: State = {
-  isLoading: false,
-  isAuthenticated: false,
-  token: '',
-  user: {
-    id: 0,
-    blocks: [],
-    projects: {},
-    userType: 'SURVEYOR',
-    name: '',
-    gender: '',
-    phoneNumber: '',
-    email: '',
-  },
-};
 
 // Create the store
 export const useAuthStore = create(
   persist<AuthStore>(
-    (set, get) => ({
-      ...initialState,
-      login: async (phoneNumber: string, password: string) => {
-        set({isLoading: true});
-        let isLoginSuccessful = false;
-        let errorMessage = '';
-        try {
-          const res = await api.post('api-token-auth/', {
-            phone_number: phoneNumber,
-            password,
-          });
-          set({
-            token: res.data.token,
-            user: transformApiUser(res.data.user),
-            isAuthenticated: true,
-          });
-          api.defaults.headers.common.Authorization = `Token ${res.data.token}`;
-          isLoginSuccessful = true;
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            isLoginSuccessful = false;
-            errorMessage =
-              error?.response?.data?.non_field_errors?.[0] ?? 'Login error';
+    (set, get) => {
+      return {
+        ...initialState,
+        getToken: async (phone_number, password) => {
+          try {
+            const response = await api.post('api/token/', {
+              phone_number,
+              password,
+            });
+            const {access, refresh} = response.data;
+            set({data: {access, refresh}, authenticated: true});
+          } catch (error) {
+            throw error;
           }
-        } finally {
-          set({isLoading: false});
-          return {isSuccessful: isLoginSuccessful, errorMessage};
-        }
-      },
-      logout: () => {
-        delete api.defaults.headers.common.Authorization;
-        set(initialState);
-      },
-      initializeAxios: () => {
-        let {isAuthenticated, token} = get();
-        // If a token is available, set it in the Authorization header
-        if (isAuthenticated && token) {
-          api.defaults.headers.common.Authorization = `Token ${token}`;
-        }
-      },
-    }),
-    {name: 'QJn5RXGF1dlx', storage: createJSONStorage(() => AsyncStorage)},
+        },
+        verifyToken: async () => {
+          try {
+            await api.post('api/token/verify/', {token: get().data.access});
+            return true;
+          } catch (error) {
+            if (isAxiosError(error) && error.request) {
+              throw error;
+            }
+            return false;
+          }
+        },
+        refreshToken: async () => {
+          try {
+            const response = await api.post('api/token/refresh/', {
+              refresh: get().data.refresh,
+            });
+            const {access} = response.data;
+            set({data: {access, refresh: get().data.refresh}});
+          } catch (error) {
+            throw error;
+          }
+        },
+        login: async (phone_number, password) => {
+          try {
+            set({loading: true});
+            await get().getToken(phone_number, password);
+            get().setApiAuthHeader();
+          } catch (error) {
+            throw error;
+          } finally {
+            set({loading: false});
+          }
+        },
+        logout: () => {
+          delete api.defaults.headers.common.Authorization;
+          set(initialState);
+        },
+        setApiAuthHeader: () => {
+          let {
+            authenticated,
+            data: {access},
+          } = get();
+          if (authenticated && access) {
+            api.defaults.headers.common.Authorization = `Bearer ${access}`;
+          }
+        },
+        withAuth: async (apiCallback: () => Promise<any>) => {
+          if (get().authenticated) {
+            try {
+              const isTokenValid = await get().verifyToken();
+              if (!isTokenValid) {
+                await get().refreshToken();
+                get().setApiAuthHeader();
+              }
+              await apiCallback();
+            } catch (error) {
+              throw error;
+            }
+          } else {
+            throw new Error('User is not authenticated');
+          }
+        },
+      };
+    },
+    {name: 'KQp5GHGV1etw', storage: createJSONStorage(() => AsyncStorage)},
   ),
 );
+
+export const useHydration = () => {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    // Note: This is just in case to take into account manual rehydration.
+    // Can remove the following line if not needed.
+    const unsubHydrate = useAuthStore.persist.onHydrate(() =>
+      setHydrated(false),
+    );
+
+    const unsubFinishHydration = useAuthStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+      unsubHydrate();
+      unsubFinishHydration();
+    });
+
+    setHydrated(useAuthStore.persist.hasHydrated());
+
+    return () => {
+      unsubHydrate();
+      unsubFinishHydration();
+    };
+  }, []);
+
+  return hydrated;
+};

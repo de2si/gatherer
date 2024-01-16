@@ -21,6 +21,9 @@ import FormTextInput from '@components/FormTextInput';
 // assets
 import Logo from '@assets/logo.png';
 
+// helpers
+import {getErrorMessage} from '@helpers/formHelpers';
+
 // types
 interface LoginForm {
   phoneNumber: string;
@@ -33,7 +36,7 @@ type LoginScreenProps = NativeStackScreenProps<
 
 const LoginScreen: React.FC<LoginScreenProps> = () => {
   const theme = useTheme();
-  const doLogin = useAuthStore(store => store.login);
+  const login = useAuthStore(store => store.login);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Login error');
 
@@ -58,9 +61,12 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    let loginResult = await doLogin(data.phoneNumber, data.password);
-    if (!loginResult.isSuccessful) {
-      showSnackbar(loginResult.errorMessage ?? 'Login error');
+    try {
+      await login(data.phoneNumber, data.password);
+    } catch (error) {
+      let message = getErrorMessage(error);
+      message = typeof message === 'string' ? message : message[0];
+      showSnackbar(message ?? 'Login error');
     }
   };
 

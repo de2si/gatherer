@@ -12,7 +12,7 @@ import MoreStack from '@nav/MoreStack';
 import PlaceholderScreen from '@screens/PlaceholderScreen';
 
 // hooks
-import {useAuthStore} from '@hooks/useAuthStore';
+import {useProfileStore} from '@hooks/useProfileStore';
 
 // define screen params
 export type BottomTabsNavProps = {
@@ -26,7 +26,7 @@ export type BottomTabsNavProps = {
 const BottomTabNav = createMaterialBottomTabNavigator<BottomTabsNavProps>();
 
 const BottomTabs = () => {
-  let userType = useAuthStore(store => store.user.userType);
+  let userType = useProfileStore(store => store.data.userType);
   const theme = useTheme();
   return (
     <BottomTabNav.Navigator
