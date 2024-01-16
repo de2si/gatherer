@@ -80,7 +80,9 @@ export const getErrorMessage = (error: unknown): string | string[] => {
       return `Request setup error: ${error.message}`;
     }
   } else {
-    return 'An unexpected error occurred.';
+    return error && typeof error === 'object' && 'message' in error
+      ? `${error.message}`
+      : 'An unexpected error occurred.';
   }
 };
 
@@ -94,6 +96,21 @@ export const getFieldErrors = (
     const fieldErrorMessage = errorMessageParts.join(':').trim();
     return {fieldName, fieldErrorMessage};
   });
+};
+
+// Utility function to check if an error is retryable
+export const isRetryableError = (error: unknown): boolean => {
+  if (error instanceof Error) {
+    // Check for common client or network-related errors
+    return (
+      error.message.includes('Network Error') ||
+      error.message.includes('timeout') ||
+      error.message.includes('ECONNABORTED') ||
+      // Add more conditions
+      false
+    );
+  }
+  return false;
 };
 
 interface LocationQueryParams {
