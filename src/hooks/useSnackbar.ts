@@ -1,17 +1,17 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 const useSnackbar = (initialMessage = 'Error') => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState(initialMessage);
 
-  const showSnackbar = (message: string) => {
+  const showSnackbar = useCallback((message: string) => {
     setSnackbarMessage(message);
     setSnackbarVisible(true);
-  };
+  }, []);
 
-  const dismissSnackbar = () => {
+  const dismissSnackbar = useCallback(() => {
     setSnackbarVisible(false);
-  };
+  }, []);
 
   return {
     snackbarVisible,

@@ -12,7 +12,7 @@ import {buildLocationFilterQueryParams} from '@helpers/formHelpers';
 
 // types
 import {Location} from '@hooks/locationHooks';
-import {ApiUserType} from '@hooks/useAuthStore';
+import {ApiUserType} from '@hooks/useProfileStore';
 import {ApiImage, LocationFilterGroup} from '@typedefs/common';
 
 export interface ApiFarmer {
