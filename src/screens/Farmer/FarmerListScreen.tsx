@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   IconButton,
+  Snackbar,
   Text,
   useTheme,
 } from 'react-native-paper';
@@ -19,16 +20,20 @@ import {FarmerStackScreenProps} from '@nav/FarmerStack';
 
 // store
 import {FarmerPreview, useFarmerStore} from '@hooks/useFarmerStore';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 // helpers
 import {areLocationFiltersEqual} from '@helpers/comparators';
+import {getErrorMessage} from '@helpers/formHelpers';
 
 // components
 import LocationFilterSheet, {
   locationFilterDefaultValues,
 } from '@components/LocationFilterSheet';
 import SearchSheet from '@components/SearchSheet';
-import {useAuthStore} from '@hooks/useAuthStore';
+
+// hooks
+import useSnackbar from '@hooks/useSnackbar';
 
 const farmerListHeaderRight = ({
   isFilterApplied,
@@ -110,7 +115,6 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const withAuth = useAuthStore(store => store.withAuth);
 
   const farmers = useFarmerStore(store => store.data);
-  const loading = useFarmerStore(store => store.loading);
   const fetchData = useFarmerStore(store => store.fetchData);
   const refresh = useFarmerStore(store => store.refresh);
   const setRefresh = useFarmerStore(store => store.setRefresh);
@@ -123,6 +127,9 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const [searchText, setSearchText] = useState('');
   const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [isSearchApplied, setIsSearchApplied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
+    useSnackbar('');
 
   const handleFilterPress = () => {
     setFilterBottomSheetVisible(true);
@@ -161,10 +168,16 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   useEffect(() => {
     const fetchProcessing = async () => {
       try {
-        await withAuth(async () => {
-          fetchData(filters, searchText);
-        });
-      } catch (error) {}
+        setLoading(true);
+        await withAuth(async () => fetchData(filters, searchText));
+      } catch (error) {
+        let message = getErrorMessage(error);
+        typeof message === 'string'
+          ? showSnackbar(message)
+          : showSnackbar('Error in getting farmers');
+      } finally {
+        setLoading(false);
+      }
       setIsSearchApplied(!!searchText.length);
       setIsFilterApplied(Object.values(filters).some(arr => arr.length > 0));
 
@@ -191,7 +204,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     ) {
       fetchProcessing();
     }
-  }, [fetchData, filters, searchText, refresh, withAuth]);
+  }, [fetchData, filters, searchText, refresh, withAuth, showSnackbar]);
 
   return (
     <View style={styles.container}>
@@ -232,6 +245,12 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
           '\n• Search using farmer code\n• Search using aadhaar no.\n• Search using name\n• Search using phone number'
         }
       />
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={dismissSnackbar}
+        duration={Snackbar.DURATION_SHORT}>
+        {snackbarMessage}
+      </Snackbar>
     </View>
   );
 };

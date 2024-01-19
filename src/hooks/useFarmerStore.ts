@@ -106,16 +106,13 @@ export const useFarmerStore = create<FarmerStore>((set, get) => ({
       const response = await api.get('farmers/', {
         params: queryParams,
       });
-      get().refresh
-        ? set({
-            data: response.data.map(transformApiFarmer),
-            refresh: false,
-          })
-        : set({data: response.data.map(transformApiFarmer)});
+      set({data: response.data.map(transformApiFarmer)});
     } catch (error) {
       throw error;
     } finally {
-      set({loading: false});
+      get().refresh
+        ? set({loading: false, refresh: false})
+        : set({loading: false});
     }
   },
 }));
