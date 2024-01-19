@@ -20,7 +20,11 @@ import {useProfileStore} from '@hooks/useProfileStore';
 import useSnackbar from '@hooks/useSnackbar';
 
 // helpers
-import {getErrorMessage, isRetryableError} from '@helpers/formHelpers';
+import {
+  getErrorMessage,
+  getFieldErrors,
+  isRetryableError,
+} from '@helpers/formHelpers';
 
 const AppNav = (): React.JSX.Element => {
   const [isProcessing, setIsProcessing] = useState(true);
@@ -28,13 +32,15 @@ const AppNav = (): React.JSX.Element => {
   const authenticated = useAuthStore(store => store.authenticated);
   const setApiAuthHeader = useAuthStore(store => store.setApiAuthHeader);
   const withAuth = useAuthStore(store => store.withAuth);
+  const logout = useAuthStore(store => store.logout);
+
+  let {hydrated} = useHydration();
 
   const fetchProfile = useProfileStore(store => store.fetchData);
   const loggedUser = useProfileStore(store => store.data);
 
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('');
-  let hydrated = useHydration();
 
   const init = useCallback(async () => {
     setIsProcessing(true);
@@ -45,16 +51,28 @@ const AppNav = (): React.JSX.Element => {
       }
     } catch (error) {
       let message = getErrorMessage(error);
-      typeof message === 'string'
-        ? showSnackbar(message)
-        : showSnackbar(message[0] ?? 'An unexpected error occurred.');
+      let messageToShow =
+        typeof message === 'string'
+          ? message
+          : getFieldErrors(message)[0]?.fieldErrorMessage ??
+            'An unexpected error occurred.';
+      showSnackbar(messageToShow);
       if (isRetryableError(error)) {
         setTimeout(init, 20000); // Retry in 20 seconds
+      } else {
+        setTimeout(logout, 2000); // Logout after 2 seconds
       }
     } finally {
       setIsProcessing(false);
     }
-  }, [authenticated, fetchProfile, setApiAuthHeader, showSnackbar, withAuth]);
+  }, [
+    authenticated,
+    fetchProfile,
+    logout,
+    setApiAuthHeader,
+    showSnackbar,
+    withAuth,
+  ]);
 
   useEffect(() => {
     init();

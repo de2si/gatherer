@@ -6,7 +6,6 @@ import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {isAxiosError} from 'axios';
 import {api} from '@api/axios';
 
 interface AuthState {
@@ -36,7 +35,7 @@ interface AuthStore extends AuthState {
   login: (phone_number: string, password: string) => Promise<void>;
   logout: () => void;
   setApiAuthHeader: () => void;
-  withAuth: (apiCallback: () => any) => Promise<any>;
+  withAuth: (apiCallback: () => Promise<void>) => Promise<void>;
 }
 
 // Create the store
@@ -62,9 +61,6 @@ export const useAuthStore = create(
             await api.post('api/token/verify/', {token: get().data.access});
             return true;
           } catch (error) {
-            if (isAxiosError(error) && error.request) {
-              throw error;
-            }
             return false;
           }
         },
@@ -149,5 +145,5 @@ export const useHydration = () => {
     };
   }, []);
 
-  return hydrated;
+  return {hydrated};
 };
