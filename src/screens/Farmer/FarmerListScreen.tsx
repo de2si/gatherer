@@ -169,7 +169,9 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     const fetchProcessing = async () => {
       try {
         setLoading(true);
-        await withAuth(async () => fetchData(filters, searchText));
+        await withAuth(async () => {
+          await fetchData(filters, searchText);
+        });
       } catch (error) {
         let message = getErrorMessage(error);
         typeof message === 'string'
