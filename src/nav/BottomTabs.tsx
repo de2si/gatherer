@@ -26,7 +26,7 @@ export type BottomTabsNavProps = {
 const BottomTabNav = createMaterialBottomTabNavigator<BottomTabsNavProps>();
 
 const BottomTabs = () => {
-  let userType = useProfileStore(store => store.data.userType);
+  let loggedUser = useProfileStore(store => store.data);
   const theme = useTheme();
   return (
     <BottomTabNav.Navigator
@@ -44,7 +44,7 @@ const BottomTabs = () => {
         initialParams={{name: 'Project'}}
         options={{tabBarIcon: 'ruler-square-compass', title: 'Projects'}}
       />
-      {userType !== 'SURVEYOR' && (
+      {loggedUser.userType !== 'SURVEYOR' && (
         <BottomTabNav.Screen
           name="User"
           component={PlaceholderScreen}
