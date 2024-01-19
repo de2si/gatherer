@@ -52,6 +52,7 @@ import {FormImage} from '@typedefs/common';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 const transformToLabelValuePair = (
   originalArray: readonly string[],
@@ -245,6 +246,8 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
   const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
 
   const theme = useTheme();
+  const withAuth = useAuthStore(store => store.withAuth);
+
   const [loading, setLoading] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Error');
@@ -318,36 +321,48 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
     try {
       setLoading(true);
       if (variant === 'add') {
-        const result = await api.post(
-          'farmers/',
-          prepareAddFormData(formData as FarmerAddForm),
-        );
-        if (result.status === 201) {
-          reset(farmerAddDefaultValues);
-          showSnackbar('Farmer added successfully');
-          setRefresh();
-          setTimeout(() => {
-            navigation.replace('FarmerDetail', {
-              id: result.data.farmer_id,
-              farmer: result.data,
-            });
-          }, 2000);
-        }
+        await withAuth(async () => {
+          try {
+            const result = await api.post(
+              'farmers/',
+              prepareAddFormData(formData as FarmerAddForm),
+            );
+            if (result.status === 201) {
+              reset(farmerAddDefaultValues);
+              showSnackbar('Farmer added successfully');
+              setRefresh();
+              setTimeout(() => {
+                navigation.replace('FarmerDetail', {
+                  id: result.data.farmer_id,
+                  farmer: result.data,
+                });
+              }, 2000);
+            }
+          } catch (error) {
+            throw error;
+          }
+        });
       } else if (variant === 'edit' && farmer) {
-        const result = await api.patch(
-          `farmers/${farmer.farmer_id}/`,
-          prepareEditFormData(formData, defaultValues as FarmerBasicForm),
-        );
-        if (result.status === 200) {
-          showSnackbar('Farmer updated successfully');
-          setRefresh();
-          setTimeout(() => {
-            navigation.navigate('FarmerDetail', {
-              id: result.data.farmer_id,
-              farmer: result.data,
-            });
-          }, 2000);
-        }
+        await withAuth(async () => {
+          try {
+            const result = await api.patch(
+              `farmers/${farmer.farmer_id}/`,
+              prepareEditFormData(formData, defaultValues as FarmerBasicForm),
+            );
+            if (result.status === 200) {
+              showSnackbar('Farmer updated successfully');
+              setRefresh();
+              setTimeout(() => {
+                navigation.navigate('FarmerDetail', {
+                  id: result.data.farmer_id,
+                  farmer: result.data,
+                });
+              }, 2000);
+            }
+          } catch (error) {
+            throw error;
+          }
+        });
       }
     } catch (error) {
       const errorMessage = getErrorMessage(error);

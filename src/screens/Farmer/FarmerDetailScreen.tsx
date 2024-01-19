@@ -31,6 +31,7 @@ import {ApiFarmer} from '@hooks/useFarmerStore';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 type FarmerDetailScreenProps = NativeStackScreenProps<
   FarmerStackScreenProps,
@@ -90,6 +91,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
   navigation,
 }) => {
   const theme = useTheme();
+  const withAuth = useAuthStore(store => store.withAuth);
   const [loading, setLoading] = useState(false);
   const [farmer, setFarmer] = useState<ApiFarmer>();
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
@@ -115,10 +117,16 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
       }
       setLoading(true);
       try {
-        const response = await api.get(`farmers/${id}/`);
-        if (response.data) {
-          setFarmer(response.data);
-        }
+        await withAuth(async () => {
+          try {
+            const response = await api.get(`farmers/${id}/`);
+            if (response.data) {
+              setFarmer(response.data);
+            }
+          } catch (error) {
+            throw error;
+          }
+        });
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         typeof errorMessage === 'string'

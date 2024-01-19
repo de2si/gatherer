@@ -1,5 +1,5 @@
 import {StyleSheet, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   FormSelectInput,
   FormSelectInputProps,
@@ -13,6 +13,7 @@ import {
   useStateStore,
   useVillageStore,
 } from '@hooks/locationHooks';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 type LocationSelectProps<TForm extends FieldValues = any> = Omit<
   FormSelectInputProps<Location, TForm>,
@@ -71,9 +72,12 @@ const populateData = async (
     (value: React.SetStateAction<Location[]>): void;
     (arg0: Location[]): void;
   },
+  withAuth: (apiCallback: () => Promise<void>) => Promise<void>,
 ) => {
   try {
-    await fetchFn(codes);
+    await withAuth(async () => {
+      await fetchFn(codes);
+    });
     const tempData = getData(codes);
     setLocalData(tempData);
   } catch (error) {
@@ -85,13 +89,20 @@ const FormStateSelectInput = <TFieldValues extends FieldValues>({
   codes: _codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
+  const withAuth = useAuthStore(store => store.withAuth);
   const isLoading = useStateStore(state => state.loading);
   const data = useStateStore(state => state.data);
   const fetchFn = useStateStore(state => state.fetchData);
 
+  const fetchStates = useCallback(async () => {
+    try {
+      await withAuth(fetchFn);
+    } catch (error) {}
+  }, [fetchFn, withAuth]);
+
   useEffect(() => {
-    fetchFn();
-  }, [fetchFn]);
+    fetchStates();
+  }, [fetchStates]);
 
   return (
     <RenderLocationSelectInput
@@ -107,14 +118,16 @@ const FormDistrictSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
+  const withAuth = useAuthStore(store => store.withAuth);
+
   const isLoading = useDistrictStore(state => state.loading);
   const getData = useDistrictStore(state => state.getItemsByCodes);
   const fetchFn = useDistrictStore(state => state.fetchData);
   const [localData, setLocalData] = useState<Location[]>([]);
 
   useEffect(() => {
-    populateData(codes, fetchFn, getData, setLocalData);
-  }, [codes, fetchFn, getData]);
+    populateData(codes, fetchFn, getData, setLocalData, withAuth);
+  }, [codes, fetchFn, getData, withAuth]);
 
   return (
     <RenderLocationSelectInput
@@ -130,14 +143,16 @@ const FormBlockSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
+  const withAuth = useAuthStore(store => store.withAuth);
+
   const isLoading = useBlockStore(state => state.loading);
   const getData = useBlockStore(state => state.getItemsByCodes);
   const fetchFn = useBlockStore(state => state.fetchData);
   const [localData, setLocalData] = useState<Location[]>([]);
 
   useEffect(() => {
-    populateData(codes, fetchFn, getData, setLocalData);
-  }, [codes, fetchFn, getData]);
+    populateData(codes, fetchFn, getData, setLocalData, withAuth);
+  }, [codes, fetchFn, getData, withAuth]);
 
   return (
     <RenderLocationSelectInput
@@ -153,14 +168,16 @@ const FormVillageSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
+  const withAuth = useAuthStore(store => store.withAuth);
+
   const isLoading = useVillageStore(state => state.loading);
   const getData = useVillageStore(state => state.getItemsByCodes);
   const fetchFn = useVillageStore(state => state.fetchData);
   const [localData, setLocalData] = useState<Location[]>([]);
 
   useEffect(() => {
-    populateData(codes, fetchFn, getData, setLocalData);
-  }, [codes, fetchFn, getData]);
+    populateData(codes, fetchFn, getData, setLocalData, withAuth);
+  }, [codes, fetchFn, getData, withAuth]);
 
   return (
     <RenderLocationSelectInput

@@ -28,6 +28,7 @@ import LocationFilterSheet, {
   locationFilterDefaultValues,
 } from '@components/LocationFilterSheet';
 import SearchSheet from '@components/SearchSheet';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 const farmerListHeaderRight = ({
   isFilterApplied,
@@ -106,6 +107,8 @@ type FarmerListScreenProps = NativeStackScreenProps<
 >;
 
 const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
+  const withAuth = useAuthStore(store => store.withAuth);
+
   const farmers = useFarmerStore(store => store.data);
   const loading = useFarmerStore(store => store.loading);
   const fetchData = useFarmerStore(store => store.fetchData);
@@ -157,7 +160,11 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const prevFilters = useRef({...filters});
   useEffect(() => {
     const fetchProcessing = async () => {
-      await fetchData(filters, searchText);
+      try {
+        await withAuth(async () => {
+          fetchData(filters, searchText);
+        });
+      } catch (error) {}
       setIsSearchApplied(!!searchText.length);
       setIsFilterApplied(Object.values(filters).some(arr => arr.length > 0));
 
@@ -184,7 +191,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     ) {
       fetchProcessing();
     }
-  }, [fetchData, filters, searchText, refresh]);
+  }, [fetchData, filters, searchText, refresh, withAuth]);
 
   return (
     <View style={styles.container}>
