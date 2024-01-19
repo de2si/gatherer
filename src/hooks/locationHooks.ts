@@ -25,10 +25,9 @@ function createLocationStore(baseWord: string, parentBaseWord: string) {
     data: {},
     loading: false,
     fetchData: async (codes: number[]) => {
-      try {
-        set({loading: true});
-
-        if (codes && codes.length > 0) {
+      if (codes && codes.length > 0) {
+        try {
+          set({loading: true});
           const existingData = get().data;
 
           const missingCodes = codes.filter(
@@ -52,11 +51,11 @@ function createLocationStore(baseWord: string, parentBaseWord: string) {
               ...updates,
             },
           });
+        } catch (error) {
+          throw error;
+        } finally {
+          set({loading: false});
         }
-      } catch (error) {
-        console.error(`Error fetching ${baseWord}:`, error);
-      } finally {
-        set({loading: false});
       }
     },
     getItemsByCodes: (codes: number[]) => {
@@ -84,10 +83,9 @@ export const useStateStore = create<StateStore>(set => ({
     try {
       set({loading: true});
       const response = await api.get('states-directory/');
-      const fetchedStates = response.data.statesDirectory;
-      set({data: fetchedStates});
+      set({data: response.data.statesDirectory});
     } catch (error) {
-      console.error('Error fetching states:', error);
+      throw error;
     } finally {
       set({loading: false});
     }

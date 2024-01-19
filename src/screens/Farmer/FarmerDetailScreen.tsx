@@ -23,7 +23,7 @@ import {FarmerStackScreenProps} from '@nav/FarmerStack';
 import {api} from '@api/axios';
 
 // helpers
-import {getErrorMessage} from '@helpers/formHelpers';
+import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
 import {formatDate, formatPhoneNumber} from '@helpers/formatters';
 
 // types
@@ -131,7 +131,10 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
         const errorMessage = getErrorMessage(error);
         typeof errorMessage === 'string'
           ? showSnackbar(errorMessage)
-          : showSnackbar('Error in fetching farmer details');
+          : showSnackbar(
+              getFieldErrors(errorMessage)[0].fieldErrorMessage ??
+                'Error in fetching farmer details',
+            );
       } finally {
         setLoading(false);
       }

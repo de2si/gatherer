@@ -75,9 +75,11 @@ export const useProfileStore = create<ProfileStore>(set => ({
     try {
       set({loading: true});
       const response = await api.get('users/profile/');
-      set({data: transformApiUser(response.data), loading: false});
+      set({data: transformApiUser(response.data)});
     } catch (error) {
       throw error;
+    } finally {
+      set({loading: false});
     }
   },
   reset: () => {

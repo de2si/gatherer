@@ -97,18 +97,25 @@ export const useFarmerStore = create<FarmerStore>((set, get) => ({
     locationFilters: LocationFilterGroup = locationFilterDefaultValues,
     searchText: string = '',
   ) => {
-    set({loading: true});
     const queryParams = {
       ...buildLocationFilterQueryParams(locationFilters),
       ...buildSearchQueryParams(searchText),
     };
-
-    const response = await api.get('farmers/', {
-      params: queryParams,
-    });
-    set({data: response.data.map(transformApiFarmer), loading: false});
-    if (get().refresh) {
-      set({refresh: false});
+    try {
+      set({loading: true});
+      const response = await api.get('farmers/', {
+        params: queryParams,
+      });
+      get().refresh
+        ? set({
+            data: response.data.map(transformApiFarmer),
+            refresh: false,
+          })
+        : set({data: response.data.map(transformApiFarmer)});
+    } catch (error) {
+      throw error;
+    } finally {
+      set({loading: false});
     }
   },
 }));
