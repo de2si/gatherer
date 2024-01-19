@@ -90,6 +90,7 @@ const SearchSheet = ({
                 onChangeText={onChangeSearch}
                 right={renderSearchButton}
                 onBlur={onSubmit}
+                autoFocus={true}
               />
               <HelperText
                 type="info"
