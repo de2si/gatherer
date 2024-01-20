@@ -136,9 +136,11 @@ const FormImageInput = <TFieldValues extends FieldValues>({
     }
   };
 
+  const imageBorderRadiusStyle =
+    variant === 'square' ? {borderRadius: theme.roundness} : styles.roundBorder;
   const imageBoundaryStyle =
     variant === 'square'
-      ? styles.imageBoundarySquare
+      ? {...styles.imageBoundarySquare, borderRadius: theme.roundness}
       : styles.imageBoundaryRound;
   const placeholderBorderStyle =
     border === 'dashed' ? styles.dashedBorder : null;
@@ -151,7 +153,14 @@ const FormImageInput = <TFieldValues extends FieldValues>({
         onPress={handleImageContainerPress}
         style={styles.centeredContainer}>
         {value && value.uri ? (
-          <Image source={{uri: value.uri}} style={imageBoundaryStyle} />
+          <View
+            style={[
+              styles.thinBorder,
+              imageBorderRadiusStyle,
+              {borderColor: theme.colors.outline},
+            ]}>
+            <Image source={{uri: value.uri}} style={imageBoundaryStyle} />
+          </View>
         ) : (
           <View
             style={[
@@ -238,11 +247,16 @@ const styles = StyleSheet.create({
   imageBoundarySquare: {
     width: 120,
     height: 120,
-    borderRadius: 4,
   },
   dashedBorder: {
     borderStyle: 'dashed',
     borderWidth: 1,
+  },
+  thinBorder: {
+    borderWidth: 1,
+  },
+  roundBorder: {
+    borderRadius: 50,
   },
   imagePlaceholderContent: {
     justifyContent: 'center',
