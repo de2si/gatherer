@@ -25,16 +25,13 @@ export const isUri = (value: string) => {
   }
 };
 
-export const isAdult = (value: Date | string) => {
+export const isValidAge = (value: Date | string) => {
   const birthDate = new Date(value);
   const currentDate = new Date();
-  const age = currentDate.getFullYear() - birthDate.getFullYear();
-  const isAtLeast18 =
-    age >= 18 ||
-    (age === 17 &&
-      currentDate.getMonth() >= birthDate.getMonth() &&
-      currentDate.getDate() >= birthDate.getDate());
-  return isAtLeast18;
+  const ageInYears =
+    (currentDate.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+  // Returns true if age between 0 and 125
+  return ageInYears >= 0 && ageInYears <= 125;
 };
 
 export const imageValidator = Yup.object().shape({

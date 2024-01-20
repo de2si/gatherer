@@ -8,7 +8,7 @@ const calculateMD5Hash = (base64String: string | null): string | null => {
     }
     return null;
   } catch (error) {
-    console.error('Error computing hash:', error);
+    // console.error('Error computing hash:', error);
     return null;
   }
 };
@@ -31,7 +31,7 @@ const calculateHash = (
     }
     return null;
   } catch (error) {
-    console.error('Error computing hash:', error);
+    // console.error('Error computing hash:', error);
     return null;
   }
 };
