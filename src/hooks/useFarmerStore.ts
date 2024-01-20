@@ -20,7 +20,13 @@ export interface ApiFarmer {
   profile_photo: ApiImage;
   id_front_image: ApiImage;
   id_back_image: ApiImage;
-  village: Location;
+  village: Location & {
+    block: Location & {
+      district: Location & {
+        state: Location;
+      };
+    };
+  };
   added_by: ApiUserType;
   last_edited_by: ApiUserType;
   land_parcels: [];
@@ -66,7 +72,7 @@ const transformApiFarmer = (apiResponse: ApiFarmer): FarmerPreview => {
     name: apiResponse.name,
     photo: apiResponse.profile_photo,
     code: 'AA9854',
-    village: apiResponse.village,
+    village: {name: apiResponse.village.name, code: apiResponse.village.code},
     guardian: apiResponse.guardian_name,
     phone: maskPhoneNumber(apiResponse.phone_number),
   };

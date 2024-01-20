@@ -78,10 +78,13 @@ const FieldItem = ({
 );
 
 const FieldThumbnail = ({url, theme}: {url: string; theme: MD3Theme}) => (
-  <Image
-    source={{uri: url}}
-    style={[styles.imageThumbnail, {borderColor: theme.colors.outline}]}
-  />
+  <View
+    style={[
+      styles.thinBorder,
+      {borderColor: theme.colors.outline, borderRadius: theme.roundness},
+    ]}>
+    <Image source={{uri: url}} style={styles.imageThumbnail} />
+  </View>
 );
 
 const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
@@ -190,6 +193,10 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                   <Avatar.Image
                     source={{uri: farmer.profile_photo.url}}
                     size={120}
+                    style={[
+                      styles.thinBorder,
+                      {borderColor: theme.colors.outline},
+                    ]}
                   />
                   <Text
                     variant="titleLarge"
@@ -218,6 +225,21 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
             </List.Section>
             <Divider />
             <List.Section>
+              <FieldItem
+                label="State"
+                value={farmer.village.block.district.state.name}
+                theme={theme}
+              />
+              <FieldItem
+                label="District"
+                value={farmer.village.block.district.name}
+                theme={theme}
+              />
+              <FieldItem
+                label="Block"
+                value={farmer.village.block.name}
+                theme={theme}
+              />
               <FieldItem
                 label="Village"
                 value={farmer.village.name}
@@ -300,7 +322,8 @@ const styles = StyleSheet.create({
   imageThumbnail: {
     width: 100,
     height: 100,
-    borderRadius: 4,
+  },
+  thinBorder: {
     borderWidth: 1,
   },
 });

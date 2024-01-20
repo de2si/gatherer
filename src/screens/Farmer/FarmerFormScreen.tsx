@@ -28,7 +28,7 @@ import {
 
 // helpers
 import {calculateHash} from '@helpers/cryptoHelpers';
-import {imageValidator, isAdult, nameValidator} from '@helpers/validators';
+import {imageValidator, isValidAge, nameValidator} from '@helpers/validators';
 import {add91Prefix, formatDate, remove91Prefix} from '@helpers/formatters';
 import {
   formatToUrlKey,
@@ -87,26 +87,40 @@ interface FarmerAddForm extends FarmerBasicForm {
 const farmerBasicSchema: Yup.ObjectSchema<FarmerBasicForm> = Yup.object().shape(
   {
     profile_photo: imageValidator.required('Profile photo is required'),
-    id_front_image: imageValidator.required('Aadhaar front image is required'),
-    id_back_image: imageValidator.required('Aadhaar back image is required'),
+    id_front_image: imageValidator
+      .required('Aadhaar front image is required')
+      .test('front-image-unique', 'Duplicate image', function (value) {
+        return (
+          value.hash !== this.parent.profile_photo.hash &&
+          value.hash !== this.parent.id_back_image.hash
+        );
+      }),
+    id_back_image: imageValidator
+      .required('Aadhaar back image is required')
+      .test('back-image-unique', 'Duplicate image', function (value) {
+        return (
+          value.hash !== this.parent.profile_photo.hash &&
+          value.hash !== this.parent.id_front_image.hash
+        );
+      }),
     state: Yup.number()
       .required('State is required')
       .positive('State code must be positive'),
     district: Yup.number()
       .required('District is required')
-      .positive('District code must be positive'),
+      .positive('District code must be valid'),
     block: Yup.number()
       .required('Block is required')
-      .positive('Block code must be positive'),
+      .positive('Block code must be valid'),
     village: Yup.number()
       .required('Village is required')
-      .positive('Village code must be positive'),
+      .positive('Village code must be valid'),
     name: nameValidator,
     guardian_name: nameValidator,
     date_of_birth: Yup.date()
       .required('Date of Birth is required')
       .max(new Date(), 'Date of Birth cannot be in the future')
-      .test('is-adult', 'Farmer must be at least 18 years old', isAdult),
+      .test('is-valid-age', 'Date of Birth must be valid', isValidAge),
     phone_number: Yup.string()
       .required('Phone number is required')
       .matches(/^[6-9]\d{9}$/, 'Invalid phone number'),
@@ -168,10 +182,10 @@ const getFarmerEditDefaultValues = ({
     id_back_image: {uri: id_back_image.url, hash: id_back_image.hash},
     date_of_birth: new Date(date_of_birth),
     phone_number: remove91Prefix(phone_number),
+    state: village.block.district.state.code,
+    district: village.block.district.code,
+    block: village.block.code,
     village: village.code,
-    state: 0,
-    district: 0,
-    block: 0,
     name,
     guardian_name,
     gender,
@@ -267,6 +281,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
     watch,
     reset,
     setError,
+    setValue,
     formState: {errors},
   } = useForm<FarmerFormType>({
     defaultValues,
@@ -274,6 +289,36 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
       variant === 'add' ? farmerAddSchema : farmerBasicSchema,
     ),
   });
+
+  const state = watch('state');
+  const district = watch('district');
+  const block = watch('block');
+  const initialStateChanged = useRef(false);
+  const initialDistrictChanged = useRef(false);
+  const initialBlockChanged = useRef(false);
+  useEffect(() => {
+    if (initialStateChanged.current) {
+      setValue('district', 0);
+    } else {
+      initialStateChanged.current = true;
+    }
+  }, [setValue, state]);
+
+  useEffect(() => {
+    if (initialDistrictChanged.current) {
+      setValue('block', 0);
+    } else {
+      initialDistrictChanged.current = true;
+    }
+  }, [setValue, district]);
+
+  useEffect(() => {
+    if (initialBlockChanged.current) {
+      setValue('village', 0);
+    } else {
+      initialBlockChanged.current = true;
+    }
+  }, [setValue, block]);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const layoutPosY = useRef<Record<string, number>>({});
