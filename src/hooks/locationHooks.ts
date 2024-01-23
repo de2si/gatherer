@@ -41,7 +41,12 @@ function createLocationStore(baseWord: string, parentBaseWord: string) {
               const response = await api.get(
                 `${parentBaseWord}-directory/${code}/${baseWord}-directory/`,
               );
-              updates[code] = response.data[`${baseWord}Directory`];
+              updates[code] = response.data[`${baseWord}Directory`].map(
+                (item: Location) => ({
+                  code: item.code,
+                  name: `${item.code} - ${item.name}`,
+                }),
+              );
             }),
           );
 
@@ -83,7 +88,12 @@ export const useStateStore = create<StateStore>(set => ({
     try {
       set({loading: true});
       const response = await api.get('states-directory/');
-      set({data: response.data.statesDirectory});
+      set({
+        data: response.data.statesDirectory.map((item: Location) => ({
+          code: item.code,
+          name: `${item.code} - ${item.name}`,
+        })),
+      });
     } catch (error) {
       throw error;
     } finally {

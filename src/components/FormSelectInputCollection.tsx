@@ -29,9 +29,7 @@ type LocationSelectProps<TForm extends FieldValues = any> = Omit<
 const RenderLocationItem = (item: Location) => {
   return (
     <View style={styles.item}>
-      <Text>
-        {item.code} - {item.name}
-      </Text>
+      <Text>{item.name}</Text>
     </View>
   );
 };
@@ -55,6 +53,7 @@ const RenderLocationSelectInput = <TFieldValues extends FieldValues>({
     data,
     labelField: 'name' as const,
     valueField: 'code' as const,
+    searchField: 'name' as const,
     placeholder: placeholder,
     renderItem: RenderLocationItem,
   };
