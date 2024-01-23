@@ -1,11 +1,13 @@
 import {StyleSheet, View} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
+import {Text} from 'react-native-paper';
+
+import {FieldValues} from 'react-hook-form';
 import {
   FormSelectInput,
   FormSelectInputProps,
 } from '@components/FormSelectInput';
-import {FieldValues} from 'react-hook-form';
-import {Text} from 'react-native-paper';
+
 import {
   Location,
   useBlockStore,
@@ -14,6 +16,8 @@ import {
   useVillageStore,
 } from '@hooks/locationHooks';
 import {useAuthStore} from '@hooks/useAuthStore';
+
+import {arraysEqual} from '@helpers/comparators';
 
 type LocationSelectProps<TForm extends FieldValues = any> = Omit<
   FormSelectInputProps<Location, TForm>,
@@ -64,34 +68,50 @@ const RenderLocationSelectInput = <TFieldValues extends FieldValues>({
   );
 };
 
-const populateData = async (
-  codes: number[],
-  fetchFn: (codes: number[]) => Promise<void>,
+const usePopulateData = (
   getData: (codes: number[]) => Location[],
-  setLocalData: {
-    (value: React.SetStateAction<Location[]>): void;
-    (arg0: Location[]): void;
-  },
-  setLoading: {
-    (value: React.SetStateAction<boolean>): void;
-    (arg0: boolean): void;
-  },
-  withAuth: (apiCallback: () => Promise<void>) => Promise<void>,
+  fetchFn: (codes: number[]) => Promise<void>,
 ) => {
-  try {
-    setLoading(true);
-    if (codes.length) {
-      await withAuth(async () => {
-        await fetchFn(codes);
-      });
-      setLocalData(getData(codes));
-    } else {
-      setLocalData([]);
+  const withAuth = useAuthStore(store => store.withAuth);
+  const [loading, setLoading] = useState(false);
+  const [localData, setLocalData] = useState<Location[]>([]);
+  const [codes, setCodes] = useState<number[]>([]);
+
+  const updateCodes = useCallback(
+    (newCodes: number[]) => {
+      if (!arraysEqual(codes, newCodes)) {
+        setCodes(newCodes);
+      }
+    },
+    [codes],
+  );
+
+  const populateData = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (codes.length) {
+        await withAuth(async () => {
+          await fetchFn(codes);
+        });
+        setLocalData(getData(codes));
+      } else {
+        setLocalData([]);
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-  } finally {
-    setLoading(false);
-  }
+  }, [codes, fetchFn, getData, withAuth]);
+
+  useEffect(() => {
+    populateData();
+  }, [populateData]);
+
+  return {
+    loading,
+    localData,
+    updateCodes,
+  };
 };
 
 const FormStateSelectInput = <TFieldValues extends FieldValues>({
@@ -131,16 +151,11 @@ const FormDistrictSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
-  const withAuth = useAuthStore(store => store.withAuth);
-
   const getData = useDistrictStore(state => state.getItemsByCodes);
   const fetchFn = useDistrictStore(state => state.fetchData);
-  const [loading, setLoading] = useState(false);
-  const [localData, setLocalData] = useState<Location[]>([]);
 
-  useEffect(() => {
-    populateData(codes, fetchFn, getData, setLocalData, setLoading, withAuth);
-  }, [codes, fetchFn, getData, withAuth]);
+  const {loading, localData, updateCodes} = usePopulateData(getData, fetchFn);
+  updateCodes(codes);
 
   return (
     <RenderLocationSelectInput
@@ -156,17 +171,11 @@ const FormBlockSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
-  const withAuth = useAuthStore(store => store.withAuth);
-
   const getData = useBlockStore(state => state.getItemsByCodes);
   const fetchFn = useBlockStore(state => state.fetchData);
-  const [loading, setLoading] = useState(false);
-  const [localData, setLocalData] = useState<Location[]>([]);
 
-  useEffect(() => {
-    populateData(codes, fetchFn, getData, setLocalData, setLoading, withAuth);
-  }, [codes, fetchFn, getData, withAuth]);
-
+  const {loading, localData, updateCodes} = usePopulateData(getData, fetchFn);
+  updateCodes(codes);
   return (
     <RenderLocationSelectInput
       data={localData}
@@ -181,16 +190,11 @@ const FormVillageSelectInput = <TFieldValues extends FieldValues>({
   codes = [],
   ...props
 }: LocationSelectProps<TFieldValues>) => {
-  const withAuth = useAuthStore(store => store.withAuth);
-
   const getData = useVillageStore(state => state.getItemsByCodes);
   const fetchFn = useVillageStore(state => state.fetchData);
-  const [loading, setLoading] = useState(false);
-  const [localData, setLocalData] = useState<Location[]>([]);
 
-  useEffect(() => {
-    populateData(codes, fetchFn, getData, setLocalData, setLoading, withAuth);
-  }, [codes, fetchFn, getData, withAuth]);
+  const {loading, localData, updateCodes} = usePopulateData(getData, fetchFn);
+  updateCodes(codes);
 
   return (
     <RenderLocationSelectInput

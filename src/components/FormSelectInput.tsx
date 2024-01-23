@@ -120,6 +120,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     searchPlaceholder,
     backgroundColor,
     valueField,
+    inverted,
     ...remainingSelectProps
   } = selectProps;
 
@@ -173,6 +174,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
       ListFooterComponent: <RenderFooter isLoading={loading} />,
       ...(flatListProps ?? {}),
     },
+    inverted: inverted ? inverted : false,
   };
   let singleSelectProps = {
     onChange: (item: T) => {
