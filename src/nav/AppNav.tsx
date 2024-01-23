@@ -9,7 +9,7 @@ import {Portal, Snackbar} from 'react-native-paper';
 // navigation
 import {NavigationContainer} from '@react-navigation/native';
 import AuthStack from '@nav/AuthStack';
-import BottomTabs from '@nav/BottomTabs';
+import AppStack from '@nav/AppStack';
 
 // screens
 import SplashScreen from '@screens/SplashScreen';
@@ -95,7 +95,7 @@ const AppNav = (): React.JSX.Element => {
   }
   return (
     <NavigationContainer>
-      {authenticated && loggedUser.phoneNumber ? <BottomTabs /> : <AuthStack />}
+      {authenticated && loggedUser.phoneNumber ? <AppStack /> : <AuthStack />}
       <Portal>
         <Snackbar
           visible={snackbarVisible}

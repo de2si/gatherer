@@ -565,29 +565,21 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             name="district"
             control={control}
             variant="single"
-            codes={
-              watch('state') ? [watch('state') as number] : ([] as number[])
-            }
+            codes={state ? [state] : []}
             onLayout={handleLayout}
           />
           <FormBlockSelectInput
             name="block"
             control={control}
             variant="single"
-            codes={
-              watch('district')
-                ? [watch('district') as number]
-                : ([] as number[])
-            }
+            codes={district ? [district] : []}
             onLayout={handleLayout}
           />
           <FormVillageSelectInput
             name="village"
             control={control}
             variant="single"
-            codes={
-              watch('block') ? [watch('block') as number] : ([] as number[])
-            }
+            codes={block ? [block] : []}
             onLayout={handleLayout}
           />
           <FormTextInput
