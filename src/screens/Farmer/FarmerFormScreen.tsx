@@ -1,15 +1,9 @@
 // FarmerFormScreen.tsx
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {
-  ActivityIndicator,
-  Button,
-  Portal,
-  Snackbar,
-  Text,
-  useTheme,
-} from 'react-native-paper';
+import {Button, Portal, Snackbar, Text, useTheme} from 'react-native-paper';
+import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
 import * as Yup from 'yup';
@@ -41,7 +35,9 @@ import {areDatesEqual, areObjectsEqual} from '@helpers/comparators';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
+import {useFormErrorScroll} from '@hooks/useFormErrorScroll';
 import {ApiFarmer, useFarmerStore} from '@hooks/useFarmerStore';
+import {useAuthStore} from '@hooks/useAuthStore';
 
 // api
 import {api} from '@api/axios';
@@ -52,7 +48,6 @@ import {FormImage} from '@typedefs/common';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
-import {useAuthStore} from '@hooks/useAuthStore';
 
 const transformToLabelValuePair = (
   originalArray: readonly string[],
@@ -90,6 +85,7 @@ const farmerBasicSchema: Yup.ObjectSchema<FarmerBasicForm> = Yup.object().shape(
     id_front_image: imageValidator
       .required('Aadhaar front image is required')
       .test('front-image-unique', 'Duplicate image', function (value) {
+        if (!value.hash) return true;
         return (
           value.hash !== this.parent.profile_photo.hash &&
           value.hash !== this.parent.id_back_image.hash
@@ -98,6 +94,7 @@ const farmerBasicSchema: Yup.ObjectSchema<FarmerBasicForm> = Yup.object().shape(
     id_back_image: imageValidator
       .required('Aadhaar back image is required')
       .test('back-image-unique', 'Duplicate image', function (value) {
+        if (!value.hash) return true;
         return (
           value.hash !== this.parent.profile_photo.hash &&
           value.hash !== this.parent.id_front_image.hash
@@ -159,7 +156,7 @@ const farmerAddDefaultValues: Partial<FarmerAddForm> = {
   phone_number: '',
   gender: 'MALE' as const,
   address: '',
-  income_level: '30-50k' as const,
+  income_level: '30k-50k' as const,
   category: 'GENERAL' as const,
 };
 const getFarmerEditDefaultValues = ({
@@ -320,36 +317,22 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
     }
   }, [setValue, block]);
 
-  const scrollViewRef = useRef<ScrollView>(null);
-  const layoutPosY = useRef<Record<string, number>>({});
-  const fieldOrder = useRef<string[]>([]);
-  const handleLayout = ({name, y}: {name: string; y: number}) => {
-    layoutPosY.current[name] = y;
-    if (!fieldOrder.current.includes(name)) {
-      fieldOrder.current.push(name);
-    }
-  };
-
-  const scrollToFirstError = useCallback(() => {
-    for (let fieldName of fieldOrder.current) {
-      if (fieldName in errors) {
-        scrollViewRef.current?.scrollTo({
-          y: layoutPosY.current[fieldName],
-          animated: true,
-        });
-        break;
-      }
-    }
-  }, [errors]);
+  const {
+    scrollViewRef,
+    fieldOrder,
+    handleLayout,
+    manualScroll,
+    setManualScroll,
+    scrollToFirstError,
+  } = useFormErrorScroll();
 
   useEffect(() => {
-    scrollToFirstError();
+    scrollToFirstError(errors);
   }, [errors, scrollToFirstError]);
 
-  const [manualScroll, setManualScroll] = useState(false);
   useEffect(() => {
     if (manualScroll) {
-      scrollToFirstError();
+      scrollToFirstError(errors);
       setManualScroll(false);
     }
   }, [errors, manualScroll, scrollToFirstError]);
@@ -388,11 +371,17 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
           }
         });
       } else if (variant === 'edit' && farmer) {
+        const dataToUpdate = prepareEditFormData(
+          formData,
+          defaultValues as FarmerBasicForm,
+        );
+        if (!Object.keys(dataToUpdate).length)
+          throw new Error('No changes made');
         await withAuth(async () => {
           try {
             const result = await api.patch(
               `farmers/${farmer.farmer_id}/`,
-              prepareEditFormData(formData, defaultValues as FarmerBasicForm),
+              dataToUpdate,
             );
             if (result.status === 200) {
               showSnackbar('Farmer updated successfully');
@@ -597,20 +586,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             Submit
           </Button>
         </View>
-        <Portal>
-          {loading && (
-            <View style={StyleSheet.absoluteFill}>
-              <ActivityIndicator
-                style={[
-                  styles.loadingIndicator,
-                  {backgroundColor: theme.colors.backdrop},
-                ]}
-                size="large"
-                animating={true}
-              />
-            </View>
-          )}
-        </Portal>
+        <Portal>{loading && <LoadingIndicator />}</Portal>
         <Portal>
           <Snackbar
             visible={snackbarVisible}
@@ -644,10 +620,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 48,
     marginTop: 20,
     marginBottom: 60,
-  },
-  loadingIndicator: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
