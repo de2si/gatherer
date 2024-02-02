@@ -23,6 +23,7 @@ import Logo from '@assets/logo.png';
 
 // helpers
 import {getErrorMessage} from '@helpers/formHelpers';
+import {add91Prefix} from '@helpers/formatters';
 
 // types
 interface LoginForm {
@@ -62,7 +63,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      await login(data.phoneNumber, data.password);
+      await login(add91Prefix(data.phoneNumber), data.password);
     } catch (error) {
       let message = getErrorMessage(error);
       message = typeof message === 'string' ? message : message[0];
