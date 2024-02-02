@@ -1,5 +1,5 @@
 import {AxiosError} from 'axios';
-import {FormImage, LocationFilterGroup} from '@typedefs/common';
+import {Filter, FormImage} from '@typedefs/common';
 
 // Function to remove specified keys from an object
 export const removeKeys = (obj: any, keysToRemove: (string | number)[]) => {
@@ -113,26 +113,28 @@ export const isRetryableError = (error: unknown): boolean => {
   return false;
 };
 
-interface LocationQueryParams {
+interface FilterQueryParams {
   states?: string;
   districts?: string;
   blocks?: string;
   villages?: string;
+  projects?: string;
 }
-export const buildLocationFilterQueryParams = (data: LocationFilterGroup) => {
-  const queryParams: LocationQueryParams = {};
+export const buildFilterQueryParams = (data: Filter): FilterQueryParams => {
+  const queryParams: FilterQueryParams = {};
 
-  for (const codeType of [
-    'villageCodes',
-    'blockCodes',
-    'districtCodes',
-    'stateCodes',
-  ] as (keyof LocationFilterGroup)[]) {
-    if (data[codeType]?.length) {
-      queryParams[codeType.replace(/Code/, '') as keyof LocationQueryParams] =
-        data[codeType].join(',');
+  const order = ['villages', 'blocks', 'districts', 'states'];
+  for (const key of order) {
+    const codeKey = key.replace(/s$/, 'Codes') as keyof Filter;
+    if (data[codeKey]?.length) {
+      queryParams[key as keyof FilterQueryParams] = data[codeKey]?.join(',');
       break;
     }
   }
+
+  if (data.projectCodes?.length) {
+    queryParams.projects = data.projectCodes.join(',');
+  }
+
   return queryParams;
 };

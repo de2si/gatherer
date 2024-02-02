@@ -3,16 +3,7 @@
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {RefreshControl} from 'react-native-gesture-handler';
-import {
-  Avatar,
-  Button,
-  Card,
-  IconButton,
-  Snackbar,
-  Text,
-  useTheme,
-} from 'react-native-paper';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {Avatar, Card, Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -23,63 +14,18 @@ import {FarmerPreview, useFarmerStore} from '@hooks/useFarmerStore';
 import {useAuthStore} from '@hooks/useAuthStore';
 
 // helpers
-import {areLocationFiltersEqual} from '@helpers/comparators';
+import {areFiltersEqual} from '@helpers/comparators';
 import {getErrorMessage} from '@helpers/formHelpers';
 
 // components
-import LocationFilterSheet, {
+import FilterSheet, {
   locationFilterDefaultValues,
-} from '@components/LocationFilterSheet';
+} from '@components/FilterSheet';
 import SearchSheet from '@components/SearchSheet';
+import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
-
-const farmerListHeaderRight = ({
-  isFilterApplied,
-  isSearchApplied,
-  handleFilterPress,
-  handleSearchPress,
-  handleSearchClearPress,
-  handleAddPress,
-}: {
-  isFilterApplied: boolean;
-  isSearchApplied: boolean;
-  handleFilterPress: () => void;
-  handleSearchPress: () => void;
-  handleSearchClearPress: () => void;
-  handleAddPress: () => void;
-}) => {
-  return (
-    <>
-      <IconButton
-        icon="filter-outline"
-        size={24}
-        onPress={handleFilterPress}
-        selected={isFilterApplied}
-        mode={isFilterApplied ? 'contained' : undefined}
-      />
-      <IconButton
-        icon="magnify"
-        size={24}
-        onPress={handleSearchPress}
-        selected={isSearchApplied}
-        mode={isSearchApplied ? 'contained' : undefined}
-      />
-      {isSearchApplied && (
-        <IconButton
-          icon={props => <MaterialIcon name="search-off" {...props} />}
-          size={24}
-          onPress={handleSearchClearPress}
-          mode="contained-tonal"
-        />
-      )}
-      <Button mode="contained-tonal" onPress={handleAddPress}>
-        Add
-      </Button>
-    </>
-  );
-};
 
 const Item = ({
   data: {id, name, photo, code, village, guardian, phone},
@@ -151,7 +97,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     };
     navigation.setOptions({
       headerRight: () =>
-        farmerListHeaderRight({
+        ListScreenHeaderRight({
           isFilterApplied,
           isSearchApplied,
           handleFilterPress,
@@ -202,7 +148,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     // Call fetchProcessing when searchText or filters change
     if (
       searchText !== prevSearchText.current ||
-      !areLocationFiltersEqual(filters, prevFilters.current)
+      !areFiltersEqual(filters, prevFilters.current)
     ) {
       fetchProcessing();
     }
@@ -232,7 +178,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
           />
         }
       />
-      <LocationFilterSheet
+      <FilterSheet
         visible={filterBottomSheetVisible}
         filterValues={filters}
         onClose={() => setFilterBottomSheetVisible(false)}

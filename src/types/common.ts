@@ -9,9 +9,13 @@ export interface FormImage {
   hash: string;
 }
 
-export interface LocationFilterGroup {
-  stateCodes: number[];
-  districtCodes: number[];
-  blockCodes: number[];
-  villageCodes: number[];
+export interface LocationFilter {
+  stateCodes?: number[];
+  districtCodes?: number[];
+  blockCodes?: number[];
+  villageCodes?: number[];
+}
+
+export interface Filter extends LocationFilter {
+  projectCodes?: number[];
 }

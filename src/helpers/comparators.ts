@@ -1,8 +1,8 @@
-import {LocationFilterGroup} from '@typedefs/common';
+import {Filter} from '@typedefs/common';
 
-export const areLocationFiltersEqual = (
-  filters1: LocationFilterGroup,
-  filters2: LocationFilterGroup,
+export const areFiltersEqual = (
+  filters1: Filter,
+  filters2: Filter,
 ): boolean => {
   const filterKeys1 = Object.keys(filters1);
   const filterKeys2 = Object.keys(filters2);
@@ -13,8 +13,8 @@ export const areLocationFiltersEqual = (
   }
 
   // Check if the values of corresponding keys are equal
-  for (const key of filterKeys1 as (keyof LocationFilterGroup)[]) {
-    if (!arraysEqual(filters1[key], filters2[key])) {
+  for (const key of filterKeys1 as (keyof Filter)[]) {
+    if (!arraysEqual(filters1[key] ?? [], filters2[key] ?? [])) {
       return false;
     }
   }

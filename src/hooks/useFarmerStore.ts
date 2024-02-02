@@ -2,18 +2,18 @@
 
 import {create} from 'zustand';
 import {api} from '@api/axios';
-import {locationFilterDefaultValues} from '@components/LocationFilterSheet';
+import {locationFilterDefaultValues} from '@components/FilterSheet';
 
 // helpers
 import {maskPhoneNumber} from '@helpers/formatters';
 import {calculateHash} from '@helpers/cryptoHelpers';
 import {CATEGORY, GENDER, INCOME_LEVELS} from '@helpers/constants';
-import {buildLocationFilterQueryParams} from '@helpers/formHelpers';
+import {buildFilterQueryParams} from '@helpers/formHelpers';
 
 // types
 import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useProfileStore';
-import {ApiImage, LocationFilterGroup} from '@typedefs/common';
+import {ApiImage, LocationFilter} from '@typedefs/common';
 
 export interface ApiFarmer {
   farmer_id: number;
@@ -59,10 +59,7 @@ interface FarmerStore {
   loading: boolean;
   refresh: boolean;
   setRefresh: () => void;
-  fetchData: (
-    filters?: LocationFilterGroup,
-    searchText?: string,
-  ) => Promise<void>;
+  fetchData: (filters?: LocationFilter, searchText?: string) => Promise<void>;
 }
 
 // Function to transform API response to match Farmer Preview interface
@@ -100,11 +97,11 @@ export const useFarmerStore = create<FarmerStore>((set, get) => ({
     set({refresh: true});
   },
   fetchData: async (
-    locationFilters: LocationFilterGroup = locationFilterDefaultValues,
+    locationFilters: LocationFilter = locationFilterDefaultValues,
     searchText: string = '',
   ) => {
     const queryParams = {
-      ...buildLocationFilterQueryParams(locationFilters),
+      ...buildFilterQueryParams(locationFilters),
       ...buildSearchQueryParams(searchText),
     };
     try {
