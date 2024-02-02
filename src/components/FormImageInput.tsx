@@ -23,6 +23,7 @@ import {
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
+import {useReducedMotion} from 'react-native-reanimated';
 import BottomSheet, {BottomSheetBackdrop} from '@gorhom/bottom-sheet';
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 import {Control, FieldValues, useController} from 'react-hook-form';
@@ -48,6 +49,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   placeholderViewStyles = {},
   onLayout = () => {},
 }: FormImageInputProps<TFieldValues>) => {
+  const reducedMotion = useReducedMotion();
   const theme = useTheme();
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
@@ -188,7 +190,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
             snapPoints={[150]}
             enablePanDownToClose
             backdropComponent={renderBackdrop}
-            onClose={handleBottomSheetClose}>
+            onClose={handleBottomSheetClose}
+            animateOnMount={!reducedMotion}>
             <View style={styles.bottomSheetRow}>
               <Button
                 buttonColor={theme.colors.primaryContainer}

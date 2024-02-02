@@ -3,6 +3,7 @@
 import React, {useEffect, useRef} from 'react';
 import {StyleSheet} from 'react-native';
 import {Portal, Button, useTheme} from 'react-native-paper';
+import {useReducedMotion} from 'react-native-reanimated';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
@@ -69,6 +70,7 @@ const FilterSheet = ({
   const filterVillageCodes = useVillageStore(store => store.getFilteredCodes);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const reducedMotion = useReducedMotion();
   const theme = useTheme();
 
   const {handleSubmit, control, watch, reset, setValue} = useForm<Filter>({
@@ -136,7 +138,8 @@ const FilterSheet = ({
             index={2}
             enablePanDownToClose
             backdropComponent={renderBackdrop}
-            onClose={handleBottomSheetClose}>
+            onClose={handleBottomSheetClose}
+            animateOnMount={!reducedMotion}>
             <BottomSheetScrollView>
               <BottomSheetView style={styles.formContainer}>
                 {variant.includes('(SD)B') &&

@@ -9,6 +9,7 @@ import {
   HelperText,
   useTheme,
 } from 'react-native-paper';
+import {useReducedMotion} from 'react-native-reanimated';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -37,6 +38,7 @@ const SearchSheet = ({
     <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
   );
 
+  const reducedMotion = useReducedMotion();
   const theme = useTheme();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -82,7 +84,8 @@ const SearchSheet = ({
             snapPoints={['40%']}
             enablePanDownToClose
             backdropComponent={renderBackdrop}
-            onClose={handleBottomSheetClose}>
+            onClose={handleBottomSheetClose}
+            animateOnMount={!reducedMotion}>
             <BottomSheetView style={styles.container}>
               <Searchbar
                 placeholder="Search"
