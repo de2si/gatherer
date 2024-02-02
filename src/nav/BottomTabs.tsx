@@ -6,6 +6,7 @@ import {useTheme} from 'react-native-paper';
 // navigation
 import {createMaterialBottomTabNavigator} from 'react-native-paper/react-navigation';
 import DataTabs from '@nav/DataTabs';
+import UserTabs from '@nav/UserTabs';
 import MoreStack from '@nav/MoreStack';
 
 // screens
@@ -13,6 +14,9 @@ import PlaceholderScreen from '@screens/PlaceholderScreen';
 
 // hooks
 import {useProfileStore} from '@hooks/useProfileStore';
+
+// types
+import {UserType} from '@helpers/constants';
 
 // define screen params
 export type BottomTabsNavProps = {
@@ -44,11 +48,10 @@ const BottomTabs = () => {
         initialParams={{name: 'Project'}}
         options={{tabBarIcon: 'ruler-square-compass', title: 'Projects'}}
       />
-      {loggedUser.userType !== 'SURVEYOR' && (
+      {loggedUser.userType !== UserType.SURVEYOR && (
         <BottomTabNav.Screen
           name="User"
-          component={PlaceholderScreen}
-          initialParams={{name: 'User'}}
+          component={UserTabs}
           options={{tabBarIcon: 'account-supervisor', title: 'Users'}}
         />
       )}
