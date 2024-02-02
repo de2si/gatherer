@@ -14,6 +14,7 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
+import DetailFieldItem from '@components/DetailFieldItem';
 
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -51,31 +52,6 @@ const farmerDetailHeaderRight = ({
     </>
   );
 };
-
-const FieldItem = ({
-  label,
-  value,
-  theme,
-}: {
-  label: string;
-  value: string;
-  theme: MD3Theme;
-}) => (
-  <View style={styles.row}>
-    <Text
-      style={[styles.labelText, {color: theme.colors.outline}]}
-      variant="labelLarge">
-      {label}
-    </Text>
-    <View style={styles.valueTextContainer}>
-      <Text
-        variant="labelLarge"
-        style={[{color: theme.colors.onSurfaceVariant}]}>
-        {value}
-      </Text>
-    </View>
-  </View>
-);
 
 const FieldThumbnail = ({url, theme}: {url: string; theme: MD3Theme}) => (
   <View
@@ -216,8 +192,8 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                 <FieldThumbnail url={farmer.id_front_image.url} theme={theme} />
                 <FieldThumbnail url={farmer.id_back_image.url} theme={theme} />
               </View>
-              <FieldItem label="Code" value="AA6543" theme={theme} />
-              <FieldItem
+              <DetailFieldItem label="Code" value="AA6543" theme={theme} />
+              <DetailFieldItem
                 label="Phone"
                 value={formatPhoneNumber(farmer.phone_number)}
                 theme={theme}
@@ -225,37 +201,45 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
             </List.Section>
             <Divider />
             <List.Section>
-              <FieldItem
+              <DetailFieldItem
                 label="State"
                 value={farmer.village.block.district.state.name}
                 theme={theme}
               />
-              <FieldItem
+              <DetailFieldItem
                 label="District"
                 value={farmer.village.block.district.name}
                 theme={theme}
               />
-              <FieldItem
+              <DetailFieldItem
                 label="Block"
                 value={farmer.village.block.name}
                 theme={theme}
               />
-              <FieldItem
+              <DetailFieldItem
                 label="Village"
                 value={farmer.village.name}
                 theme={theme}
               />
-              <FieldItem label="Address" value={farmer.address} theme={theme} />
+              <DetailFieldItem
+                label="Address"
+                value={farmer.address}
+                theme={theme}
+              />
             </List.Section>
             <Divider />
             <List.Section>
-              <FieldItem label="Gender" value={farmer.gender} theme={theme} />
-              <FieldItem
+              <DetailFieldItem
+                label="Gender"
+                value={farmer.gender}
+                theme={theme}
+              />
+              <DetailFieldItem
                 label="Category"
                 value={farmer.category}
                 theme={theme}
               />
-              <FieldItem
+              <DetailFieldItem
                 label="Income Level"
                 value={farmer.income_level}
                 theme={theme}
@@ -264,11 +248,11 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
             <Divider />
             <List.Section>
               {/* <List.Subheader>Land</List.Subheader> */}
-              <FieldItem label="Total Land" value="167" theme={theme} />
+              <DetailFieldItem label="Total Land" value="167" theme={theme} />
             </List.Section>
             <Divider />
             <List.Section>
-              <FieldItem label="Member" value="" theme={theme} />
+              <DetailFieldItem label="Member" value="" theme={theme} />
             </List.Section>
           </>
         )}
@@ -313,11 +297,6 @@ const styles = StyleSheet.create({
   },
   labelText: {
     minWidth: 90,
-  },
-  valueTextContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
   },
   imageThumbnail: {
     width: 100,
