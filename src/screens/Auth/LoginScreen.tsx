@@ -38,6 +38,7 @@ type LoginScreenProps = NativeStackScreenProps<
 const LoginScreen: React.FC<LoginScreenProps> = () => {
   const theme = useTheme();
   const login = useAuthStore(store => store.login);
+  const loading = useAuthStore(store => store.loading);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Login error');
 
@@ -95,7 +96,9 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
         <Button
           mode="contained-tonal"
           onPress={handleSubmit(onSubmit)}
-          style={styles.button}>
+          style={styles.button}
+          loading={loading}
+          disabled={loading}>
           Login
         </Button>
       </View>
