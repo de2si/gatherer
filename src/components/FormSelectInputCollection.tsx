@@ -2,12 +2,14 @@ import {StyleSheet, View} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Text} from 'react-native-paper';
 
+// form
 import {FieldValues} from 'react-hook-form';
 import {
   FormSelectInput,
   FormSelectInputProps,
 } from '@components/FormSelectInput';
 
+// types & stores
 import {
   Location,
   useBlockStore,
@@ -16,7 +18,9 @@ import {
   useVillageStore,
 } from '@hooks/locationHooks';
 import {useAuthStore} from '@hooks/useAuthStore';
+import {Project, useProjectStore} from '@hooks/useProjectStore';
 
+// helpers
 import {arraysEqual} from '@helpers/comparators';
 
 type LocationSelectProps<TForm extends FieldValues = any> = Omit<
@@ -26,7 +30,15 @@ type LocationSelectProps<TForm extends FieldValues = any> = Omit<
   codes?: number[];
 };
 
-const RenderLocationItem = (item: Location) => {
+type LoadedLocationSelectProps<TForm extends FieldValues = any> = Omit<
+  FormSelectInputProps<Location, TForm>,
+  'loading' | 'selectProps'
+> & {
+  data: Location[];
+  placeholder: string;
+};
+
+const renderSelectItem = (item: {name: string}) => {
   return (
     <View style={styles.item}>
       <Text>{item.name}</Text>
@@ -55,7 +67,7 @@ const RenderLocationSelectInput = <TFieldValues extends FieldValues>({
     valueField: 'code' as const,
     searchField: 'name' as const,
     placeholder: placeholder,
-    renderItem: RenderLocationItem,
+    renderItem: renderSelectItem,
   };
 
   return (
@@ -205,6 +217,64 @@ const FormVillageSelectInput = <TFieldValues extends FieldValues>({
   );
 };
 
+const FormProjectSelectInput = <TFieldValues extends FieldValues>({
+  ...props
+}: Omit<
+  FormSelectInputProps<Project, TFieldValues>,
+  'loading' | 'selectProps'
+>) => {
+  const withAuth = useAuthStore(store => store.withAuth);
+  const data = useProjectStore(state => state.data);
+  const fetchFn = useProjectStore(state => state.fetchData);
+  const [loading, setLoading] = useState(false);
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      await withAuth(fetchFn);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchFn, withAuth]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const selectProps = {
+    data,
+    labelField: 'name' as const,
+    valueField: 'id' as const,
+    searchField: 'name' as const,
+    placeholder: 'Select project',
+    renderItem: renderSelectItem,
+  };
+
+  return (
+    <FormSelectInput
+      {...props}
+      selectProps={{...selectProps}}
+      loading={loading}
+    />
+  );
+};
+
+const FormLoadedLocationSelectInput = <TFieldValues extends FieldValues>({
+  data,
+  placeholder,
+  ...props
+}: LoadedLocationSelectProps<TFieldValues>) => {
+  return (
+    <RenderLocationSelectInput
+      data={data}
+      placeholder={placeholder}
+      otherProps={props}
+      loading={false}
+    />
+  );
+};
+
 let styles = StyleSheet.create({
   item: {
     padding: 17,
@@ -219,4 +289,6 @@ export {
   FormDistrictSelectInput,
   FormBlockSelectInput,
   FormVillageSelectInput,
+  FormProjectSelectInput,
+  FormLoadedLocationSelectInput,
 };

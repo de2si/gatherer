@@ -23,10 +23,7 @@ import {
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetBackdrop} from '@gorhom/bottom-sheet';
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {calculateHash} from '@helpers/cryptoHelpers';
@@ -192,7 +189,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
             enablePanDownToClose
             backdropComponent={renderBackdrop}
             onClose={handleBottomSheetClose}>
-            <BottomSheetView style={styles.bottomSheetRow}>
+            <View style={styles.bottomSheetRow}>
               <Button
                 buttonColor={theme.colors.primaryContainer}
                 icon="camera-outline"
@@ -218,7 +215,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
                 style={styles.bottomSheetButton}>
                 Clear
               </Button>
-            </BottomSheetView>
+            </View>
           </BottomSheet>
         </Portal>
       )}
