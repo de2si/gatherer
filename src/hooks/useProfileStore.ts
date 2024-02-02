@@ -2,13 +2,27 @@
 
 import {create} from 'zustand';
 import {api} from '@api/axios';
-import {GENDER} from '@helpers/constants';
+import {GENDER, UserType} from '@helpers/constants';
+import {Location} from '@hooks/locationHooks';
+import {Project} from '@hooks/useProjectStore';
 
 export interface ApiUserType {
   id: number;
-  blocks: [];
-  projects: {};
-  user_type: 'ADMIN' | 'SUPERVISOR' | 'SURVEYOR';
+  blocks: {
+    [key: string]: {
+      name: string;
+      district: Location & {
+        state: Location;
+      };
+    };
+  };
+  projects: {
+    [key: string]: {
+      name: string;
+      blocks: number[];
+    };
+  };
+  user_type: UserType;
   name: string;
   gender: (typeof GENDER)[number];
   phone_number: string;
@@ -19,9 +33,9 @@ export interface ApiUserType {
 
 interface User {
   id: number;
-  blocks: []; // TODO: Update type
-  projects: {}; // TODO: Update type
-  userType: 'ADMIN' | 'SUPERVISOR' | 'SURVEYOR';
+  blocks: Location[];
+  projects: Project[];
+  userType: UserType;
   name: string;
   gender: (typeof GENDER)[number];
   phoneNumber: string;
@@ -32,8 +46,14 @@ interface User {
 const transformApiUser = (apiResponse: ApiUserType): User => {
   return {
     id: apiResponse.id,
-    blocks: apiResponse.blocks,
-    projects: apiResponse.projects,
+    blocks: Object.entries(apiResponse.blocks).map(([code, {name}]) => ({
+      code: parseInt(code, 10),
+      name,
+    })),
+    projects: Object.entries(apiResponse.projects).map(([id, {name}]) => ({
+      id: parseInt(id, 10),
+      name,
+    })),
     userType: apiResponse.user_type,
     name: apiResponse.name,
     gender: apiResponse.gender,
@@ -53,8 +73,8 @@ const initialState: ProfileState = {
   data: {
     id: 0,
     blocks: [],
-    projects: {},
-    userType: 'SURVEYOR',
+    projects: [],
+    userType: UserType.SURVEYOR,
     name: '',
     gender: 'MALE',
     phoneNumber: '',
