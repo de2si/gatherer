@@ -946,6 +946,8 @@ PODS:
     - React-debug
   - react-native-date-picker (4.3.5):
     - React-Core
+  - react-native-geolocation (3.1.0):
+    - React-Core
   - react-native-image-picker (7.1.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1129,6 +1131,8 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
+  - RNPermissions (4.1.1):
+    - React-Core
   - RNReanimated (3.6.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1137,6 +1141,8 @@ PODS:
   - RNScreens (3.29.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - RNSVG (14.1.0):
     - React-Core
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
@@ -1195,6 +1201,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -1220,8 +1227,10 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1298,6 +1307,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-pager-view:
@@ -1348,10 +1359,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1396,6 +1411,7 @@ SPEC CHECKSUMS:
   React-logger: 008caec0d6a587abc1e71be21bfac5ba1662fe6a
   React-Mapbuffer: 58fe558faf52ecde6705376700f848d0293d1cef
   react-native-date-picker: 90d1d60802a20085125657940b944f2bb4e5c113
+  react-native-geolocation: ef66fb798d96284c6043f0b16c15d9d1d4955db4
   react-native-image-picker: 6c51359eca7a7df9f07e297218c25696eb9da976
   react-native-pager-view: d81ab2060b9caf57ca8c3a0d57467ff407cdb825
   react-native-safe-area-context: d1c8161a1e9560f7066e8926a7d825eb57c5dab5
@@ -1421,11 +1437,13 @@ SPEC CHECKSUMS:
   ReactCommon: 851280fb976399ca1aabc74cc2c3612069ea70a2
   RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
   RNGestureHandler: 61bfdfc05db9b79dd61f894dcd29d3dcc6db3c02
+  RNPermissions: 250047ffa01a1fa65e870fcae3e2b87786acf0d8
   RNReanimated: 57f436e7aa3d277fbfed05e003230b43428157c0
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2
+  RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 20d6a900dcc8d61d5e3b799bbf627cc34474a8c4
 
 PODFILE CHECKSUM: 7eb80977412414172aa5e8435a167d63e3792746
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3
