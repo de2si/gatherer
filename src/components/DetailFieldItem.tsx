@@ -6,14 +6,16 @@ import {Text, MD3Theme} from 'react-native-paper';
 
 interface DetailFieldItemProps {
   label: string;
-  value: string;
+  value?: string;
   theme: MD3Theme;
+  valueComponent?: React.ReactNode;
 }
 
 const DetailFieldItem: React.FC<DetailFieldItemProps> = ({
   label,
-  value,
+  value = '',
   theme,
+  valueComponent,
 }) => (
   <View style={styles.row}>
     <Text
@@ -22,11 +24,15 @@ const DetailFieldItem: React.FC<DetailFieldItemProps> = ({
       {label}
     </Text>
     <View style={styles.valueTextContainer}>
-      <Text
-        variant="labelLarge"
-        style={[{color: theme.colors.onSurfaceVariant}]}>
-        {value}
-      </Text>
+      {valueComponent ? (
+        valueComponent
+      ) : (
+        <Text
+          variant="labelLarge"
+          style={[{color: theme.colors.onSurfaceVariant}]}>
+          {value}
+        </Text>
+      )}
     </View>
   </View>
 );
