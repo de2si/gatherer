@@ -19,3 +19,13 @@ export interface LocationFilter {
 export interface Filter extends LocationFilter {
   projectCodes?: number[];
 }
+
+export interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
+
+export interface LV {
+  label: string;
+  value: string;
+}

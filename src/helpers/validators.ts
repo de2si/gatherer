@@ -43,6 +43,24 @@ export const imageValidator = Yup.object().shape({
     .test('is-valid-sha-256', 'Invalid 256 bit hash', isValidSha256),
 });
 
+export const multiImageValidator = Yup.array()
+  .of(imageValidator)
+  .min(1, 'At least one image is required')
+  .test('are-distinct-hashes', 'Images must be different', images => {
+    if (!images) {
+      // If the array is null or undefined, skip validation
+      return true;
+    }
+    const hashes = new Set();
+    for (const image of images) {
+      if (hashes.has(image.hash)) {
+        return false; // Duplicate hash found
+      }
+      hashes.add(image.hash);
+    }
+    return true;
+  });
+
 export const nameValidator = Yup.string()
   .required('Name is required')
   .min(2, 'Invalid name')

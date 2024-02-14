@@ -1,5 +1,6 @@
 import {AxiosError} from 'axios';
-import {Filter, FormImage} from '@typedefs/common';
+import {Filter, FormImage, LV} from '@typedefs/common';
+import {AreaUnit} from '@helpers/constants';
 
 // Function to remove specified keys from an object
 export const removeKeys = (obj: any, keysToRemove: (string | number)[]) => {
@@ -137,4 +138,28 @@ export const buildFilterQueryParams = (data: Filter): FilterQueryParams => {
   }
 
   return queryParams;
+};
+
+export const transformToLabelValuePair = (
+  originalArray: readonly string[],
+): LV[] => {
+  return originalArray.map(item => ({label: item, value: item}));
+};
+
+export const convertToSquareMeters = (
+  value: number,
+  unit: AreaUnit,
+): number => {
+  switch (unit) {
+    case AreaUnit.SquareMeters:
+      return value;
+    case AreaUnit.SquareFeet:
+      return value * 0.092903; // 1 square meter = 0.092903 square feet
+    case AreaUnit.Acres:
+      return value * 4046.86; // 1 acre = 4046.86 square meters
+    case AreaUnit.Hectares:
+      return value * 10000; // 1 hectare = 10000 square meters
+    default:
+      throw new Error('Invalid area unit');
+  }
 };

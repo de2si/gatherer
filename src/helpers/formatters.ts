@@ -54,3 +54,9 @@ export const convertToSentenceCase = (input: string) => {
     .toLowerCase()
     .replace(/^(.)|\s+(.)/g, match => match.toUpperCase());
 };
+
+export const truncateString = (input: string, maxLength = 25) => {
+  return input.length > maxLength
+    ? input.substring(0, maxLength - 3).trim() + '...'
+    : input;
+};

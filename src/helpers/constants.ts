@@ -13,3 +13,15 @@ export enum UserType {
   SUPERVISOR = 'SUPERVISOR',
   SURVEYOR = 'SURVEYOR',
 }
+
+// land constants
+export enum Ownership {
+  PRIVATE = 'PRIVATE',
+  COMMUNITY = 'COMMUNITY',
+}
+export enum AreaUnit {
+  SquareMeters = 'Sq. Meters (m²)',
+  SquareFeet = 'Sq. Feet (ft²)',
+  Acres = 'Acres',
+  Hectares = 'Hectares',
+}
