@@ -14,6 +14,7 @@ import {buildFilterQueryParams} from '@helpers/formHelpers';
 import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useProfileStore';
 import {ApiImage, LocationFilter} from '@typedefs/common';
+import {ApiLand} from '@hooks/useLandStore';
 
 export interface ApiFarmer {
   farmer_id: number;
@@ -29,7 +30,7 @@ export interface ApiFarmer {
   };
   added_by: ApiUserType;
   last_edited_by: ApiUserType;
-  land_parcels: [];
+  land_parcels: ApiLand[];
   id_hash: string;
   name: string;
   guardian_name: string;
@@ -63,7 +64,7 @@ interface FarmerStore {
 }
 
 // Function to transform API response to match Farmer Preview interface
-const transformApiFarmer = (apiResponse: ApiFarmer): FarmerPreview => {
+export const transformApiFarmer = (apiResponse: ApiFarmer): FarmerPreview => {
   return {
     id: apiResponse.farmer_id,
     name: apiResponse.name,
@@ -75,7 +76,7 @@ const transformApiFarmer = (apiResponse: ApiFarmer): FarmerPreview => {
   };
 };
 
-const buildSearchQueryParams = (searchText: string) => {
+export const buildFarmerSearchQueryParams = (searchText: string) => {
   if (!searchText) {
     return {};
   }
@@ -102,7 +103,7 @@ export const useFarmerStore = create<FarmerStore>((set, get) => ({
   ) => {
     const queryParams = {
       ...buildFilterQueryParams(locationFilters),
-      ...buildSearchQueryParams(searchText),
+      ...buildFarmerSearchQueryParams(searchText),
     };
     try {
       set({loading: true});
