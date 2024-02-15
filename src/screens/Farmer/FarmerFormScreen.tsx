@@ -2,7 +2,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Portal, Snackbar, Text, useTheme} from 'react-native-paper';
+import {Button, Portal, Snackbar, Text} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
@@ -29,6 +29,7 @@ import {
   getErrorMessage,
   getFieldErrors,
   removeKeys,
+  transformToLabelValuePair,
 } from '@helpers/formHelpers';
 import {CATEGORY, GENDER, INCOME_LEVELS} from '@helpers/constants';
 import {areDatesEqual, areObjectsEqual} from '@helpers/comparators';
@@ -48,12 +49,6 @@ import {FormImage} from '@typedefs/common';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
-
-const transformToLabelValuePair = (
-  originalArray: readonly string[],
-): {label: string; value: string}[] => {
-  return originalArray.map(item => ({label: item, value: item}));
-};
 
 // types
 interface FarmerBasicForm {
@@ -85,7 +80,9 @@ const farmerBasicSchema: Yup.ObjectSchema<FarmerBasicForm> = Yup.object().shape(
     id_front_image: imageValidator
       .required('Aadhaar front image is required')
       .test('front-image-unique', 'Duplicate image', function (value) {
-        if (!value.hash) return true;
+        if (!value.hash) {
+          return true;
+        }
         return (
           value.hash !== this.parent.profile_photo.hash &&
           value.hash !== this.parent.id_back_image.hash
@@ -94,7 +91,9 @@ const farmerBasicSchema: Yup.ObjectSchema<FarmerBasicForm> = Yup.object().shape(
     id_back_image: imageValidator
       .required('Aadhaar back image is required')
       .test('back-image-unique', 'Duplicate image', function (value) {
-        if (!value.hash) return true;
+        if (!value.hash) {
+          return true;
+        }
         return (
           value.hash !== this.parent.profile_photo.hash &&
           value.hash !== this.parent.id_front_image.hash
@@ -256,7 +255,6 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
   const {variant} = route.params;
   const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
 
-  const theme = useTheme();
   const withAuth = useAuthStore(store => store.withAuth);
 
   const [loading, setLoading] = useState(false);
@@ -335,7 +333,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
       scrollToFirstError(errors);
       setManualScroll(false);
     }
-  }, [errors, manualScroll, scrollToFirstError]);
+  }, [errors, manualScroll, scrollToFirstError, setManualScroll]);
 
   if (variant === 'edit' && !farmer) {
     return (
@@ -375,8 +373,9 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
           formData,
           defaultValues as FarmerBasicForm,
         );
-        if (!Object.keys(dataToUpdate).length)
+        if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
+        }
         await withAuth(async () => {
           try {
             const result = await api.patch(
@@ -500,14 +499,14 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
               name="id_front_image"
               control={control}
               label="Aadhaar Front"
-              variant="square"
+              styleVariant="square"
               border="dashed"
             />
             <FormImageInput
               name="id_back_image"
               control={control}
               label="Aadhaar Back"
-              variant="square"
+              styleVariant="square"
               border="dashed"
             />
           </View>

@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import {
   Image,
   Pressable,
+  ScrollView,
   StyleProp,
   StyleSheet,
   View,
@@ -29,12 +30,15 @@ import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/comp
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {calculateHash} from '@helpers/cryptoHelpers';
 import useSnackbar from '@hooks/useSnackbar';
+import {FormImage} from '@typedefs/common';
 
 interface FormImageInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name']; // form field name
   control: Control<TFieldValues>; // form control
   label?: string;
-  variant?: 'round' | 'square';
+  variant?: 'single' | 'multiple';
+  styleVariant?: 'round' | 'square';
+  maxSelect?: number;
   border?: 'none' | 'dashed';
   placeholderViewStyles?: StyleProp<ViewStyle>;
   onLayout?: (fieldY: {name: string; y: number}) => void;
@@ -44,7 +48,9 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   name,
   control,
   label = 'Photo',
-  variant = 'round',
+  variant = 'single',
+  styleVariant = 'round',
+  maxSelect = 3,
   border = 'none',
   placeholderViewStyles = {},
   onLayout = () => {},
@@ -96,6 +102,7 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       mediaType: 'photo' as const,
       quality: 0.5 as const,
       includeBase64: true,
+      selectionLimit: variant === 'single' ? 1 : maxSelect,
     };
     let result: ImagePickerResponse;
     if (source === 'camera') {
@@ -106,43 +113,120 @@ const FormImageInput = <TFieldValues extends FieldValues>({
     handleImagePickerResponse(result);
   };
 
+  const handleImagePickerError = (response: ImagePickerResponse) => {
+    switch (response.errorCode) {
+      case 'camera_unavailable':
+        showSnackbar('Camera not available on device');
+        break;
+      case 'permission':
+        showSnackbar('Permission not satisfied');
+        break;
+      default:
+        showSnackbar(
+          response.errorMessage
+            ? response.errorMessage
+            : 'Unknown error occurred',
+        );
+        break;
+    }
+  };
+
   const handleImagePickerResponse = (response: ImagePickerResponse) => {
     if (response.didCancel) {
       showSnackbar('Image selection canceled');
     } else if (response.errorCode) {
-      switch (response.errorCode) {
-        case 'camera_unavailable':
-          showSnackbar('Camera not available on device');
-          break;
-        case 'permission':
-          showSnackbar('Permission not satisfied');
-          break;
-        default:
-          showSnackbar(
-            response.errorMessage
-              ? response.errorMessage
-              : 'Unknown error occurred',
-          );
-          break;
-      }
+      handleImagePickerError(response);
     } else if (response.assets) {
-      const {uri, base64} = response.assets[0];
-      onChange(
-        uri ? {uri: uri, hash: calculateHash(base64 ?? null, 256)} : null,
-      );
+      if (variant === 'single') {
+        const {uri, base64} = response.assets[0];
+        onChange(
+          uri ? {uri: uri, hash: calculateHash(base64 ?? null, 256)} : null,
+        );
+      } else {
+        response.assets.length
+          ? onChange(
+              response.assets.map(imgItem => ({
+                uri: imgItem.uri,
+                hash: calculateHash(imgItem.base64 ?? null, 256),
+              })),
+            )
+          : onChange(null);
+      }
       setBottomSheetVisible(false);
       // showSnackbar('Image selected');
     }
   };
 
   const imageBorderRadiusStyle =
-    variant === 'square' ? {borderRadius: theme.roundness} : styles.roundBorder;
+    styleVariant === 'square'
+      ? {borderRadius: theme.roundness}
+      : styles.roundBorder;
   const imageBoundaryStyle =
-    variant === 'square'
+    styleVariant === 'square'
       ? {...styles.imageBoundarySquare, borderRadius: theme.roundness}
       : styles.imageBoundaryRound;
   const placeholderBorderStyle =
     border === 'dashed' ? styles.dashedBorder : null;
+
+  const renderImages = () => {
+    return Array.isArray(value) ? (
+      // Render multiple images if value is an array
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={true}
+        contentContainerStyle={styles.multiImageScrollView}>
+        {value.map((image: FormImage, index: number) => (
+          <View
+            key={index}
+            style={[
+              styles.thinBorder,
+              imageBorderRadiusStyle,
+              {borderColor: theme.colors.outline},
+            ]}>
+            <Image
+              source={{uri: image.uri}}
+              style={[
+                imageBoundaryStyle,
+                {backgroundColor: theme.colors.primary},
+              ]}
+            />
+          </View>
+        ))}
+      </ScrollView>
+    ) : (
+      // Render a single image if value is not an array
+      <View
+        style={[
+          styles.thinBorder,
+          imageBorderRadiusStyle,
+          {borderColor: theme.colors.outline},
+        ]}>
+        <Image
+          source={{uri: (value as FormImage).uri}}
+          style={[imageBoundaryStyle, {backgroundColor: theme.colors.primary}]}
+        />
+      </View>
+    );
+  };
+
+  const renderImagePlaceholder = () => (
+    <View
+      style={[
+        imageBoundaryStyle,
+        placeholderBorderStyle,
+        styles.imagePlaceholderContent,
+        {
+          backgroundColor: error
+            ? theme.colors.errorContainer
+            : theme.colors.tertiaryContainer,
+        },
+        placeholderViewStyles,
+      ]}>
+      <Icon source="tray-arrow-up" size={24} />
+      <Text style={theme.fonts.labelMedium}>{label}</Text>
+    </View>
+  );
+
   return (
     <View
       onLayout={event => {
@@ -151,32 +235,9 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       <Pressable
         onPress={handleImageContainerPress}
         style={styles.centeredContainer}>
-        {value && value.uri ? (
-          <View
-            style={[
-              styles.thinBorder,
-              imageBorderRadiusStyle,
-              {borderColor: theme.colors.outline},
-            ]}>
-            <Image source={{uri: value.uri}} style={imageBoundaryStyle} />
-          </View>
-        ) : (
-          <View
-            style={[
-              imageBoundaryStyle,
-              placeholderBorderStyle,
-              styles.imagePlaceholderContent,
-              {
-                backgroundColor: error
-                  ? theme.colors.errorContainer
-                  : theme.colors.tertiaryContainer,
-              },
-              placeholderViewStyles,
-            ]}>
-            <Icon source="tray-arrow-up" size={24} />
-            <Text style={theme.fonts.labelMedium}>{label}</Text>
-          </View>
-        )}
+        {value && (value.uri || (Array.isArray(value) && value.length > 0))
+          ? renderImages()
+          : renderImagePlaceholder()}
       </Pressable>
       <View style={styles.centeredContainer}>
         <HelperText type="error" visible={error ? true : false}>
@@ -272,6 +333,9 @@ const styles = StyleSheet.create({
   },
   bottomSheetButton: {
     minWidth: 100,
+  },
+  multiImageScrollView: {
+    columnGap: 8,
   },
 });
 
