@@ -3,7 +3,7 @@
 import {FlatList, StyleSheet, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {RefreshControl} from 'react-native-gesture-handler';
-import {Avatar, Card, Snackbar, Text, useTheme} from 'react-native-paper';
+import {Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -18,6 +18,7 @@ import {areFiltersEqual} from '@helpers/comparators';
 import {getErrorMessage} from '@helpers/formHelpers';
 
 // components
+import FarmerListItem from '@components/FarmerListItem';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
@@ -26,31 +27,6 @@ import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
-
-const Item = ({
-  data: {id, name, photo, code, village, guardian, phone},
-  onPress,
-}: {
-  data: FarmerPreview;
-  onPress: any;
-}) => (
-  <Card mode="elevated" onPress={() => onPress(id)}>
-    <Card.Content style={styles.row}>
-      <Avatar.Image source={{uri: photo.url}} size={80} style={styles.avatar} />
-      <View style={styles.cardTextContent}>
-        <View style={styles.cardDataRow}>
-          <Text variant="titleSmall">{name}</Text>
-          <Text variant="titleSmall">{code}</Text>
-        </View>
-        <View style={styles.cardDataRow}>
-          <Text variant="bodySmall">{guardian}</Text>
-          <Text variant="bodySmall">{phone}</Text>
-        </View>
-        <Text variant="bodySmall">{village.name}</Text>
-      </View>
-    </Card.Content>
-  </Card>
-);
 
 type FarmerListScreenProps = NativeStackScreenProps<
   FarmerStackScreenProps,
@@ -87,8 +63,8 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     setSearchText('');
   };
 
-  const showDetailScreen = (id: number) => {
-    navigation.navigate('FarmerDetail', {id});
+  const showDetailScreen = (farmer: FarmerPreview) => {
+    navigation.navigate('FarmerDetail', {id: farmer.id});
   };
 
   useEffect(() => {
@@ -158,7 +134,9 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
     <View style={styles.container}>
       <FlatList
         data={farmers}
-        renderItem={({item}) => <Item data={item} onPress={showDetailScreen} />}
+        renderItem={({item}) => (
+          <FarmerListItem data={item} onPress={showDetailScreen} />
+        )}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
           <Text
@@ -210,18 +188,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  row: {
-    flexDirection: 'row',
-  },
-  avatar: {
-    marginRight: 16,
-  },
-  cardTextContent: {
-    flex: 1,
-  },
-  cardDataRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
 });
