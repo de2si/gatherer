@@ -2,7 +2,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Portal, Snackbar, Text, useTheme} from 'react-native-paper';
+import {Button, Portal, Snackbar, Text} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
@@ -28,6 +28,7 @@ import {
   getErrorMessage,
   getFieldErrors,
   removeKeys,
+  transformToLabelValuePair,
 } from '@helpers/formHelpers';
 import {GENDER, UserType} from '@helpers/constants';
 import {areObjectsEqual, arraysEqual} from '@helpers/comparators';
@@ -50,12 +51,6 @@ import {ApiUserType} from '@hooks/useProfileStore';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {UserStackScreenProps} from '@nav/UserStack';
-
-const transformToLabelValuePair = (
-  originalArray: readonly string[],
-): {label: string; value: string}[] => {
-  return originalArray.map(item => ({label: item, value: item}));
-};
 
 // types
 interface UserBasicForm {
@@ -127,10 +122,12 @@ const getUserValidationSchema = (
   loggedUserType: UserType,
 ): Yup.ObjectSchema<UserBasicForm> => {
   let userSchema = userBasicValidation;
-  if (variant === 'add')
+  if (variant === 'add') {
     userSchema = {...userSchema, ...userPasswordValidation};
-  if (loggedUserType === UserType.ADMIN)
+  }
+  if (loggedUserType === UserType.ADMIN) {
     userSchema = {...userSchema, ...userStateDistrictValidation};
+  }
   return Yup.object().shape(userSchema);
 };
 
@@ -237,9 +234,9 @@ const prepareEditFormData = (
     } else if (formKey === 'projects') {
       if (!arraysEqual(formData.projects ?? [], initialValues.projects ?? [])) {
         acc.projects = JSON.stringify(
-          formData.projects?.reduce((acc, val) => {
-            acc[val] = formData.blocks ?? [];
-            return acc;
+          formData.projects?.reduce((projectsAccumulator, val) => {
+            projectsAccumulator[val] = formData.blocks ?? [];
+            return projectsAccumulator;
           }, {} as Record<number, number[]>),
         );
       }
@@ -261,7 +258,6 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
   const user = 'user' in route.params ? route.params.user : undefined;
   const userType = route.params.userType;
 
-  const theme = useTheme();
   let loggedUser = useProfileStore(store => store.data);
   const withAuth = useAuthStore(store => store.withAuth);
   const filterDistrictCodes = useDistrictStore(store => store.getFilteredCodes);
@@ -335,7 +331,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
       scrollToFirstError(errors);
       setManualScroll(false);
     }
-  }, [errors, manualScroll, scrollToFirstError]);
+  }, [errors, manualScroll, scrollToFirstError, setManualScroll]);
 
   if (variant === 'edit' && !user) {
     return (
@@ -376,8 +372,9 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
           formData,
           defaultValues as UserBasicForm,
         );
-        if (!Object.keys(dataToUpdate).length)
+        if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
+        }
         await withAuth(async () => {
           try {
             const result = await api.patch(`users/${user.id}/`, dataToUpdate);
