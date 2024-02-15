@@ -22,6 +22,7 @@ import {Project, useProjectStore} from '@hooks/useProjectStore';
 
 // helpers
 import {arraysEqual} from '@helpers/comparators';
+import {LV} from '@typedefs/common';
 
 type LocationSelectProps<TForm extends FieldValues = any> = Omit<
   FormSelectInputProps<Location, TForm>,
@@ -38,10 +39,26 @@ type LoadedLocationSelectProps<TForm extends FieldValues = any> = Omit<
   placeholder: string;
 };
 
+type StandardSelectProps<TForm extends FieldValues = any> = Omit<
+  FormSelectInputProps<LV, TForm>,
+  'loading' | 'selectProps'
+> & {
+  data: LV[];
+  placeholder: string;
+};
+
 const renderSelectItem = (item: {name: string}) => {
   return (
     <View style={styles.item}>
       <Text>{item.name}</Text>
+    </View>
+  );
+};
+
+const renderStandardSelectItem = (item: LV) => {
+  return (
+    <View style={styles.item}>
+      <Text>{item.label}</Text>
     </View>
   );
 };
@@ -275,6 +292,29 @@ const FormLoadedLocationSelectInput = <TFieldValues extends FieldValues>({
   );
 };
 
+const FormStandardSelectInput = <TFieldValues extends FieldValues>({
+  data,
+  placeholder,
+  ...props
+}: StandardSelectProps<TFieldValues>) => {
+  const selectProps = {
+    data,
+    labelField: 'label' as const,
+    valueField: 'value' as const,
+    searchField: 'label' as const,
+    placeholder,
+    renderItem: renderStandardSelectItem,
+  };
+
+  return (
+    <FormSelectInput
+      {...props}
+      selectProps={{...selectProps}}
+      loading={false}
+    />
+  );
+};
+
 let styles = StyleSheet.create({
   item: {
     padding: 17,
@@ -291,4 +331,5 @@ export {
   FormVillageSelectInput,
   FormProjectSelectInput,
   FormLoadedLocationSelectInput,
+  FormStandardSelectInput,
 };

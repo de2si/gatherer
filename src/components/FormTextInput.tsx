@@ -9,6 +9,7 @@ interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   name: FieldValues['name'];
   sentenceCase?: boolean;
+  numericValue?: boolean;
   inputProps?: TextInputProps; // Pass TextInputProps directly
   onLayout?: (fieldY: {name: string; y: number}) => void;
 }
@@ -17,6 +18,7 @@ const FormTextInput = <TFieldValues extends FieldValues>({
   control,
   name,
   sentenceCase = false,
+  numericValue = false,
   inputProps = {},
   onLayout = () => {},
 }: FormTextInputProps<TFieldValues>) => {
@@ -35,9 +37,15 @@ const FormTextInput = <TFieldValues extends FieldValues>({
             mode="outlined"
             onBlur={onBlur}
             onChangeText={text =>
-              onChange(sentenceCase ? convertToSentenceCase(text) : text)
+              onChange(
+                numericValue
+                  ? parseFloat(text)
+                  : sentenceCase
+                  ? convertToSentenceCase(text)
+                  : text,
+              )
             }
-            value={value}
+            value={numericValue && value ? value.toString() : value}
             {...inputProps}
           />
           <HelperText type="error" visible={error ? true : false}>
