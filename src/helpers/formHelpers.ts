@@ -16,7 +16,7 @@ export const formatToUrlKey = (imageData: FormImage) => ({
 });
 
 interface NestedErrors {
-  [key: string]: string[] | NestedErrors;
+  [key: string]: string[] | NestedErrors | (NestedErrors | {})[];
 }
 
 const flattenNestedErrors = (nestedErrors: NestedErrors): string[] => {
@@ -25,8 +25,21 @@ const flattenNestedErrors = (nestedErrors: NestedErrors): string[] => {
   for (const key in nestedErrors) {
     const errorValue = nestedErrors[key];
 
-    if (Array.isArray(errorValue)) {
+    if (
+      Array.isArray(errorValue) &&
+      errorValue.length > 0 &&
+      typeof errorValue[0] === 'string'
+    ) {
       flattenedErrors.push(`${key}: ${errorValue.join(', ')}`);
+    } else if (Array.isArray(errorValue) && errorValue.length > 0) {
+      errorValue.forEach((item, _index) => {
+        if (typeof item === 'object' && Object.keys(item).length > 0) {
+          const nestedErrorsArray = flattenNestedErrors(item as NestedErrors);
+          flattenedErrors.push(
+            ...nestedErrorsArray.map(nestedError => `${key}: ${nestedError}`),
+          );
+        }
+      });
     } else if (typeof errorValue === 'object' && errorValue !== null) {
       const nestedErrorsArray = flattenNestedErrors(errorValue as NestedErrors);
       flattenedErrors.push(
@@ -150,16 +163,22 @@ export const convertToSquareMeters = (
   value: number,
   unit: AreaUnit,
 ): number => {
+  let result: number;
   switch (unit) {
     case AreaUnit.SquareMeters:
-      return value;
+      result = value;
+      break;
     case AreaUnit.SquareFeet:
-      return value * 0.092903; // 1 square meter = 0.092903 square feet
+      result = value * 0.092903; // 1 square meter = 0.092903 square feet
+      break;
     case AreaUnit.Acres:
-      return value * 4046.86; // 1 acre = 4046.86 square meters
+      result = value * 4046.86; // 1 acre = 4046.86 square meters
+      break;
     case AreaUnit.Hectares:
-      return value * 10000; // 1 hectare = 10000 square meters
+      result = value * 10000; // 1 hectare = 10000 square meters
+      break;
     default:
       throw new Error('Invalid area unit');
   }
+  return Math.round(result);
 };

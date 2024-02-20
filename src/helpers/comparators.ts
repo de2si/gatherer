@@ -1,4 +1,4 @@
-import {Filter} from '@typedefs/common';
+import {Filter, FormImage} from '@typedefs/common';
 
 export const areFiltersEqual = (
   filters1: Filter,
@@ -65,3 +65,20 @@ export const areObjectsEqual = (
 // dates comparator
 export const areDatesEqual = (date1: Date, date2: Date): boolean =>
   date1.getTime() === date2.getTime();
+
+export const arePicturesEqual = (
+  arr1: FormImage[] = [],
+  arr2: FormImage[] = [],
+): boolean => {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i].uri !== arr2[i].uri || arr1[i].hash !== arr2[i].hash) {
+      return false;
+    }
+  }
+
+  return true;
+};

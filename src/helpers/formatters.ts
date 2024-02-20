@@ -60,3 +60,8 @@ export const truncateString = (input: string, maxLength = 25) => {
     ? input.substring(0, maxLength - 3).trim() + '...'
     : input;
 };
+
+export const formatNumber = (number: number): string => {
+  const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+  return formattedNumber;
+};
