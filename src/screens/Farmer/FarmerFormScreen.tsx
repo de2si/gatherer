@@ -219,7 +219,9 @@ const prepareEditFormData = (
 ) => {
   const changedFields = Object.keys(formData).reduce((acc, key) => {
     let formKey = key as keyof FarmerBasicForm;
-    if (formKey === 'date_of_birth') {
+    if (formKey in ['state', 'district', 'block']) {
+      // do nothing
+    } else if (formKey === 'date_of_birth') {
       if (!areDatesEqual(formData[formKey], initialValues[formKey])) {
         acc[formKey] = formatDate(formData[formKey], 'YYYY-MM-DD');
       }

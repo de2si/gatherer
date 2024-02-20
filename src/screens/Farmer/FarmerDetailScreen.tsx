@@ -1,6 +1,6 @@
 // FarmerDetailScreen.tsx
 
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, Pressable, StyleSheet, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
@@ -25,7 +25,8 @@ import {api} from '@api/axios';
 
 // helpers
 import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
-import {formatDate, formatPhoneNumber} from '@helpers/formatters';
+import {formatDate, formatNumber, formatPhoneNumber} from '@helpers/formatters';
+import {AreaUnit} from '@helpers/constants';
 
 // types
 import {ApiFarmer} from '@hooks/useFarmerStore';
@@ -119,8 +120,8 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
       }
     };
     fetchFarmer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, propFarmer]); // intentionally removing showSnackbar from dependencies
+  }, [id, propFarmer, showSnackbar, withAuth]);
+
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
@@ -128,6 +129,16 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
       </View>
     );
   }
+
+  const totalArea = farmer?.land_parcels.length
+    ? formatNumber(
+        farmer?.land_parcels.reduce((accumulator, currentObject) => {
+          return accumulator + currentObject.area;
+        }, 0),
+      ) +
+      ' ' +
+      AreaUnit.SquareMeters
+    : '-';
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -247,13 +258,41 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
             </List.Section>
             <Divider />
             <List.Section>
-              {/* <List.Subheader>Land</List.Subheader> */}
-              <DetailFieldItem label="Total Land" value="167" theme={theme} />
+              {farmer.land_parcels.length ? (
+                <DetailFieldItem
+                  label="Land"
+                  valueComponent={
+                    <View style={styles.linkRow}>
+                      {farmer.land_parcels.map(landItem => (
+                        <Pressable
+                          key={landItem.id}
+                          onPress={() => {
+                            // Navigation too be resolved by parent
+                            (navigation as any).navigate('LandDetail', {
+                              id: landItem.id,
+                            });
+                          }}>
+                          <Text
+                            variant="labelLarge"
+                            style={{color: theme.colors.secondary}}>
+                            LX198{landItem.id}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  }
+                  theme={theme}
+                />
+              ) : (
+                <DetailFieldItem label="Land" value={'-'} theme={theme} />
+              )}
+              <DetailFieldItem
+                label="Total Land"
+                value={totalArea}
+                theme={theme}
+              />
             </List.Section>
             <Divider />
-            <List.Section>
-              <DetailFieldItem label="Member" value="" theme={theme} />
-            </List.Section>
           </>
         )}
         <Snackbar
@@ -304,5 +343,9 @@ const styles = StyleSheet.create({
   },
   thinBorder: {
     borderWidth: 1,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    columnGap: 12,
   },
 });
