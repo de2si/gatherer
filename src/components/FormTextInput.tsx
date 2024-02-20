@@ -39,7 +39,9 @@ const FormTextInput = <TFieldValues extends FieldValues>({
             onChangeText={text =>
               onChange(
                 numericValue
-                  ? parseFloat(text)
+                  ? text
+                    ? parseFloat(text)
+                    : undefined
                   : sentenceCase
                   ? convertToSentenceCase(text)
                   : text,

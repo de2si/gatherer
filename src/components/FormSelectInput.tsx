@@ -72,6 +72,7 @@ interface FormSelectInputBaseProps<TForm extends FieldValues> {
   control: Control<TForm>;
   loading: boolean;
   onLayout?: (fieldY: {name: string; y: number}) => void;
+  hideErrors?: boolean;
 }
 
 interface FormSingleSelectInputProps<T = any, TForm extends FieldValues = any>
@@ -95,6 +96,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
   control,
   loading = false,
   onLayout = () => {},
+  hideErrors = false,
   variant = 'single',
   selectProps,
 }: FormSelectInputProps<T, TForm>) => {
@@ -216,9 +218,11 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
           {...multiSelectProps}
         />
       )}
-      <HelperText type="error" visible={ctrlError ? true : false}>
-        {ctrlError?.message ?? 'Error'}
-      </HelperText>
+      {!hideErrors && (
+        <HelperText type="error" visible={ctrlError ? true : false}>
+          {ctrlError?.message ?? 'Error'}
+        </HelperText>
+      )}
     </View>
   );
 };
