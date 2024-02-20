@@ -57,7 +57,7 @@ interface LandStore {
 }
 
 // Function to transform API response to match Land Preview interface
-const transformApiLand = (apiResponse: ApiLand): LandPreview => {
+export const transformApiLand = (apiResponse: ApiLand): LandPreview => {
   let {
     id,
     farmer,
