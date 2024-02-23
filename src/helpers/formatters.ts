@@ -65,3 +65,21 @@ export const formatNumber = (number: number): string => {
   const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
   return formattedNumber;
 };
+
+export function formatIdAsCode(char: string, id: number): string {
+  // Determine the second character based on the length of id
+  const secondChar = String.fromCharCode(Math.floor(id / 9999) + 65);
+
+  // Convert the id to a 4-digit string, pad with zeros if needed
+  const idString = (id % 9999).toString().padStart(4, '0');
+
+  // Construct the final code
+  const code = char + secondChar + idString;
+
+  // Ensure the code is exactly 6 characters long
+  if (code.length !== 6) {
+    throw new Error('Generated code is not 6 characters long');
+  }
+
+  return code;
+}

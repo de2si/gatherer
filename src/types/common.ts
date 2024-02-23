@@ -9,6 +9,12 @@ export interface FormImage {
   hash: string;
 }
 
+export interface FormDoc {
+  uri: string;
+  hash: string;
+  name: string;
+}
+
 export interface LocationFilter {
   stateCodes?: number[];
   districtCodes?: number[];

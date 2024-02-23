@@ -68,3 +68,13 @@ export const nameValidator = Yup.string()
     /^[A-Za-z\s-]+$/,
     'Invalid name. Only letters, spaces, and hyphens are allowed',
   );
+
+export const docValidator = Yup.object().shape({
+  uri: Yup.string()
+    .required('Doc URI is required')
+    .test('is-valid-uri', 'Invalid URI', isUri),
+  hash: Yup.string()
+    .required('Doc hash not calculated')
+    .test('is-valid-sha-256', 'Invalid 256 bit hash', isValidSha256),
+  name: Yup.string().required('Doc name required'),
+});
