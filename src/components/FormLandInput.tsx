@@ -156,7 +156,7 @@ const FormLandInput = <TFieldValues extends FieldValues>({
             )}
           </View>
           <HelperText type="error" visible={error ? true : false}>
-            {error?.message || 'Error'}
+            {error?.message ?? (error as any)?.id?.message ?? 'Error'}
           </HelperText>
         </View>
       )}

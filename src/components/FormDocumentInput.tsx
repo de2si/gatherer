@@ -109,7 +109,7 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
         </View>
       </View>
       <HelperText type="error" visible={error ? true : false}>
-        {error?.message || 'Error'}
+        {error?.message ?? (error as any)?.uri?.message ?? 'Error'}
       </HelperText>
       <Portal>
         <Snackbar
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   documentInputLabel: {
-    minWidth: 70,
+    width: 90,
   },
   rowContainer: {
     flexDirection: 'row',
