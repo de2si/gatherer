@@ -10,7 +10,7 @@ import UserTabs from '@nav/UserTabs';
 import MoreStack from '@nav/MoreStack';
 
 // screens
-import PlaceholderScreen from '@screens/PlaceholderScreen';
+import ProjectScreen from '@screens/ProjectScreen';
 
 // hooks
 import {useProfileStore} from '@hooks/useProfileStore';
@@ -44,7 +44,7 @@ const BottomTabs = () => {
       />
       <BottomTabNav.Screen
         name="Project"
-        component={PlaceholderScreen}
+        component={ProjectScreen}
         initialParams={{name: 'Project'}}
         options={{tabBarIcon: 'ruler-square-compass', title: 'Projects'}}
       />
