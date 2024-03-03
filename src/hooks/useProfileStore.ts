@@ -5,6 +5,7 @@ import {api} from '@api/axios';
 import {GENDER, UserType} from '@helpers/constants';
 import {Location} from '@hooks/locationHooks';
 import {Project} from '@hooks/useProjectStore';
+import {ApiImage} from '@typedefs/common';
 
 export interface ApiUserType {
   id: number;
@@ -22,6 +23,7 @@ export interface ApiUserType {
       blocks: number[];
     };
   };
+  profile_photo: ApiImage | null;
   user_type: UserType;
   name: string;
   gender: (typeof GENDER)[number];
@@ -65,6 +67,7 @@ const transformApiUser = (apiResponse: ApiUserType): User => {
 interface ProfileState {
   loading: boolean;
   data: User;
+  apiData: ApiUserType;
 }
 
 // Define initial profile state
@@ -80,11 +83,25 @@ const initialState: ProfileState = {
     phoneNumber: '',
     email: '',
   },
+  apiData: {
+    id: 0,
+    blocks: {},
+    projects: {},
+    user_type: UserType.SURVEYOR,
+    name: '',
+    gender: 'MALE',
+    phone_number: '',
+    email: '',
+    is_active: false,
+    date_joined: '',
+    profile_photo: null,
+  },
 };
 
 // Define the shape of the store
 interface ProfileStore extends ProfileState {
   fetchData: () => Promise<void>;
+  setProfile: (newProfile: ApiUserType) => void;
   reset: () => void;
 }
 
@@ -95,12 +112,15 @@ export const useProfileStore = create<ProfileStore>(set => ({
     try {
       set({loading: true});
       const response = await api.get('users/profile/');
-      set({data: transformApiUser(response.data)});
+      set({apiData: response.data, data: transformApiUser(response.data)});
     } catch (error) {
       throw error;
     } finally {
       set({loading: false});
     }
+  },
+  setProfile: newProfile => {
+    set({apiData: newProfile, data: transformApiUser(newProfile)});
   },
   reset: () => {
     set(initialState);

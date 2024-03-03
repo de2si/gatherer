@@ -8,6 +8,7 @@ import LoadingIndicator from '@components/LoadingIndicator';
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {UserStackScreenProps} from '@nav/UserStack';
+import {MoreStackScreenProps} from '@nav/MoreStack';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
@@ -27,11 +28,11 @@ import {api} from '@api/axios';
 interface UserPasswordForm {
   password: string;
 }
-type UserPasswordScreenProps = NativeStackScreenProps<
-  UserStackScreenProps,
-  'UserPassword'
->;
 
+// Define a generic type for the route parameters
+type UserPasswordScreenProps =
+  | NativeStackScreenProps<UserStackScreenProps, 'UserPassword'>
+  | NativeStackScreenProps<MoreStackScreenProps, 'ProfilePassword'>;
 // define validation schema
 const userPasswordSchema = Yup.object().shape({
   password: Yup.string()
@@ -43,12 +44,12 @@ const defaultValues: UserPasswordForm = {
   password: '',
 };
 
-const UserPassword: React.FC<UserPasswordScreenProps> = ({
-  route: {
-    params: {id, userType},
-  },
+const UserPasswordScreen: React.FC<UserPasswordScreenProps> = ({
+  route: {params, name: routeName},
   navigation,
 }) => {
+  const id = params.id;
+
   const withAuth = useAuthStore(store => store.withAuth);
   const [loading, setLoading] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
@@ -67,10 +68,17 @@ const UserPassword: React.FC<UserPasswordScreenProps> = ({
           await api.put(`users/${id}/password/`, data);
           showSnackbar('Password changed successfully');
           setTimeout(() => {
-            navigation.replace('UserDetail', {
-              id,
-              userType,
-            });
+            if (routeName === 'ProfilePassword') {
+              // handled by parent navigator
+              (navigation as any).replace('ProfileDetail', {
+                id,
+              });
+            } else {
+              (navigation as any).replace('UserDetail', {
+                id,
+                userType: params?.userType,
+              });
+            }
           }, 2000);
         } catch (error) {
           throw error;
@@ -112,7 +120,7 @@ const UserPassword: React.FC<UserPasswordScreenProps> = ({
   );
 };
 
-export default UserPassword;
+export default UserPasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -121,6 +129,7 @@ const styles = StyleSheet.create({
   formContainer: {
     rowGap: 24,
     marginHorizontal: 24,
+    marginTop: 24,
   },
   button: {
     marginHorizontal: 48,

@@ -36,6 +36,24 @@ export type UserStackScreenProps = {
   };
 };
 
+const UserDetailScreenWrapper: React.FC<
+  NativeStackScreenProps<UserStackScreenProps, 'UserDetail'>
+> = props => {
+  return <UserDetailScreen {...props} />;
+};
+
+const UserFormScreenWrapper: React.FC<
+  NativeStackScreenProps<UserStackScreenProps, 'UserAdd' | 'UserEdit'>
+> = props => {
+  return <UserFormScreen {...props} />;
+};
+
+const UserPasswordScreenWrapper: React.FC<
+  NativeStackScreenProps<UserStackScreenProps, 'UserPassword'>
+> = props => {
+  return <UserPasswordScreen {...props} />;
+};
+
 // create navigation stack
 const Stack = createNativeStackNavigator<UserStackScreenProps>();
 
@@ -68,23 +86,23 @@ const UserStack: React.FC<UserStackProps> = ({route}) => {
       />
       <Stack.Screen
         name="UserDetail"
-        component={UserDetailScreen}
+        component={UserDetailScreenWrapper}
         options={{title: `${userTypeSentenceCase} details`}}
       />
       <Stack.Screen
         name="UserAdd"
-        component={UserFormScreen}
+        component={UserFormScreenWrapper}
         initialParams={{variant: 'add', userType}}
         options={{title: `Add ${userTypeLowerCase}`}}
       />
       <Stack.Screen
         name="UserEdit"
-        component={UserFormScreen}
+        component={UserFormScreenWrapper}
         options={{title: `Update ${userTypeLowerCase}`}}
       />
       <Stack.Screen
         name="UserPassword"
-        component={UserPasswordScreen}
+        component={UserPasswordScreenWrapper}
         options={{title: 'Reset password'}}
       />
     </Stack.Navigator>

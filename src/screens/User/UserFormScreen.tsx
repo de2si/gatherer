@@ -51,6 +51,7 @@ import {ApiUserType} from '@hooks/useProfileStore';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {UserStackScreenProps} from '@nav/UserStack';
+import {MoreStackScreenProps} from '@nav/MoreStack';
 
 // types
 interface UserBasicForm {
@@ -248,17 +249,24 @@ const prepareEditFormData = (
   return changedFields;
 };
 
-type UserFormScreenProps = NativeStackScreenProps<
-  UserStackScreenProps,
-  'UserAdd' | 'UserEdit'
->;
+type UserFormScreenProps =
+  | NativeStackScreenProps<UserStackScreenProps, 'UserAdd' | 'UserEdit'>
+  | NativeStackScreenProps<MoreStackScreenProps, 'ProfileEdit'>;
 
-const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
-  const {variant} = route.params;
-  const user = 'user' in route.params ? route.params.user : undefined;
-  const userType = route.params.userType;
+const UserFormScreen: React.FC<UserFormScreenProps> = ({
+  route: {params, name: routeName},
+  navigation,
+}) => {
+  const variant = 'variant' in params ? params.variant : 'edit';
+  let user = 'user' in params ? params.user : undefined;
+  const userType = 'userType' in params ? params.userType : UserType.ADMIN;
 
   let loggedUser = useProfileStore(store => store.data);
+  let setProfile = useProfileStore(store => store.setProfile);
+  const profileUser = useProfileStore(store => store.apiData);
+  if (routeName === 'ProfileEdit') {
+    user = profileUser;
+  }
   const withAuth = useAuthStore(store => store.withAuth);
   const filterDistrictCodes = useDistrictStore(store => store.getFilteredCodes);
   const filterBlockCodes = useBlockStore(store => store.getFilteredCodes);
@@ -356,7 +364,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
               showSnackbar('User added successfully');
               setRefresh(userType);
               setTimeout(() => {
-                navigation.replace('UserDetail', {
+                (navigation as any).replace('UserDetail', {
                   id: result.data.user_id,
                   user: result.data,
                   userType,
@@ -380,13 +388,18 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
             const result = await api.patch(`users/${user.id}/`, dataToUpdate);
             if (result.status === 200) {
               showSnackbar('User updated successfully');
-              setRefresh(userType);
               setTimeout(() => {
-                navigation.navigate('UserDetail', {
-                  id: result.data.user_id,
-                  user: result.data,
-                  userType,
-                });
+                if (routeName === 'ProfileEdit') {
+                  setProfile(result.data);
+                  (navigation as any).navigate('ProfileDetail', {});
+                } else {
+                  setRefresh(userType);
+                  (navigation as any).navigate('UserDetail', {
+                    id: result.data.user_id,
+                    user: result.data,
+                    userType,
+                  });
+                }
               }, 2000);
             }
           } catch (error) {
@@ -464,7 +477,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
             options={transformToLabelValuePair(GENDER)}
             onLayout={handleLayout}
           />
-          {variant === 'edit' && (
+          {variant === 'edit' && routeName !== 'ProfileEdit' && (
             <FormRadioInput
               name="user_type"
               control={control}
@@ -474,7 +487,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({route, navigation}) => {
             />
           )}
 
-          {formUserType !== UserType.ADMIN && (
+          {formUserType !== UserType.ADMIN && routeName !== 'ProfileEdit' && (
             <>
               <FormProjectSelectInput
                 name="projects"
@@ -546,6 +559,7 @@ export default UserFormScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingVertical: 12,
   },
   formContainer: {
     rowGap: 24,
@@ -560,6 +574,6 @@ const styles = StyleSheet.create({
   button: {
     marginHorizontal: 48,
     marginTop: 20,
-    marginBottom: 60,
+    marginBottom: 40,
   },
 });

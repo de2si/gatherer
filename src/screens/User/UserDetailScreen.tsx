@@ -30,17 +30,17 @@ import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
 import {formatDate, formatPhoneNumber} from '@helpers/formatters';
 
 // types
-import {ApiUserType} from '@hooks/useProfileStore';
+import {ApiUserType, useProfileStore} from '@hooks/useProfileStore';
 import {UserType} from '@helpers/constants';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
+import {MoreStackScreenProps} from '@nav/MoreStack';
 
-type UserDetailScreenProps = NativeStackScreenProps<
-  UserStackScreenProps,
-  'UserDetail'
->;
+type UserDetailScreenProps =
+  | NativeStackScreenProps<UserStackScreenProps, 'UserDetail'>
+  | NativeStackScreenProps<MoreStackScreenProps, 'ProfileDetail'>;
 
 const UserDetailHeaderRight = ({
   isActive = true,
@@ -49,6 +49,7 @@ const UserDetailHeaderRight = ({
   menuVisible,
   handleMenuVisibility,
   handlePasswordChange,
+  routeName,
 }: {
   isActive: boolean;
   handleStatusChange: () => void;
@@ -56,6 +57,7 @@ const UserDetailHeaderRight = ({
   menuVisible: boolean;
   handleMenuVisibility: (show: boolean) => void;
   handlePasswordChange: () => void;
+  routeName: 'UserDetail' | 'ProfileDetail';
 }) => {
   return (
     <>
@@ -74,22 +76,29 @@ const UserDetailHeaderRight = ({
           />
         }>
         <Menu.Item onPress={handlePasswordChange} title="Change password" />
-        <Menu.Item
-          onPress={handleStatusChange}
-          title={isActive ? 'Deactivate user' : 'Activate user'}
-        />
+        {routeName === 'UserDetail' && (
+          <Menu.Item
+            onPress={handleStatusChange}
+            title={isActive ? 'Deactivate user' : 'Activate user'}
+          />
+        )}
       </Menu>
     </>
   );
 };
 
 const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
-  route: {
-    params: {id, user: propUser, userType},
-  },
+  route: {params, name: routeName},
   navigation,
 }) => {
   const theme = useTheme();
+  let propUser = 'user' in params ? params.user : undefined;
+  const userType = 'userType' in params ? params.userType : UserType.ADMIN;
+  const profileUser = useProfileStore(store => store.apiData);
+  if (routeName === 'ProfileDetail') {
+    propUser = profileUser;
+  }
+  const id = 'id' in params ? params.id : profileUser.id;
   const withAuth = useAuthStore(store => store.withAuth);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
@@ -120,12 +129,25 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
   const [menuVisible, setMenuVisible] = useState(false);
   useEffect(() => {
     const handleEditPress = () => {
-      user &&
-        navigation.navigate('UserEdit', {variant: 'edit', user, userType});
+      if (routeName === 'ProfileDetail') {
+        (navigation as any).navigate('ProfileEdit', {});
+      } else {
+        user &&
+          (navigation as any).navigate('UserEdit', {
+            variant: 'edit',
+            user,
+            userType,
+          });
+      }
     };
     const handlePasswordChange = () => {
       handleMenuVisibility(false);
-      user && navigation.navigate('UserPassword', {id: user.id, userType});
+      if (routeName === 'ProfileDetail') {
+        user && (navigation as any).navigate('ProfilePassword', {id: user.id});
+      } else {
+        user &&
+          (navigation as any).navigate('UserPassword', {id: user.id, userType});
+      }
     };
     const handleMenuVisibility = (show: boolean) => {
       setMenuVisible(show);
@@ -172,9 +194,18 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
           menuVisible,
           handleMenuVisibility,
           handlePasswordChange,
+          routeName,
         }),
     });
-  }, [user, navigation, userType, menuVisible, withAuth, showSnackbar]);
+  }, [
+    user,
+    navigation,
+    userType,
+    menuVisible,
+    withAuth,
+    showSnackbar,
+    routeName,
+  ]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -221,36 +252,34 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
       <View style={styles.container}>
         {user && (
           <>
-            <List.Section>
-              <View
-                style={[
-                  styles.headerRow,
-                  {backgroundColor: theme.colors.primary},
-                ]}>
-                <View style={styles.col}>
-                  <List.Item
-                    title={user.name}
-                    description={user.user_type}
-                    titleStyle={[
-                      theme.fonts.titleMedium,
-                      {color: theme.colors.onPrimary},
-                    ]}
-                    descriptionStyle={[
-                      theme.fonts.labelLarge,
-                      {color: theme.colors.inverseOnSurface},
-                    ]}
-                  />
-                </View>
-                <View style={styles.col}>
-                  <Avatar.Text
-                    label={user.name[0]}
-                    size={120}
-                    style={[
-                      styles.thinBorder,
-                      {borderColor: theme.colors.outline},
-                    ]}
-                  />
-                </View>
+            <List.Section
+              style={[
+                styles.headerRow,
+                {backgroundColor: theme.colors.primary},
+              ]}>
+              <View style={styles.col}>
+                <List.Item
+                  title={user.name}
+                  description={user.user_type}
+                  titleStyle={[
+                    theme.fonts.titleMedium,
+                    {color: theme.colors.onPrimary},
+                  ]}
+                  descriptionStyle={[
+                    theme.fonts.labelLarge,
+                    {color: theme.colors.inverseOnSurface},
+                  ]}
+                />
+              </View>
+              <View style={styles.col}>
+                <Avatar.Text
+                  label={user.name[0]}
+                  size={120}
+                  style={[
+                    styles.thinBorder,
+                    {borderColor: theme.colors.outline},
+                  ]}
+                />
               </View>
             </List.Section>
             <List.Section>
@@ -338,6 +367,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 0,
   },
   col: {
     justifyContent: 'center',
