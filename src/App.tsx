@@ -9,10 +9,19 @@ import {lightTheme} from '@styles/lightTheme';
 import {darkTheme} from '@styles/darkTheme';
 import AppNav from '@nav/AppNav';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useSettingStore} from '@hooks/useSettingStore';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const selectedTheme = useSettingStore(store => store.theme);
+  const theme =
+    selectedTheme === 'auto'
+      ? isDarkMode
+        ? darkTheme
+        : lightTheme
+      : selectedTheme === 'light'
+      ? lightTheme
+      : darkTheme;
 
   return (
     <GestureHandlerRootView style={styles.container}>

@@ -1,6 +1,7 @@
 // MoreStack.tsx
 
 import React from 'react';
+import {useTheme} from 'react-native-paper';
 
 // navigation
 import {
@@ -13,6 +14,7 @@ import MoreListScreen from '@screens/More/MoreListScreen';
 import UserPasswordScreen from '@screens/User/UserPasswordScreen';
 import UserDetailScreen from '@screens/User/UserDetailScreen';
 import UserFormScreen from '@screens/User/UserFormScreen';
+import ThemeScreen from '@screens/More/ThemeScreen';
 
 // define screen params
 export type MoreStackScreenProps = {
@@ -22,6 +24,7 @@ export type MoreStackScreenProps = {
   ProfilePassword: {
     id: number;
   };
+  ThemeSelect: {};
 };
 
 const ProfileDetailScreenWrapper: React.FC<
@@ -46,8 +49,16 @@ const ProfilePasswordScreenWrapper: React.FC<
 const Stack = createNativeStackNavigator<MoreStackScreenProps>();
 
 const MoreStack = (): React.JSX.Element => {
+  const theme = useTheme();
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerBackTitleVisible: false,
+        headerShadowVisible: false,
+        headerStyle: {backgroundColor: theme.colors.background},
+        headerTitleStyle: theme.fonts.titleMedium,
+        contentStyle: {flex: 1, backgroundColor: theme.colors.background},
+      }}>
       <Stack.Screen
         name="MoreList"
         component={MoreListScreen}
@@ -67,6 +78,11 @@ const MoreStack = (): React.JSX.Element => {
         name="ProfilePassword"
         component={ProfilePasswordScreenWrapper}
         options={{title: 'Change password'}}
+      />
+      <Stack.Screen
+        name="ThemeSelect"
+        component={ThemeScreen}
+        options={{title: 'Choose theme'}}
       />
     </Stack.Navigator>
   );
