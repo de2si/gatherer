@@ -73,11 +73,12 @@ const LandProgressTable: React.FC<LandProgressTableProps> = ({
     <View style={styles.container}>
       <DataTable>
         <DataTable.Header>
-          {['Model', 'Target', 'Dug', 'Fertilized', 'Planted'].map(
-            (colTitle, index) => (
-              <DataTable.Title key={index}>{colTitle}</DataTable.Title>
-            ),
-          )}
+          <DataTable.Title>Model</DataTable.Title>
+          {['Target', 'Dug', 'Fertilized', 'Planted'].map((colTitle, index) => (
+            <DataTable.Title key={index} style={styles.cellStyle}>
+              {colTitle}
+            </DataTable.Title>
+          ))}
         </DataTable.Header>
         {progress.map(progressItem => (
           <DataTable.Row key={progressItem.id}>
@@ -86,6 +87,7 @@ const LandProgressTable: React.FC<LandProgressTableProps> = ({
             </DataTable.Title>
             {ACTIVITY_KEYS.map(colKey => (
               <DataTable.Cell
+                style={styles.cellStyle}
                 key={colKey}
                 onPress={() =>
                   setEditable({model: progressItem.model, col: colKey})
@@ -131,5 +133,9 @@ const styles = StyleSheet.create({
   },
   helperText: {
     marginLeft: 12,
+  },
+  cellStyle: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
