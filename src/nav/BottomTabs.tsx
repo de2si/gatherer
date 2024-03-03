@@ -8,9 +8,7 @@ import {createMaterialBottomTabNavigator} from 'react-native-paper/react-navigat
 import DataTabs from '@nav/DataTabs';
 import UserTabs from '@nav/UserTabs';
 import MoreStack from '@nav/MoreStack';
-
-// screens
-import ProjectScreen from '@screens/ProjectScreen';
+import ProjectStack from '@nav/ProjectStack';
 
 // hooks
 import {useProfileStore} from '@hooks/useProfileStore';
@@ -44,8 +42,7 @@ const BottomTabs = () => {
       />
       <BottomTabNav.Screen
         name="Project"
-        component={ProjectScreen}
-        initialParams={{name: 'Project'}}
+        component={ProjectStack}
         options={{tabBarIcon: 'ruler-square-compass', title: 'Projects'}}
       />
       {loggedUser.userType !== UserType.SURVEYOR && (

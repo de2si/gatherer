@@ -30,7 +30,7 @@ import ActivityTable from '@components/CarbonSeq/ActivityTable';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
-import {ACTIVITY_NAMES} from '@screens/CarbonSeq/ActivityListScreen';
+import {ACTIVITY_NAMES} from '@screens/Project/CarbonSeq/ActivityListScreen';
 
 const activityTableHeaderRight = ({
   isFilterApplied = false,

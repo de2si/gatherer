@@ -1,25 +1,25 @@
-// ActivityStack.tsx
+// ProjectStack.tsx
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
 
 // navigation
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import CarbonSeqTabs from '@nav/Project/CarbonSeq/CarbonSeqTabs';
 
 // screens
-import ActivityListScreen from '@screens/Project/CarbonSeq/ActivityListScreen';
-import ActivityTableScreen from '@screens/Project/CarbonSeq/ActivityTableScreen';
+import ProjectScreen from '@screens/Project/ProjectScreen';
 
 // define screen params
-export type ActivityStackScreenProps = {
-  ActivityList: {};
-  ActivityTable: {name: string};
+export type ProjectStackScreenProps = {
+  HomeScreen: {};
+  CarbonSeq: {};
 };
 
 // create navigation stack
-const Stack = createNativeStackNavigator<ActivityStackScreenProps>();
+const Stack = createNativeStackNavigator<ProjectStackScreenProps>();
 
-const ActivityStack = (): React.JSX.Element => {
+const ProjectStack = (): React.JSX.Element => {
   const theme = useTheme();
   return (
     <Stack.Navigator
@@ -31,15 +31,21 @@ const ActivityStack = (): React.JSX.Element => {
         contentStyle: {flex: 1, backgroundColor: theme.colors.background},
       }}>
       <Stack.Screen
-        name="ActivityList"
-        component={ActivityListScreen}
+        name="HomeScreen"
+        component={ProjectScreen}
         options={{
-          headerShown: false,
+          title: 'Projects',
         }}
       />
-      <Stack.Screen name="ActivityTable" component={ActivityTableScreen} />
+      <Stack.Screen
+        name="CarbonSeq"
+        component={CarbonSeqTabs}
+        options={{
+          title: 'Carbon Sequestration',
+        }}
+      />
     </Stack.Navigator>
   );
 };
 
-export default ActivityStack;
+export default ProjectStack;

@@ -7,9 +7,9 @@ import {useTheme} from 'react-native-paper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 // screens
-import ParticipantListScreen from '@screens/CarbonSeq/ParticipantListScreen';
-import ParticipantDetailScreen from '@screens/CarbonSeq/ParticipantDetailScreen';
-import ParticipantAddScreen from '@screens/CarbonSeq/ParticipantAddScreen';
+import ParticipantListScreen from '@screens/Project/CarbonSeq/ParticipantListScreen';
+import ParticipantDetailScreen from '@screens/Project/CarbonSeq/ParticipantDetailScreen';
+import ParticipantAddScreen from '@screens/Project/CarbonSeq/ParticipantAddScreen';
 
 // types
 import {ApiParticipant} from '@hooks/carbonSeqHooks';
