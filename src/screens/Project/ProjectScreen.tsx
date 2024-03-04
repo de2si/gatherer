@@ -61,12 +61,13 @@ const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   card: {
     margin: 4,
     padding: 8,
     height: 200,
-    width: '48%',
+    width: '44%',
     alignItems: 'center',
     justifyContent: 'center',
   },

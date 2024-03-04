@@ -22,12 +22,14 @@ function App(): React.JSX.Element {
       : selectedTheme === 'light'
       ? lightTheme
       : darkTheme;
+  const statusBarContent =
+    theme === lightTheme ? 'dark-content' : 'light-content';
 
   return (
     <GestureHandlerRootView style={styles.container}>
       <PaperProvider theme={theme}>
         <StatusBar
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          barStyle={statusBarContent}
           backgroundColor={theme.colors.background}
           translucent={false}
         />

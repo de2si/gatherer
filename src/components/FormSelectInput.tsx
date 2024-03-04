@@ -143,11 +143,13 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     ],
     containerStyle: [styles.containerStyle, containerStyle ?? null],
     placeholderStyle: [
+      {color: theme.colors.onSurfaceVariant},
       styles.placeholderStyle,
       theme.fonts.bodyLarge,
       placeholderStyle ?? null,
     ],
     selectedTextStyle: [
+      {color: theme.colors.onSurface},
       styles.selectedTextStyle,
       theme.fonts.bodyLarge,
       selectedTextStyle ?? null,
