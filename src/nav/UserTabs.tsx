@@ -36,7 +36,7 @@ const UserTabs = () => {
           backgroundColor: theme.colors.background,
         },
         tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.backdrop,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarLabelStyle: {
           fontWeight: 'normal',
         },

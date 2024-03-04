@@ -33,6 +33,7 @@ const ParticipantStack = (): React.JSX.Element => {
         headerShadowVisible: false,
         headerStyle: {backgroundColor: theme.colors.background},
         headerTitleStyle: theme.fonts.titleMedium,
+        headerTintColor: theme.colors.onSurface,
         contentStyle: {flex: 1, backgroundColor: theme.colors.background},
       }}>
       <Stack.Screen
