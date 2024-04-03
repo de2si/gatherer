@@ -49,6 +49,7 @@ import {FormImage} from '@typedefs/common';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
+import {useS3Upload} from '@hooks/useS3';
 
 // types
 interface FarmerBasicForm {
@@ -173,7 +174,10 @@ const getFarmerEditDefaultValues = ({
   category,
 }: ApiFarmer): FarmerBasicForm => {
   return {
-    profile_photo: {uri: profile_photo.url, hash: profile_photo.hash},
+    profile_photo: {
+      uri: profile_photo.url,
+      hash: profile_photo.hash,
+    },
     id_front_image: {uri: id_front_image.url, hash: id_front_image.hash},
     id_back_image: {uri: id_back_image.url, hash: id_back_image.hash},
     date_of_birth: new Date(date_of_birth),
@@ -206,9 +210,9 @@ const prepareAddFormData = (formData: FarmerAddForm) => {
       'date_of_birth',
     ]),
     id_hash: calculateHash(formData.aadhaar),
-    profile_photo: formatToUrlKey(formData.profile_photo),
-    id_back_image: formatToUrlKey(formData.id_back_image),
-    id_front_image: formatToUrlKey(formData.id_front_image),
+    // profile_photo: formData.profile_photo,
+    // id_back_image: formData.id_back_image,
+    // id_front_image: formData.id_front_image,
     date_of_birth: formatDate(formData.date_of_birth, 'YYYY-MM-DD'),
     phone_number: add91Prefix(formData.phone_number),
   };
@@ -258,6 +262,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
   const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
 
   const withAuth = useAuthStore(store => store.withAuth);
+  const {upload: uploadToS3} = useS3Upload();
 
   const [loading, setLoading] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
@@ -349,12 +354,14 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
     try {
       setLoading(true);
       if (variant === 'add') {
+        const {profile_photo, id_back_image, id_front_image} = formData;
+        const farmerAddData = {
+          ...uploadToS3({profile_photo, id_back_image, id_front_image}),
+          ...prepareAddFormData(formData as FarmerAddForm),
+        };
         await withAuth(async () => {
           try {
-            const result = await api.post(
-              'farmers/',
-              prepareAddFormData(formData as FarmerAddForm),
-            );
+            const result = await api.post('farmers/', farmerAddData);
             if (result.status === 201) {
               reset(farmerAddDefaultValues);
               showSnackbar('Farmer added successfully');
@@ -371,13 +378,29 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
           }
         });
       } else if (variant === 'edit' && farmer) {
-        const dataToUpdate = prepareEditFormData(
+        let dataToUpdate = prepareEditFormData(
           formData,
           defaultValues as FarmerBasicForm,
         );
+        let photosToUpdate = {
+          profile_photo:
+            'profile_photo' in dataToUpdate
+              ? formData.profile_photo
+              : undefined,
+          id_back_image:
+            'id_back_image' in dataToUpdate
+              ? formData.id_back_image
+              : undefined,
+          id_front_image:
+            'id_front_image' in dataToUpdate
+              ? formData.id_front_image
+              : undefined,
+        };
+        dataToUpdate = {...dataToUpdate, ...uploadToS3(photosToUpdate)};
         if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
         }
+        console.log('sending', dataToUpdate);
         await withAuth(async () => {
           try {
             const result = await api.patch(

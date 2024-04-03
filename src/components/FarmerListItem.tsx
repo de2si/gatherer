@@ -2,7 +2,8 @@
 
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Avatar, Card, Text} from 'react-native-paper';
+import {Card, Text} from 'react-native-paper';
+import ImageWrapper from '@components/ImageWrapper';
 import {FarmerPreview} from '@hooks/useFarmerStore';
 import {truncateString} from '@helpers/formatters';
 
@@ -14,8 +15,9 @@ interface FarmerListItemProps {
 const FarmerListItem: React.FC<FarmerListItemProps> = ({data, onPress}) => (
   <Card mode="elevated" onPress={() => onPress(data)}>
     <Card.Content style={styles.row}>
-      <Avatar.Image
-        source={{uri: data.photo.url}}
+      <ImageWrapper
+        flavor="avatar"
+        value={data.photo}
         size={80}
         style={styles.avatar}
       />

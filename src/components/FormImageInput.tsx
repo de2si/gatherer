@@ -138,9 +138,16 @@ const FormImageInput = <TFieldValues extends FieldValues>({
       handleImagePickerError(response);
     } else if (response.assets) {
       if (variant === 'single') {
-        const {uri, base64} = response.assets[0];
+        const {uri, base64, type, fileName} = response.assets[0];
         onChange(
-          uri ? {uri: uri, hash: calculateHash(base64 ?? null, 256)} : null,
+          uri
+            ? {
+                uri: uri,
+                hash: calculateHash(base64 ?? null, 256),
+                type,
+                name: fileName,
+              }
+            : null,
         );
       } else {
         response.assets.length
@@ -148,6 +155,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
               response.assets.map(imgItem => ({
                 uri: imgItem.uri,
                 hash: calculateHash(imgItem.base64 ?? null, 256),
+                type: imgItem.type,
+                name: imgItem.fileName,
               })),
             )
           : onChange(null);

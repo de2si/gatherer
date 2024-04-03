@@ -7,6 +7,8 @@ export interface ApiImage {
 export interface FormImage {
   uri: string;
   hash: string;
+  type?: string;
+  name?: string;
 }
 
 export interface FormDoc {
