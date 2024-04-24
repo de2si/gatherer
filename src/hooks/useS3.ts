@@ -17,9 +17,11 @@ import {createJSONStorage, persist} from 'zustand/middleware';
 import {calculateHash} from '@helpers/cryptoHelpers';
 import RNFS from 'react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CookieManager from '@react-native-cookies/cookies';
 
 // Type Definitions
 interface ApiS3Upload {
+  resource_url: string;
   url: string;
   fields: {
     [key: string]: string;
@@ -79,17 +81,18 @@ export const useS3Upload = (): UseS3Upload => {
               },
             });
 
-            const bucket =
-              response.data.url.match(/\/\/([^.]+)\./)?.[1] ?? 'haritika-org';
-            const pathString = `s3://${bucket}/${response.data.fields.key}`;
+            // const bucket =
+            // response.data.url.match(/\/\/([^.]+)\./)?.[1] ?? 'haritika-org';
+            // const pathString = `s3://${bucket}/${response.data.fields.key}`;
 
-            return [key, {url: pathString, hash: file.hash}];
+            return [key, {url: response.data.resource_url, hash: file.hash}];
           },
         );
 
         const result = await Promise.all(uploadPromises);
-
-        output = Object.fromEntries(result).filter(Boolean);
+        output = Object.fromEntries(
+          result.filter(entry => entry[1] !== undefined),
+        );
       } catch (error) {
         let message = getErrorMessage(error);
         let messageToShow =
@@ -139,6 +142,23 @@ const convertBlobToBase64 = async (blob: Blob): Promise<string> => {
   });
 };
 
+// Set the received cookies
+const setCookies = async (
+  url: string,
+  awsSignedCookies: {[key: string]: string},
+) => {
+  if (!url.includes('cloudfront.net')) {
+    return;
+  }
+  try {
+    for (const [key, value] of Object.entries(awsSignedCookies)) {
+      await CookieManager.set(url, {name: key, value: value});
+    }
+  } catch (error) {
+    throw new Error('Unable to set cookies');
+  }
+};
+
 interface UseS3Download {
   localUrl: string;
   error: string | null;
@@ -151,7 +171,6 @@ export const useS3Download = (file: ApiImage): UseS3Download => {
   const updateIndex = useFileIndexStore(store => store.updateIndex);
 
   const download = useCallback(async () => {
-    console.log('Download start', file.url);
     if (file.url.startsWith('file://')) {
       setLocalUrl(file.url);
       return;
@@ -162,14 +181,13 @@ export const useS3Download = (file: ApiImage): UseS3Download => {
     }
     await withAuth(async () => {
       try {
-        let fileS3Url = await api.get('getS3DownloadUrl', {
-          params: {
-            s3_path: file.url,
-          },
-        });
+        let {
+          data: {awsSignedCookies},
+        } = await api.get('getAwsSignedCookies');
+        await setCookies(file.url, awsSignedCookies);
 
         // Download the image and update the store
-        const response = await fetch(fileS3Url.data);
+        const response = await fetch(file.url);
         const blob = await response.blob();
         const base64Image = await convertBlobToBase64(blob);
         const calculatedHash = calculateHash(base64Image, 256);
@@ -192,7 +210,7 @@ export const useS3Download = (file: ApiImage): UseS3Download => {
         setError(finalMessage);
       }
     });
-  }, [file.hash, file.id, file.url, localFileIndex, updateIndex, withAuth]);
+  }, [file, localFileIndex, updateIndex, withAuth]);
 
   useEffect(() => {
     download();
