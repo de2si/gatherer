@@ -1,4 +1,5 @@
-import {MD3LightTheme} from 'react-native-paper';
+import {configureFonts, MD3LightTheme} from 'react-native-paper';
+import {fontConfig} from '@styles/font';
 
 const appLightTheme = {
   colors: {
@@ -10,7 +11,7 @@ const appLightTheme = {
     onSecondary: 'rgb(255, 255, 255)',
     secondaryContainer: 'rgb(167, 245, 167)',
     onSecondaryContainer: 'rgb(0, 33, 6)',
-    tertiary: 'rgb(0, 104, 116)',
+    tertiary: '#707070',
     onTertiary: 'rgb(255, 255, 255)',
     tertiaryContainer: 'rgb(151, 240, 255)',
     onTertiaryContainer: 'rgb(0, 31, 36)',
@@ -48,4 +49,5 @@ const appLightTheme = {
 export const lightTheme = {
   ...MD3LightTheme,
   colors: appLightTheme.colors,
+  fonts: configureFonts({config: fontConfig}),
 };
