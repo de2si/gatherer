@@ -45,7 +45,7 @@ export const formatPhoneNumber = (phoneNumber: string) => {
     return cleanedPhoneNumber.replace(/(\d{1})(\d{5})(\d{5})/, '0-$2-$3');
   } else {
     // Format international number: +91 XXXXX-XXXXX
-    return cleanedPhoneNumber.replace(/(\d{2})(\d{5})(\d{5})/, '+$1 $2-$3');
+    return cleanedPhoneNumber.replace(/(\d{2})(\d{5})(\d{5})/, '+$1-$2$3');
   }
 };
 
