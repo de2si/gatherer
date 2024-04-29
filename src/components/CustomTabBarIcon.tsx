@@ -10,7 +10,7 @@ const CustomTabBarIcon = ({icon, color}: CustomTabBarIconProps) => {
   const Icon = icon;
   return Icon ? (
     <View style={styles.iconContainer}>
-      <Icon color={color} style={styles.icon} />
+      <Icon color={color} />
     </View>
   ) : (
     <></>
@@ -20,14 +20,6 @@ const CustomTabBarIcon = ({icon, color}: CustomTabBarIconProps) => {
 const styles = StyleSheet.create({
   iconContainer: {
     flex: 1,
-    minWidth: 84,
-    minHeight: 48,
-    padding: 10,
-  },
-  icon: {
-    flex: 1,
-    minWidth: 84,
-    minHeight: 48,
     padding: 10,
   },
 });

@@ -78,8 +78,14 @@ const CustomTabBar = ({
 const Tab = createMaterialTopTabNavigator();
 
 const DataTabs = () => {
+  const theme = useTheme();
   return (
-    <Tab.Navigator tabBar={CustomTabBar}>
+    <Tab.Navigator
+      tabBar={CustomTabBar}
+      sceneContainerStyle={[
+        styles.screenContainer,
+        {backgroundColor: theme.colors.background},
+      ]}>
       <Tab.Screen
         name="Farmer"
         component={FarmerStack}
@@ -118,5 +124,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
     borderRadius: 6,
+  },
+  screenContainer: {
+    flex: 1,
   },
 });

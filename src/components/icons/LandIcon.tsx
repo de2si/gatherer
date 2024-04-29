@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Svg, {SvgProps, Defs, ClipPath, Path, G} from 'react-native-svg';
 const LandIcon = ({
   color = 'black',
@@ -8,7 +8,7 @@ const LandIcon = ({
 }: SvgProps) => (
   <Svg
     {...props}
-    viewBox="0 0 100 100"
+    viewBox="0 0 86.607 62.644"
     preserveAspectRatio="xMidYMid meet"
     width={width}
     height={height}>
