@@ -33,9 +33,12 @@ const FarmerStack = (): React.JSX.Element => {
         headerBackTitleVisible: false,
         headerShadowVisible: false,
         headerStyle: {backgroundColor: theme.colors.background},
-        headerTitleStyle: theme.fonts.titleMedium,
-        headerTintColor: theme.colors.onSurface,
-        contentStyle: {flex: 1, backgroundColor: theme.colors.background},
+        headerTitleStyle: theme.fonts.titleLarge,
+        headerTintColor: theme.colors.tertiary,
+        contentStyle: {
+          flex: 1,
+          backgroundColor: theme.colors.background,
+        },
       }}>
       <Stack.Screen
         name="FarmerList"
@@ -47,7 +50,7 @@ const FarmerStack = (): React.JSX.Element => {
       <Stack.Screen
         name="FarmerDetail"
         component={FarmerDetailScreen}
-        options={{title: 'Farmer details'}}
+        options={{title: 'Farmer'}}
       />
       <Stack.Screen
         name="FarmerAdd"
