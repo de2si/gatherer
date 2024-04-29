@@ -20,7 +20,7 @@ const CustomTabBarIcon = ({icon, color}: CustomTabBarIconProps) => {
 const styles = StyleSheet.create({
   iconContainer: {
     flex: 1,
-    padding: 10,
+    padding: 8,
   },
 });
 
