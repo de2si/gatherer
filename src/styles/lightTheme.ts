@@ -1,4 +1,4 @@
-import {configureFonts, MD3LightTheme} from 'react-native-paper';
+import {configureFonts, MD3LightTheme, MD3Theme} from 'react-native-paper';
 import {fontConfig} from '@styles/font';
 
 const appLightTheme = {
@@ -46,7 +46,7 @@ const appLightTheme = {
   },
 };
 
-export const lightTheme = {
+export const lightTheme: MD3Theme = {
   ...MD3LightTheme,
   colors: appLightTheme.colors,
   fonts: configureFonts({config: fontConfig}),

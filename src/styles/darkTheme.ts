@@ -1,6 +1,7 @@
 import {
   configureFonts,
-  MD3LightTheme as DefaultTheme,
+  MD3DarkTheme as DefaultTheme,
+  MD3Theme,
 } from 'react-native-paper';
 import {fontConfig} from '@styles/font';
 
@@ -49,7 +50,7 @@ const appDarkTheme = {
   },
 };
 
-export const darkTheme = {
+export const darkTheme: MD3Theme = {
   ...DefaultTheme,
   colors: appDarkTheme.colors,
   fonts: configureFonts({config: fontConfig}),
