@@ -19,19 +19,15 @@ const DetailFieldItem: React.FC<DetailFieldItemProps> = ({
 }) => (
   <View style={styles.row}>
     <Text
-      style={[styles.labelText, {color: theme.colors.outline}]}
-      variant="labelLarge">
+      style={[styles.labelText, {color: theme.colors.tertiary}]}
+      variant="titleMedium">
       {label}
     </Text>
     <View style={styles.valueTextContainer}>
       {valueComponent ? (
         valueComponent
       ) : (
-        <Text
-          variant="labelLarge"
-          style={[{color: theme.colors.onSurfaceVariant}]}>
-          {value}
-        </Text>
+        <Text variant="titleMedium">{value}</Text>
       )}
     </View>
   </View>
@@ -43,14 +39,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     columnGap: 24,
-    paddingHorizontal: 32,
     marginVertical: 12,
   },
   labelText: {
     minWidth: 90,
+    flex: 2,
   },
   valueTextContainer: {
-    flex: 1,
+    flex: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
