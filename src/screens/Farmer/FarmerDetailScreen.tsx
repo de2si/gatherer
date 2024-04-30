@@ -1,12 +1,10 @@
 // FarmerDetailScreen.tsx
 
-import {Image, Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
-  Avatar,
-  Button,
   Divider,
   List,
   MD3Theme,
@@ -15,6 +13,8 @@ import {
   useTheme,
 } from 'react-native-paper';
 import DetailFieldItem from '@components/DetailFieldItem';
+import ImageWrapper from '@components/ImageWrapper';
+import {EditIcon} from '@components/icons/EditIcon';
 
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -25,11 +25,17 @@ import {api} from '@api/axios';
 
 // helpers
 import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
-import {formatDate, formatNumber, formatPhoneNumber} from '@helpers/formatters';
+import {
+  formatDate,
+  formatIdAsCode,
+  formatNumber,
+  formatPhoneNumber,
+} from '@helpers/formatters';
 import {AreaUnit} from '@helpers/constants';
 
 // types
 import {ApiFarmer} from '@hooks/useFarmerStore';
+import {ApiImage} from '@typedefs/common';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
@@ -40,27 +46,17 @@ type FarmerDetailScreenProps = NativeStackScreenProps<
   'FarmerDetail'
 >;
 
-const farmerDetailHeaderRight = ({
-  handleEditPress,
-}: {
-  handleEditPress: () => void;
-}) => {
-  return (
-    <>
-      <Button mode="contained-tonal" onPress={handleEditPress}>
-        Edit
-      </Button>
-    </>
-  );
-};
-
-const FieldThumbnail = ({url, theme}: {url: string; theme: MD3Theme}) => (
+const FieldThumbnail = ({value, theme}: {value: ApiImage; theme: MD3Theme}) => (
   <View
     style={[
       styles.thinBorder,
       {borderColor: theme.colors.outline, borderRadius: theme.roundness},
     ]}>
-    <Image source={{uri: url}} style={styles.imageThumbnail} />
+    <ImageWrapper
+      flavor="regular"
+      value={value}
+      style={styles.imageThumbnail}
+    />
   </View>
 );
 
@@ -77,17 +73,9 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Farmer detail error');
 
-  useEffect(() => {
-    const handleEditPress = () => {
-      farmer && navigation.navigate('FarmerEdit', {variant: 'edit', farmer});
-    };
-    navigation.setOptions({
-      headerRight: () =>
-        farmerDetailHeaderRight({
-          handleEditPress,
-        }),
-    });
-  }, [farmer, navigation]);
+  const handleEditPress = () => {
+    farmer && navigation.navigate('FarmerEdit', {variant: 'edit', farmer});
+  };
 
   useEffect(() => {
     const fetchFarmer = async () => {
@@ -136,77 +124,116 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
           return accumulator + currentObject.area;
         }, 0),
       ) +
-      ' ' +
+      '\n' +
       AreaUnit.SquareMeters
     : '-';
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View style={[styles.container, {borderTopColor: theme.colors.tertiary}]}>
         {farmer && (
           <>
+            <View style={styles.header}>
+              <ImageWrapper
+                flavor="avatar"
+                value={farmer.profile_photo}
+                size={150}
+                style={[styles.thinBorder, {borderColor: theme.colors.outline}]}
+              />
+              <View style={styles.fatherNameActions}>
+                <Text
+                  style={[
+                    theme.fonts.titleMedium,
+                    {color: theme.colors.primary},
+                  ]}>
+                  Father/Spouse
+                </Text>
+                <Text style={theme.fonts.titleLarge}>
+                  {farmer.guardian_name}
+                </Text>
+                <Pressable style={styles.editBtn} onPress={handleEditPress}>
+                  <EditIcon
+                    height={18}
+                    width={18}
+                    color={theme.colors.primary}
+                  />
+                </Pressable>
+              </View>
+            </View>
+            <Text variant="headlineLarge" style={{color: theme.colors.primary}}>
+              {farmer.name}
+            </Text>
             <List.Section>
-              <View
-                style={[
-                  styles.headerRow,
-                  {backgroundColor: theme.colors.primary},
-                ]}>
-                <View style={styles.col}>
-                  <List.Item
-                    title={farmer.guardian_name}
-                    description="Father/Spouse"
-                    titleStyle={[
-                      theme.fonts.titleMedium,
-                      {color: theme.colors.onPrimary},
-                    ]}
-                    descriptionStyle={[
-                      theme.fonts.labelLarge,
-                      {color: theme.colors.inverseOnSurface},
-                    ]}
-                  />
-                  <List.Item
-                    title={formatDate(new Date(farmer.date_of_birth))}
-                    description="Date of birth"
-                    titleStyle={[
-                      theme.fonts.titleMedium,
-                      {color: theme.colors.onPrimary},
-                    ]}
-                    descriptionStyle={[
-                      theme.fonts.labelLarge,
-                      {color: theme.colors.inverseOnSurface},
-                    ]}
-                  />
-                </View>
-                <View style={styles.col}>
-                  <Avatar.Image
-                    source={{uri: farmer.profile_photo.url}}
-                    size={120}
-                    style={[
-                      styles.thinBorder,
-                      {borderColor: theme.colors.outline},
-                    ]}
-                  />
-                  <Text
-                    variant="titleLarge"
-                    style={{color: theme.colors.onPrimary}}>
-                    {farmer.name}
-                  </Text>
-                </View>
+              <DetailFieldItem
+                label="Code"
+                value={formatIdAsCode('F', farmer.farmer_id)}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Phone number"
+                value={formatPhoneNumber(farmer.phone_number)}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Date of birth"
+                value={formatDate(new Date(farmer.date_of_birth))}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Category"
+                value={farmer.category}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Gender"
+                value={farmer.gender}
+                theme={theme}
+              />
+              <View style={styles.aadhaarRow}>
+                <FieldThumbnail value={farmer.id_front_image} theme={theme} />
+                <FieldThumbnail value={farmer.id_back_image} theme={theme} />
               </View>
             </List.Section>
+            <Divider />
             <List.Section>
-              <View style={styles.row}>
-                <Text
-                  style={[styles.labelText, {color: theme.colors.outline}]}
-                  variant="labelLarge">
-                  Aadhaar
-                </Text>
-                <FieldThumbnail url={farmer.id_front_image.url} theme={theme} />
-                <FieldThumbnail url={farmer.id_back_image.url} theme={theme} />
-              </View>
-              <DetailFieldItem label="Code" value="AA6543" theme={theme} />
               <DetailFieldItem
-                label="Phone"
-                value={formatPhoneNumber(farmer.phone_number)}
+                label="Income Level"
+                value={farmer.income_level + '/month'}
+                theme={theme}
+              />
+            </List.Section>
+            <Divider />
+            <List.Section>
+              {farmer.land_parcels.length ? (
+                <DetailFieldItem
+                  label="Land"
+                  valueComponent={
+                    <View style={styles.linkRow}>
+                      {farmer.land_parcels.map(landItem => (
+                        <Pressable
+                          key={landItem.id}
+                          onPress={() => {
+                            // Navigation too be resolved by parent
+                            (navigation as any).navigate('LandDetail', {
+                              id: landItem.id,
+                            });
+                          }}>
+                          <Text
+                            variant="titleMedium"
+                            style={{color: theme.colors.secondary}}>
+                            {formatIdAsCode('L', landItem.id)}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  }
+                  theme={theme}
+                />
+              ) : (
+                <DetailFieldItem label="Land" value={'-'} theme={theme} />
+              )}
+              <DetailFieldItem
+                label="Total Land"
+                value={totalArea}
                 theme={theme}
               />
             </List.Section>
@@ -239,60 +266,6 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
               />
             </List.Section>
             <Divider />
-            <List.Section>
-              <DetailFieldItem
-                label="Gender"
-                value={farmer.gender}
-                theme={theme}
-              />
-              <DetailFieldItem
-                label="Category"
-                value={farmer.category}
-                theme={theme}
-              />
-              <DetailFieldItem
-                label="Income Level"
-                value={farmer.income_level}
-                theme={theme}
-              />
-            </List.Section>
-            <Divider />
-            <List.Section>
-              {farmer.land_parcels.length ? (
-                <DetailFieldItem
-                  label="Land"
-                  valueComponent={
-                    <View style={styles.linkRow}>
-                      {farmer.land_parcels.map(landItem => (
-                        <Pressable
-                          key={landItem.id}
-                          onPress={() => {
-                            // Navigation too be resolved by parent
-                            (navigation as any).navigate('LandDetail', {
-                              id: landItem.id,
-                            });
-                          }}>
-                          <Text
-                            variant="labelLarge"
-                            style={{color: theme.colors.secondary}}>
-                            LX198{landItem.id}
-                          </Text>
-                        </Pressable>
-                      ))}
-                    </View>
-                  }
-                  theme={theme}
-                />
-              ) : (
-                <DetailFieldItem label="Land" value={'-'} theme={theme} />
-              )}
-              <DetailFieldItem
-                label="Total Land"
-                value={totalArea}
-                theme={theme}
-              />
-            </List.Section>
-            <Divider />
           </>
         )}
         <Snackbar
@@ -311,35 +284,18 @@ export default FarmerDetailScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginHorizontal: 16,
+    borderTopWidth: 2,
   },
   centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  headerRow: {
+  header: {
     flex: 1,
     flexDirection: 'row',
-    paddingVertical: 24,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  col: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    rowGap: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    columnGap: 24,
-    paddingHorizontal: 32,
-    marginVertical: 12,
-  },
-  labelText: {
-    minWidth: 90,
+    paddingTop: 24,
   },
   imageThumbnail: {
-    width: 100,
-    height: 100,
+    width: 170,
+    height: 110,
   },
   thinBorder: {
     borderWidth: 1,
@@ -347,5 +303,20 @@ const styles = StyleSheet.create({
   linkRow: {
     flexDirection: 'row',
     columnGap: 12,
+  },
+  fatherNameActions: {
+    flex: 1,
+    alignItems: 'flex-end',
+    rowGap: 4,
+  },
+  editBtn: {
+    marginTop: 12,
+  },
+  aadhaarRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    columnGap: 24,
+    marginVertical: 12,
   },
 });
