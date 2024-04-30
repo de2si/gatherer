@@ -1,11 +1,11 @@
 // DataTabs.tsx
 
 import React from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Pressable} from 'react-native';
 import {useTheme} from 'react-native-paper';
 
 // components
-import CustomTabBarIcon from '@components/CustomTabBarIcon';
+import CustomTopTabIcon from '@components/CustomTopTabIcon';
 import {FarmerIcon} from '@components/icons/FarmerIcon';
 import {LandIcon} from '@components/icons/LandIcon';
 import {BeneficiaryIcon} from '@components/icons/BeneficiaryIcon';
@@ -27,7 +27,8 @@ const CustomTabBar = ({
   const theme = useTheme();
 
   return (
-    <View style={styles.tabContainer}>
+    <View
+      style={[styles.tabContainer, {backgroundColor: theme.colors.background}]}>
       {state.routes.map((route: any, index: number) => {
         const {options} = descriptors[route.key];
         const isFocused = state.index === index;
@@ -58,7 +59,7 @@ const CustomTabBar = ({
           ? theme.colors.secondary
           : theme.colors.primary;
         return (
-          <TouchableOpacity
+          <Pressable
             key={index}
             accessibilityRole="button"
             accessibilityState={isFocused ? {selected: true} : {}}
@@ -67,8 +68,8 @@ const CustomTabBar = ({
             onPress={onPress}
             onLongPress={onLongPress}
             style={[styles.tabButton, {backgroundColor: bgColor}]}>
-            <CustomTabBarIcon icon={options.tabBarIcon} color={iconColor} />
-          </TouchableOpacity>
+            <CustomTopTabIcon icon={options.tabBarIcon} color={iconColor} />
+          </Pressable>
         );
       })}
     </View>
