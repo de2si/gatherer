@@ -9,4 +9,10 @@ export const commonStyles = StyleSheet.create({
   width100: {
     width: '100%',
   },
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

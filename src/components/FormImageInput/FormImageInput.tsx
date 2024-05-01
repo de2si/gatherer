@@ -1,36 +1,31 @@
 // FormImageInput.tsx
 
 import React, {useState} from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import {
   Button,
   HelperText,
-  Icon,
   Portal,
   Snackbar,
-  Text,
   useTheme,
 } from 'react-native-paper';
+import {useReducedMotion} from 'react-native-reanimated';
+
+import {Control, FieldValues, useController} from 'react-hook-form';
+import {calculateHash} from '@helpers/cryptoHelpers';
+import useSnackbar from '@hooks/useSnackbar';
+
 import {
   ImagePickerResponse,
   launchCamera,
   launchImageLibrary,
 } from 'react-native-image-picker';
-import {useReducedMotion} from 'react-native-reanimated';
 import BottomSheet, {BottomSheetBackdrop} from '@gorhom/bottom-sheet';
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
-import {Control, FieldValues, useController} from 'react-hook-form';
-import {calculateHash} from '@helpers/cryptoHelpers';
-import useSnackbar from '@hooks/useSnackbar';
-import {FormImage} from '@typedefs/common';
+
+import RoundSingleView from '@components/FormImageInput/RoundSingleView';
+import SquarePlaceholder from '@components/FormImageInput/SquarePlaceholder';
+import ValueView from '@components/FormImageInput/ValueView';
 
 interface FormImageInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name']; // form field name
@@ -39,8 +34,6 @@ interface FormImageInputProps<TFieldValues extends FieldValues> {
   variant?: 'single' | 'multiple';
   styleVariant?: 'round' | 'square';
   maxSelect?: number;
-  border?: 'none' | 'dashed';
-  placeholderViewStyles?: StyleProp<ViewStyle>;
   onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
@@ -51,8 +44,6 @@ const FormImageInput = <TFieldValues extends FieldValues>({
   variant = 'single',
   styleVariant = 'round',
   maxSelect = 3,
-  border = 'none',
-  placeholderViewStyles = {},
   onLayout = () => {},
 }: FormImageInputProps<TFieldValues>) => {
   const reducedMotion = useReducedMotion();
@@ -166,89 +157,21 @@ const FormImageInput = <TFieldValues extends FieldValues>({
     }
   };
 
-  const imageBorderRadiusStyle =
-    styleVariant === 'square'
-      ? {borderRadius: theme.roundness}
-      : styles.roundBorder;
-  const imageBoundaryStyle =
-    styleVariant === 'square'
-      ? {...styles.imageBoundarySquare, borderRadius: theme.roundness}
-      : styles.imageBoundaryRound;
-  const placeholderBorderStyle =
-    border === 'dashed' ? styles.dashedBorder : null;
-
-  const renderImages = () => {
-    return Array.isArray(value) ? (
-      // Render multiple images if value is an array
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={true}
-        contentContainerStyle={styles.multiImageScrollView}>
-        {value.map((image: FormImage, index: number) => (
-          <View
-            key={index}
-            style={[
-              styles.thinBorder,
-              imageBorderRadiusStyle,
-              {borderColor: theme.colors.outline},
-            ]}>
-            <Image
-              source={{uri: image.uri}}
-              style={[
-                imageBoundaryStyle,
-                {backgroundColor: theme.colors.primary},
-              ]}
-            />
-          </View>
-        ))}
-      </ScrollView>
-    ) : (
-      // Render a single image if value is not an array
-      <View
-        style={[
-          styles.thinBorder,
-          imageBorderRadiusStyle,
-          {borderColor: theme.colors.outline},
-        ]}>
-        <Image
-          source={{uri: (value as FormImage).uri}}
-          style={[imageBoundaryStyle, {backgroundColor: theme.colors.primary}]}
-        />
-      </View>
-    );
-  };
-
-  const renderImagePlaceholder = () => (
-    <View
-      style={[
-        imageBoundaryStyle,
-        placeholderBorderStyle,
-        styles.imagePlaceholderContent,
-        {
-          backgroundColor: error
-            ? theme.colors.errorContainer
-            : theme.colors.tertiaryContainer,
-        },
-        placeholderViewStyles,
-      ]}>
-      <Icon source="tray-arrow-up" size={24} />
-      <Text style={theme.fonts.labelMedium}>{label}</Text>
-    </View>
-  );
-
   return (
     <View
       onLayout={event => {
         onLayout({name, y: event.nativeEvent.layout.y});
       }}>
-      <Pressable
-        onPress={handleImageContainerPress}
-        style={styles.centeredContainer}>
-        {value && (value.uri || (Array.isArray(value) && value.length > 0))
-          ? renderImages()
-          : renderImagePlaceholder()}
+      <Pressable onPress={handleImageContainerPress}>
+        {value && (value.uri || (Array.isArray(value) && value.length > 0)) ? (
+          <ValueView value={value} styleVariant={styleVariant} />
+        ) : styleVariant === 'square' ? (
+          <SquarePlaceholder label={label} />
+        ) : (
+          <RoundSingleView />
+        )}
       </Pressable>
-      <View style={styles.centeredContainer}>
+      <View>
         <HelperText type="error" visible={error ? true : false}>
           {error?.message ?? 'Image error'}
         </HelperText>
@@ -264,7 +187,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
             animateOnMount={!reducedMotion}>
             <View style={styles.bottomSheetRow}>
               <Button
-                buttonColor={theme.colors.primaryContainer}
+                buttonColor={theme.colors.secondary}
+                textColor={theme.colors.onSecondary}
                 icon="camera-outline"
                 mode="contained-tonal"
                 onPress={handleCameraPress}
@@ -272,7 +196,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
                 Camera
               </Button>
               <Button
-                buttonColor={theme.colors.secondaryContainer}
+                buttonColor={theme.colors.secondary}
+                textColor={theme.colors.onSecondary}
                 icon="image-outline"
                 mode="contained-tonal"
                 onPress={handleGalleryPress}
@@ -280,7 +205,8 @@ const FormImageInput = <TFieldValues extends FieldValues>({
                 Gallery
               </Button>
               <Button
-                buttonColor={theme.colors.tertiaryContainer}
+                buttonColor={theme.colors.tertiary}
+                textColor={theme.colors.onTertiary}
                 disabled={!value}
                 icon="backspace-outline"
                 mode="contained-tonal"
@@ -305,34 +231,6 @@ const FormImageInput = <TFieldValues extends FieldValues>({
 };
 
 const styles = StyleSheet.create({
-  centeredContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  imageBoundaryRound: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  imageBoundarySquare: {
-    width: 120,
-    height: 120,
-  },
-  dashedBorder: {
-    borderStyle: 'dashed',
-    borderWidth: 1,
-  },
-  thinBorder: {
-    borderWidth: 1,
-  },
-  roundBorder: {
-    borderRadius: 50,
-  },
-  imagePlaceholderContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    rowGap: 4,
-  },
   bottomSheetRow: {
     flex: 1,
     flexDirection: 'row',
@@ -342,9 +240,6 @@ const styles = StyleSheet.create({
   },
   bottomSheetButton: {
     minWidth: 100,
-  },
-  multiImageScrollView: {
-    columnGap: 8,
   },
 });
 
