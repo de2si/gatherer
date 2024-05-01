@@ -11,7 +11,7 @@ import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import FormTextInput from '@components/FormTextInput';
 import FormRadioInput from '@components/FormRadioInput';
-import FormImageInput from '@components/FormImageInput';
+import FormImageInput from '@components/FormImageInput/FormImageInput';
 
 // helpers
 import {imageValidator, nameValidator} from '@helpers/validators';

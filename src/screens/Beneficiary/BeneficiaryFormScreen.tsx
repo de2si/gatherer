@@ -12,7 +12,7 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import FormTextInput from '@components/FormTextInput';
 import FormDateInput from '@components/FormDateInput';
 import FormRadioInput from '@components/FormRadioInput';
-import FormImageInput from '@components/FormImageInput';
+import FormImageInput from '@components/FormImageInput/FormImageInput';
 import FormFarmerInput from '@components/FormFarmerInput';
 import {
   FormDistrictSelectInput,
@@ -518,14 +518,12 @@ const BeneficiaryFormScreen: React.FC<BeneficiaryFormScreenProps> = ({
               control={control}
               label="Aadhaar Front"
               styleVariant="square"
-              border="dashed"
             />
             <FormImageInput
               name="id_back_image"
               control={control}
               label="Aadhaar Back"
               styleVariant="square"
-              border="dashed"
             />
           </View>
 
