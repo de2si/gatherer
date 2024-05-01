@@ -6,4 +6,7 @@ export const commonStyles = StyleSheet.create({
     marginHorizontal: 16,
     borderTopWidth: 2,
   },
+  width100: {
+    width: '100%',
+  },
 });

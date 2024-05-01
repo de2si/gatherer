@@ -1,16 +1,22 @@
 // FormTextInput.tsx
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import {HelperText, TextInput, TextInputProps} from 'react-native-paper';
+import {
+  HelperText,
+  TextInput,
+  TextInputProps,
+  useTheme,
+} from 'react-native-paper';
 import {Controller, Control, FieldValues} from 'react-hook-form';
 import {convertToSentenceCase} from '@helpers/formatters';
+import {commonStyles} from '@styles/common';
 
 interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   name: FieldValues['name'];
   sentenceCase?: boolean;
   numericValue?: boolean;
-  inputProps?: TextInputProps; // Pass TextInputProps directly
+  inputProps?: TextInputProps;
   onLayout?: (fieldY: {name: string; y: number}) => void;
 }
 
@@ -22,19 +28,38 @@ const FormTextInput = <TFieldValues extends FieldValues>({
   inputProps = {},
   onLayout = () => {},
 }: FormTextInputProps<TFieldValues>) => {
+  const theme = useTheme();
+
+  // Merge inputProps with default props
+  const mergedInputProps: TextInputProps = {
+    mode: 'outlined',
+    style: [
+      {backgroundColor: theme.colors.primary},
+      theme.fonts.bodyLarge,
+      styles.textInput,
+    ],
+    outlineStyle: styles.outline,
+    placeholderTextColor: theme.colors.primaryContainer,
+    selectionColor: theme.colors.onPrimary,
+    textColor: theme.colors.onPrimary,
+    cursorColor: theme.colors.onPrimary,
+    outlineColor: theme.colors.tertiary,
+    activeOutlineColor: theme.colors.onPrimaryContainer,
+    ...inputProps,
+  };
+
   return (
     <Controller
       control={control}
       name={name}
       render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
         <View
-          style={[styles.container]}
+          style={[commonStyles.width100]}
           onLayout={event => {
             onLayout({name, y: event.nativeEvent.layout.y});
           }}>
           <TextInput
             error={error ? true : false}
-            mode="outlined"
             onBlur={onBlur}
             onChangeText={text =>
               onChange(
@@ -48,7 +73,7 @@ const FormTextInput = <TFieldValues extends FieldValues>({
               )
             }
             value={numericValue && value ? value.toString() : value}
-            {...inputProps}
+            {...mergedInputProps}
           />
           <HelperText type="error" visible={error ? true : false}>
             {error?.message || 'Error'}
@@ -60,8 +85,12 @@ const FormTextInput = <TFieldValues extends FieldValues>({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
+  textInput: {
+    height: 40,
+    fontWeight: 'normal',
+  },
+  outline: {
+    borderRadius: 8,
   },
 });
 
