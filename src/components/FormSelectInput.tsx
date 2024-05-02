@@ -5,9 +5,10 @@ import {
   ActivityIndicator,
   Chip,
   HelperText,
+  Icon,
+  MD3Theme,
   Text,
   useTheme,
-  // MD3Theme,
 } from 'react-native-paper';
 import {Dropdown, MultiSelect} from 'react-native-element-dropdown';
 import {Control, FieldValues, useController} from 'react-hook-form';
@@ -45,20 +46,25 @@ interface RenderSelectedItemProps<T> {
   item: T;
   unSelect?: (item: T) => void;
   labelField?: keyof T;
-  // theme: MD3Theme;
+  theme: MD3Theme;
 }
 
 const RenderSelectedItem = <T extends any>({
   item,
   unSelect,
   labelField,
-}: // theme,
-RenderSelectedItemProps<T>) => {
+  theme,
+}: RenderSelectedItemProps<T>) => {
   return (
     <Chip
-      style={styles.chip}
-      // style={[styles.chip, {backgroundColor: theme.colors.secondaryContainer}]}
-      // textStyle={{color: theme.colors.onSecondaryContainer}}
+      closeIcon={props =>
+        Icon({
+          ...props,
+          ...{source: 'close', color: theme.colors.onPrimaryContainer},
+        })
+      }
+      style={[styles.chip, {backgroundColor: theme.colors.primaryContainer}]}
+      textStyle={{color: theme.colors.onPrimaryContainer}}
       onPress={() => unSelect && unSelect(item)}
       onClose={() => unSelect && unSelect(item)}
       ellipsizeMode="middle">
@@ -115,7 +121,9 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     containerStyle,
     placeholderStyle,
     selectedTextStyle,
+    iconColor,
     iconStyle,
+    activeColor,
     inputSearchStyle,
     flatListProps,
     search,
@@ -131,27 +139,29 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     style: [
       styles.dropdown,
       {
-        backgroundColor: ctrlError
-          ? theme.colors.errorContainer
-          : theme.colors.background,
-        borderColor: theme.colors.outline,
-        borderRadius: theme.roundness,
+        backgroundColor: theme.colors.primary,
+        borderColor: ctrlError ? theme.colors.error : theme.colors.outline,
+        // borderRadius: theme.roundness,
       },
       isFocus && styles.dropdownFocusStyle,
-      // isFocus && {borderColor: theme.colors.primary, borderWidth: 2},
+      isFocus && {borderColor: theme.colors.onPrimaryContainer, borderWidth: 2},
       style ?? null,
     ],
-    containerStyle: [styles.containerStyle, containerStyle ?? null],
+    containerStyle: [
+      {backgroundColor: theme.colors.surface},
+      styles.containerStyle,
+      containerStyle ?? null,
+    ],
     placeholderStyle: [
-      {color: theme.colors.onSurfaceVariant},
-      styles.placeholderStyle,
+      {color: theme.colors.primaryContainer},
       theme.fonts.bodyLarge,
+      styles.placeholderStyle,
       placeholderStyle ?? null,
     ],
     selectedTextStyle: [
-      {color: theme.colors.onSurface},
-      styles.selectedTextStyle,
+      {color: theme.colors.onPrimary},
       theme.fonts.bodyLarge,
+      styles.selectedTextStyle,
       selectedTextStyle ?? null,
     ],
     selectedStyle: [
@@ -160,7 +170,9 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
         ? remainingSelectProps.selectedStyle
         : null,
     ],
+    iconColor: iconColor ?? theme.colors.primaryContainer,
     iconStyle: [styles.iconStyle, iconStyle ?? null],
+    activeColor: activeColor ?? theme.colors.surfaceVariant,
     inputSearchStyle: [styles.inputSearchStyle, inputSearchStyle ?? null],
     search: search ?? remainingSelectProps.data.length > 5,
     searchPlaceholder: searchPlaceholder ?? 'Search...',
@@ -196,7 +208,7 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
               item,
               unSelect,
               labelField: remainingSelectProps.labelField,
-              // theme,
+              theme,
             });
           },
   };
@@ -233,18 +245,18 @@ const styles = StyleSheet.create({
   container: {width: '100%'},
   dropdown: {
     width: '100%',
-    height: 50,
-    // borderRadius: 12,
-    // borderWidth: 1,
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 1,
+    // },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 1.41,
+    // elevation: 2,
   },
   dropdownFocusStyle: {
     // borderColor: 'pink',
@@ -258,11 +270,13 @@ const styles = StyleSheet.create({
     // borderBottomRightRadius: 12,
   },
   placeholderStyle: {
+    fontWeight: 'normal',
     // fontSize: 16,
     // // color: MD3LightTheme.colors.onSurfaceVariant,
     // fontSize: MD3LightTheme.fonts.bodyLarge.fontSize,
   },
   selectedTextStyle: {
+    fontWeight: 'normal',
     // fontSize: 14,
     // // color: MD3LightTheme.colors.primary,
     // fontSize: MD3LightTheme.fonts.bodyLarge.fontSize,
