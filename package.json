@@ -24,6 +24,7 @@
     "react": "18.2.0",
     "react-hook-form": "^7.51.3",
     "react-native": "0.73.0",
+    "react-native-bouncy-checkbox": "^4.0.0",
     "react-native-date-picker": "^4.3.5",
     "react-native-document-picker": "^9.2.0",
     "react-native-element-dropdown": "^2.10.4",
