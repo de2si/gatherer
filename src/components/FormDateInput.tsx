@@ -44,12 +44,7 @@ const FormDateInput = <TFieldValues extends FieldValues>({
           }}>
           <View style={[commonStyles.width100, styles.container]}>
             <View style={styles.dateInput}>
-              <FormTextInput
-                control={control}
-                name={name}
-                dateValue
-                inputProps={{readOnly: true}}
-              />
+              <FormTextInput control={control} name={name} dateValue />
             </View>
             <Pressable
               onPress={() => {
