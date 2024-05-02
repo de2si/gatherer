@@ -1,11 +1,13 @@
 // FormDateInput.tsx
 
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {HelperText, IconButton, Text, useTheme} from 'react-native-paper';
+import {View, StyleSheet, Pressable} from 'react-native';
+import {HelperText, useTheme} from 'react-native-paper';
 import DatePicker, {DatePickerProps} from 'react-native-date-picker';
 import {Control, Controller, FieldValues} from 'react-hook-form';
-import {formatDate} from '@helpers/formatters';
+import FormTextInput from '@components/FormTextInput';
+import {CalendarIcon} from '@components/icons/CalendarIcon';
+import {commonStyles} from '@styles/common';
 
 interface FormDatePickerProps
   extends Omit<DatePickerProps, 'date' | 'onConfirm'> {
@@ -40,55 +42,50 @@ const FormDateInput = <TFieldValues extends FieldValues>({
           onLayout={event => {
             onLayout({name, y: event.nativeEvent.layout.y});
           }}>
-          <View style={[styles.container, styles.rowContainer]}>
-            <Text style={[styles.dateInputLabel, theme.fonts.labelLarge]}>
-              {label}
-            </Text>
-
-            <View style={styles.colContainer}>
-              <View style={styles.rowContainer}>
-                <Text style={[theme.fonts.bodyMedium]}>
-                  {formatDate(value)}
-                </Text>
-                <IconButton
-                  icon="calendar"
-                  mode="contained-tonal"
-                  size={24}
-                  onPress={() => {
-                    setShowDatePicker(true);
-                  }}
-                  containerColor={
-                    error
-                      ? theme.colors.errorContainer
-                      : theme.colors.tertiaryContainer
-                  }
-                />
-              </View>
+          <View style={[commonStyles.width100, styles.container]}>
+            <View style={styles.dateInput}>
+              <FormTextInput
+                control={control}
+                name={name}
+                dateValue
+                inputProps={{readOnly: true}}
+              />
             </View>
-            <DatePicker
-              modal
-              open={showDatePicker}
-              date={value ?? datePickerProps.date ?? new Date('1990-01-01')}
-              onConfirm={changedDate => {
-                onChange(changedDate);
-                setShowDatePicker(false);
+            <Pressable
+              onPress={() => {
+                setShowDatePicker(true);
               }}
-              onCancel={() => {
-                setShowDatePicker(false);
-              }}
-              textColor={theme.colors.primary}
-              fadeToColor={theme.colors.onPrimary}
-              mode="date"
-              confirmText="Ok"
-              {...datePickerProps}
-              title={label}
-              // maximumDate
-              // minimumDate
-            />
+              style={styles.dateIcon}>
+              <CalendarIcon
+                height={32}
+                width={32}
+                color={theme.colors.primary}
+              />
+            </Pressable>
           </View>
           <HelperText type="error" visible={error ? true : false}>
             {error?.message || 'Error'}
           </HelperText>
+          <DatePicker
+            modal
+            open={showDatePicker}
+            date={value ?? datePickerProps.date ?? new Date('1990-01-01')}
+            onConfirm={changedDate => {
+              onChange(changedDate);
+              setShowDatePicker(false);
+            }}
+            onCancel={() => {
+              setShowDatePicker(false);
+            }}
+            textColor={theme.colors.primary}
+            fadeToColor={theme.colors.onPrimary}
+            mode="date"
+            confirmText="Ok"
+            {...datePickerProps}
+            title={label}
+            // maximumDate
+            // minimumDate
+          />
         </View>
       )}
     />
@@ -97,18 +94,18 @@ const FormDateInput = <TFieldValues extends FieldValues>({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-  },
-  dateInputLabel: {
-    minWidth: 70,
-  },
-  rowContainer: {
+    flex: 1,
     flexDirection: 'row',
+    columnGap: 24,
     alignItems: 'center',
-    columnGap: 12,
+    justifyContent: 'space-between',
   },
-  colContainer: {
-    flexDirection: 'column',
+  dateInput: {
+    maxWidth: 120,
+  },
+  dateIcon: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });
 

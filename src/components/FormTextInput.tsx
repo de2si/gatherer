@@ -8,13 +8,14 @@ import {
   useTheme,
 } from 'react-native-paper';
 import {Controller, Control, FieldValues} from 'react-hook-form';
-import {convertToSentenceCase} from '@helpers/formatters';
+import {convertToSentenceCase, formatDate} from '@helpers/formatters';
 import {commonStyles} from '@styles/common';
 
 interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   name: FieldValues['name'];
   sentenceCase?: boolean;
+  dateValue?: boolean;
   numericValue?: boolean;
   inputProps?: TextInputProps;
   onLayout?: (fieldY: {name: string; y: number}) => void;
@@ -24,6 +25,7 @@ const FormTextInput = <TFieldValues extends FieldValues>({
   control,
   name,
   sentenceCase = false,
+  dateValue = false,
   numericValue = false,
   inputProps = {},
   onLayout = () => {},
@@ -45,6 +47,7 @@ const FormTextInput = <TFieldValues extends FieldValues>({
     cursorColor: theme.colors.onPrimary,
     outlineColor: theme.colors.tertiary,
     activeOutlineColor: theme.colors.onPrimaryContainer,
+    readOnly: dateValue ? true : false,
     ...inputProps,
   };
 
@@ -72,12 +75,20 @@ const FormTextInput = <TFieldValues extends FieldValues>({
                   : text,
               )
             }
-            value={numericValue && value ? value.toString() : value}
+            value={
+              dateValue
+                ? formatDate(value)
+                : numericValue && value
+                ? value.toString()
+                : value
+            }
             {...mergedInputProps}
           />
-          <HelperText type="error" visible={error ? true : false}>
-            {error?.message || 'Error'}
-          </HelperText>
+          {!dateValue && (
+            <HelperText type="error" visible={error ? true : false}>
+              {error?.message || 'Error'}
+            </HelperText>
+          )}
         </View>
       )}
     />
