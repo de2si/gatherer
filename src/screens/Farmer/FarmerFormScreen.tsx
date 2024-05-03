@@ -1,8 +1,15 @@
 // FarmerFormScreen.tsx
 
 import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Portal, Snackbar, Text} from 'react-native-paper';
+import {ScrollView, View} from 'react-native';
+import {
+  Button,
+  Divider,
+  Portal,
+  Snackbar,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
@@ -50,6 +57,12 @@ import {FormImage} from '@typedefs/common';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
 import {useS3Upload} from '@hooks/useS3';
+import {
+  commonStyles,
+  detailStyles,
+  fontStyles,
+  spacingStyles,
+} from '@styles/common';
 
 // types
 interface FarmerBasicForm {
@@ -258,6 +271,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
   route,
   navigation,
 }) => {
+  const theme = useTheme();
   const {variant} = route.params;
   const farmer = 'farmer' in route.params ? route.params.farmer : undefined;
 
@@ -344,7 +358,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
 
   if (variant === 'edit' && !farmer) {
     return (
-      <View style={styles.container}>
+      <View style={commonStyles.flex1}>
         <Text variant="titleLarge">Farmer not found error</Text>
       </View>
     );
@@ -355,8 +369,13 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
       setLoading(true);
       if (variant === 'add') {
         const {profile_photo, id_back_image, id_front_image} = formData;
+        const uploadedImages = await uploadToS3({
+          profile_photo,
+          id_back_image,
+          id_front_image,
+        });
         const farmerAddData = {
-          ...uploadToS3({profile_photo, id_back_image, id_front_image}),
+          ...uploadedImages,
           ...prepareAddFormData(formData as FarmerAddForm),
         };
         await withAuth(async () => {
@@ -396,7 +415,8 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
               ? formData.id_front_image
               : undefined,
         };
-        dataToUpdate = {...dataToUpdate, ...uploadToS3(photosToUpdate)};
+        const uploadedImages = await uploadToS3(photosToUpdate);
+        dataToUpdate = {...dataToUpdate, ...uploadedImages};
         if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
         }
@@ -461,8 +481,14 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
 
   return (
     <ScrollView ref={scrollViewRef}>
-      <View style={styles.container}>
-        <View style={styles.formContainer}>
+      <View style={commonStyles.flex1}>
+        <View
+          style={[
+            spacingStyles.mh16,
+            spacingStyles.pv16,
+            spacingStyles.rowGap8,
+            {borderColor: theme.colors.tertiary},
+          ]}>
           <FormImageInput
             name="profile_photo"
             control={control}
@@ -472,7 +498,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             name="name"
             control={control}
             sentenceCase
-            inputProps={{placeholder: 'Name', autoCapitalize: 'words'}}
+            inputProps={{placeholder: 'Name*', autoCapitalize: 'words'}}
             onLayout={handleLayout}
           />
           <FormTextInput
@@ -480,65 +506,77 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             control={control}
             sentenceCase
             inputProps={{
-              placeholder: 'Father/Spouse Name',
+              placeholder: "Father/Spouse's name*",
               autoCapitalize: 'words',
             }}
             onLayout={handleLayout}
           />
-          {variant === 'add' && (
-            <FormTextInput
-              name="aadhaar"
-              control={control}
-              inputProps={{
-                placeholder: 'Aadhaar',
-                keyboardType: 'numeric',
-                secureTextEntry: true,
-              }}
-              onLayout={handleLayout}
-            />
-          )}
-          {variant === 'add' && (
-            <FormTextInput
-              name="confirm_aadhaar"
-              control={control}
-              inputProps={{
-                placeholder: 'Confirm Aadhaar',
-                keyboardType: 'numeric',
-              }}
-              onLayout={handleLayout}
-            />
-          )}
-          <View
-            style={styles.imgRow}
-            onLayout={event => {
-              handleLayout({
-                name: 'id_front_image',
-                y: event.nativeEvent.layout.y,
-              });
-              handleLayout({
-                name: 'id_back_image',
-                y: event.nativeEvent.layout.y,
-              });
-            }}>
-            <FormImageInput
-              name="id_front_image"
-              control={control}
-              label="Aadhaar Front"
-              styleVariant="square"
-            />
-            <FormImageInput
-              name="id_back_image"
-              control={control}
-              label="Aadhaar Back"
-              styleVariant="square"
-            />
-          </View>
+          <FormDateInput
+            name="date_of_birth"
+            control={control}
+            label="Date of birth"
+            onLayout={handleLayout}
+          />
           <FormTextInput
             name="phone_number"
             control={control}
-            inputProps={{placeholder: 'Phone number', keyboardType: 'numeric'}}
+            inputProps={{placeholder: 'Phone number*', keyboardType: 'numeric'}}
             onLayout={handleLayout}
           />
+          <Divider style={spacingStyles.mv16} bold />
+          <View style={commonStyles.row}>
+            {variant === 'add' && (
+              <View
+                style={[
+                  commonStyles.flex2,
+                  spacingStyles.mr16,
+                  spacingStyles.rowGap8,
+                ]}>
+                <FormTextInput
+                  name="aadhaar"
+                  control={control}
+                  inputProps={{
+                    placeholder: 'Aadhaar*',
+                    keyboardType: 'numeric',
+                    secureTextEntry: true,
+                  }}
+                  onLayout={handleLayout}
+                />
+                <FormTextInput
+                  name="confirm_aadhaar"
+                  control={control}
+                  inputProps={{
+                    placeholder: 'Confirm Aadhaar*',
+                    keyboardType: 'numeric',
+                  }}
+                  onLayout={handleLayout}
+                />
+              </View>
+            )}
+            <View
+              style={[
+                variant === 'add'
+                  ? [detailStyles.colSide, spacingStyles.rowGap8]
+                  : [commonStyles.row, spacingStyles.colGap8],
+              ]}>
+              <FormImageInput
+                name="id_front_image"
+                control={control}
+                label="Aadhaar Front"
+                styleVariant="square"
+                onLayout={handleLayout}
+              />
+              <FormImageInput
+                name="id_back_image"
+                control={control}
+                label="Aadhaar Back"
+                styleVariant="square"
+                onLayout={handleLayout}
+              />
+            </View>
+          </View>
+
+          <Divider style={spacingStyles.mv16} bold />
           <FormRadioInput
             name="gender"
             control={control}
@@ -546,12 +584,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             options={transformToLabelValuePair(GENDER)}
             onLayout={handleLayout}
           />
-          <FormDateInput
-            name="date_of_birth"
-            control={control}
-            label="DOB"
-            onLayout={handleLayout}
-          />
+          <Divider style={spacingStyles.mv16} bold />
           <FormRadioInput
             name="category"
             control={control}
@@ -559,6 +592,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             options={transformToLabelValuePair(CATEGORY)}
             onLayout={handleLayout}
           />
+          <Divider style={spacingStyles.mv16} bold />
           <FormRadioInput
             name="income_level"
             control={control}
@@ -566,6 +600,10 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             options={transformToLabelValuePair(INCOME_LEVELS)}
             onLayout={handleLayout}
           />
+          <Divider style={spacingStyles.mv16} bold />
+          <Text style={[theme.fonts.bodyLarge, {color: theme.colors.outline}]}>
+            Address
+          </Text>
           <FormStateSelectInput
             name="state"
             control={control}
@@ -600,13 +638,21 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             onLayout={handleLayout}
           />
 
-          <Button
-            onPress={handleSubmit(onSubmit)}
-            mode="contained-tonal"
-            style={styles.button}
-            disabled={loading}>
-            Submit
-          </Button>
+          <View
+            style={[
+              commonStyles.centeredContainer,
+              spacingStyles.mt16,
+              spacingStyles.mb48,
+            ]}>
+            <Button
+              onPress={handleSubmit(onSubmit)}
+              mode="contained"
+              buttonColor={theme.colors.secondary}
+              disabled={loading}
+              labelStyle={fontStyles.bodyXl}>
+              Submit
+            </Button>
+          </View>
         </View>
         <Portal>{loading && <LoadingIndicator />}</Portal>
         <Portal>
@@ -623,24 +669,3 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
 };
 
 export default FarmerFormScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    rowGap: 24,
-    marginHorizontal: 24,
-  },
-  imgRow: {
-    flexDirection: 'row',
-    marginVertical: 6,
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-  },
-  button: {
-    marginHorizontal: 48,
-    marginTop: 20,
-    marginBottom: 60,
-  },
-});
