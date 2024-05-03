@@ -24,6 +24,7 @@ import Logo from '@assets/logo.png';
 // helpers
 import {getErrorMessage} from '@helpers/formHelpers';
 import {add91Prefix} from '@helpers/formatters';
+import {commonStyles, logoStyles} from '@styles/common';
 
 // types
 interface LoginForm {
@@ -74,12 +75,11 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
 
   return (
     <View
-      style={[styles.container, {backgroundColor: theme.colors.background}]}>
+      style={[commonStyles.flex1, {backgroundColor: theme.colors.background}]}>
       <View style={styles.logoContainer}>
-        <Image source={Logo} style={styles.logoImage} />
-        <Text style={[theme.fonts.headlineLarge]}>Gatherer</Text>
-        <Text style={[theme.fonts.titleLarge, {color: theme.colors.primary}]}>
-          Haritika
+        <Image source={Logo} style={logoStyles.logoImage} />
+        <Text style={[theme.fonts.headlineLarge, logoStyles.gathererText]}>
+          Gatherer
         </Text>
       </View>
       <View style={styles.formContainer}>
@@ -94,9 +94,10 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
           inputProps={{placeholder: 'Password', secureTextEntry: true}}
         />
         <Button
-          mode="contained-tonal"
+          mode="contained"
           onPress={handleSubmit(onSubmit)}
           style={styles.button}
+          labelStyle={theme.fonts.titleMedium}
           loading={loading}
           disabled={loading}>
           Login
@@ -115,27 +116,21 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   logoContainer: {
     flex: 1,
     alignItems: 'center',
     marginBottom: 24,
     justifyContent: 'flex-end',
   },
-  logoImage: {
-    width: 80,
-    height: 80,
-  },
   formContainer: {
     flex: 2,
     rowGap: 4,
     marginTop: 48,
     marginHorizontal: 24,
+    alignItems: 'center',
   },
   button: {
-    marginHorizontal: 48,
+    paddingHorizontal: 24,
     marginTop: 60,
     marginBottom: 60,
   },
