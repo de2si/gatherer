@@ -1,56 +1,79 @@
 // FarmerListItem.tsx
 
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Card, Text} from 'react-native-paper';
+import {View, Pressable, Linking} from 'react-native';
+import {Card} from 'react-native-paper';
+import {Text} from '@components/Text';
+import {PhoneIcon} from '@components/icons/PhoneIcon';
 import ImageWrapper from '@components/ImageWrapper';
+
 import {FarmerPreview} from '@hooks/useFarmerStore';
 import {truncateString} from '@helpers/formatters';
+import {
+  cardStyles,
+  commonStyles,
+  fontStyles,
+  spacingStyles,
+} from '@styles/common';
 
 interface FarmerListItemProps {
   data: FarmerPreview;
   onPress: (farmer: FarmerPreview) => void;
+  color: string;
+  borderColor: string;
 }
 
-const FarmerListItem: React.FC<FarmerListItemProps> = ({data, onPress}) => (
-  <Card mode="elevated" onPress={() => onPress(data)}>
-    <Card.Content style={styles.row}>
+const handleDialPress = (phoneNumber: string) => {
+  if (phoneNumber) {
+    Linking.openURL(`tel:${phoneNumber}`);
+  }
+};
+
+const FarmerListItem: React.FC<FarmerListItemProps> = ({
+  data,
+  onPress,
+  color,
+  borderColor,
+}) => (
+  <Card
+    mode="contained"
+    onPress={() => onPress(data)}
+    style={[cardStyles.card, {borderColor}]}>
+    <Card.Content style={cardStyles.cardContent}>
       <ImageWrapper
         flavor="avatar"
         value={data.photo}
-        size={80}
-        style={styles.avatar}
+        size={70}
+        style={spacingStyles.mr16}
       />
-      <View style={styles.cardTextContainer}>
-        <View style={styles.cardDataRow}>
-          <Text variant="titleSmall">{truncateString(data.name)}</Text>
-          <Text variant="titleSmall">{data.code}</Text>
+      <View style={commonStyles.flex1}>
+        <View style={cardStyles.cardDataRow}>
+          <Text variant="bodyXl" style={{color}}>
+            {truncateString(data.name)}
+          </Text>
+          <Text variant="bodyXl" style={{color}}>
+            {data.code}
+          </Text>
         </View>
-        <View style={styles.cardDataRow}>
-          <Text variant="bodySmall">{truncateString(data.guardian)}</Text>
-          <Text variant="bodySmall">{data.phone}</Text>
+        <View style={cardStyles.cardDataRow}>
+          <Text variant="bodySmall" style={{color}}>
+            {truncateString(data.guardian)}
+          </Text>
+          <Pressable
+            style={cardStyles.cardSideItem}
+            onPress={() => handleDialPress(data.phone)}>
+            <PhoneIcon height={24} width={24} color={color} />
+            <Text variant="bodyLarge" style={[{color}, fontStyles.regularText]}>
+              {data.phone}
+            </Text>
+          </Pressable>
         </View>
-        <Text variant="bodySmall">{data.village.name}</Text>
+        <Text variant="bodySmall" style={{color}}>
+          {data.village.name}
+        </Text>
       </View>
     </Card.Content>
   </Card>
 );
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-  },
-  avatar: {
-    marginRight: 16,
-  },
-  cardTextContainer: {
-    flex: 1,
-  },
-  cardDataRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-});
 
 export default FarmerListItem;

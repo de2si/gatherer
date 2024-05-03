@@ -1,10 +1,20 @@
 import React from 'react';
-import {Button, IconButton} from 'react-native-paper';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {Pressable, StyleSheet} from 'react-native';
+import {useTheme} from 'react-native-paper';
 
-const SearchOffIcon = (props: any) => (
-  <MaterialIcon name="search-off" {...props} />
-);
+// icons
+import {FilterIcon} from '@components/icons/FilterIcon';
+import {SearchIcon} from '@components/icons/SearchIcon';
+import {AddIcon} from '@components/icons/AddIcon';
+
+interface ListScreenHeaderRightProps {
+  showFilterBtn?: boolean;
+  isFilterApplied?: boolean;
+  isSearchApplied?: boolean;
+  handleFilterPress?: () => void;
+  handleSearchPress?: () => void;
+  handleAddPress?: () => void;
+}
 
 export const ListScreenHeaderRight = ({
   showFilterBtn = true,
@@ -12,46 +22,59 @@ export const ListScreenHeaderRight = ({
   isSearchApplied = false,
   handleFilterPress = () => {},
   handleSearchPress = () => {},
-  handleSearchClearPress = () => {},
   handleAddPress = () => {},
-}: {
-  showFilterBtn?: boolean;
-  isFilterApplied?: boolean;
-  isSearchApplied?: boolean;
-  handleFilterPress?: () => void;
-  handleSearchPress?: () => void;
-  handleSearchClearPress?: () => void;
-  handleAddPress?: () => void;
-}) => {
+}: ListScreenHeaderRightProps) => {
+  const theme = useTheme();
+  const bgColor = (applied: boolean) =>
+    applied ? theme.colors.secondary : theme.colors.background;
+  const iconColor = (applied: boolean) =>
+    applied ? theme.colors.onSecondary : theme.colors.primary;
   return (
     <>
       {showFilterBtn && (
-        <IconButton
-          icon="filter-outline"
-          size={24}
+        <Pressable
           onPress={handleFilterPress}
-          selected={isFilterApplied}
-          mode={isFilterApplied ? 'contained' : undefined}
-        />
+          style={[
+            {backgroundColor: bgColor(isFilterApplied)},
+            styles.pressable,
+          ]}>
+          <FilterIcon
+            height={24}
+            width={24}
+            color={iconColor(isFilterApplied)}
+          />
+        </Pressable>
       )}
-      <IconButton
-        icon="magnify"
-        size={24}
+      <Pressable
         onPress={handleSearchPress}
-        selected={isSearchApplied}
-        mode={isSearchApplied ? 'contained' : undefined}
-      />
-      {isSearchApplied && (
-        <IconButton
-          icon={SearchOffIcon}
-          size={24}
-          onPress={handleSearchClearPress}
-          mode="contained-tonal"
+        style={[
+          {backgroundColor: bgColor(isSearchApplied)},
+          styles.pressable,
+          isSearchApplied ? styles.searchApplied : styles.searchUnapplied,
+        ]}>
+        <SearchIcon
+          height={isSearchApplied ? 24 : 32}
+          width={isSearchApplied ? 24 : 32}
+          color={iconColor(isSearchApplied)}
         />
-      )}
-      <Button mode="contained-tonal" onPress={handleAddPress}>
-        Add
-      </Button>
+      </Pressable>
+      <Pressable onPress={handleAddPress} style={styles.pressable}>
+        <AddIcon height={24} width={24} color={iconColor(false)} />
+      </Pressable>
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  pressable: {
+    padding: 8,
+    borderRadius: 500,
+  },
+  searchApplied: {
+    margin: 8,
+  },
+  searchUnapplied: {
+    marginLeft: 8,
+    marginTop: 4,
+  },
+});
