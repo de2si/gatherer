@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
+import CustomBackBtn from '@components/CustomBackBtn';
 
 // navigation
 import {
@@ -52,14 +53,21 @@ const MoreStack = (): React.JSX.Element => {
   const theme = useTheme();
   return (
     <Stack.Navigator
-      screenOptions={{
+      screenOptions={({route}) => ({
         headerBackTitleVisible: false,
         headerShadowVisible: false,
         headerStyle: {backgroundColor: theme.colors.background},
-        headerTitleStyle: theme.fonts.titleMedium,
-        headerTintColor: theme.colors.onSurface,
-        contentStyle: {flex: 1, backgroundColor: theme.colors.background},
-      }}>
+        headerTitleStyle: theme.fonts.titleLarge,
+        headerTintColor: theme.colors.tertiary,
+        headerLeft: CustomBackBtn,
+        contentStyle: {
+          flex: 1,
+          backgroundColor: theme.colors.background,
+          borderRadius: 20,
+          borderTopWidth: route.name === 'MoreList' ? 0 : 2,
+          borderTopColor: theme.colors.tertiary,
+        },
+      })}>
       <Stack.Screen
         name="MoreList"
         component={MoreListScreen}
@@ -68,7 +76,7 @@ const MoreStack = (): React.JSX.Element => {
       <Stack.Screen
         name="ProfileDetail"
         component={ProfileDetailScreenWrapper}
-        options={{title: 'Profile details'}}
+        options={{title: 'Profile'}}
       />
       <Stack.Screen
         name="ProfileEdit"

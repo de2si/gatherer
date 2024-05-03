@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
+import CustomBackBtn from '@components/CustomBackBtn';
 
 // navigation
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -33,9 +34,16 @@ const BeneficiaryStack = (): React.JSX.Element => {
         headerBackTitleVisible: false,
         headerShadowVisible: false,
         headerStyle: {backgroundColor: theme.colors.background},
-        headerTitleStyle: theme.fonts.titleMedium,
-        headerTintColor: theme.colors.onSurface,
-        contentStyle: {flex: 1, backgroundColor: theme.colors.background},
+        headerTitleStyle: theme.fonts.titleLarge,
+        headerTintColor: theme.colors.tertiary,
+        headerLeft: CustomBackBtn,
+        contentStyle: {
+          flex: 1,
+          backgroundColor: theme.colors.background,
+          borderRadius: 20,
+          borderTopWidth: 2,
+          borderTopColor: theme.colors.tertiary,
+        },
       }}>
       <Stack.Screen
         name="BeneficiaryList"
@@ -47,7 +55,7 @@ const BeneficiaryStack = (): React.JSX.Element => {
       <Stack.Screen
         name="BeneficiaryDetail"
         component={BeneficiaryDetailScreen}
-        options={{title: 'Beneficiary details'}}
+        options={{title: 'Beneficiary'}}
       />
       <Stack.Screen
         name="BeneficiaryAdd"
