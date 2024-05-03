@@ -14,6 +14,7 @@ import {Dropdown, MultiSelect} from 'react-native-element-dropdown';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {DropdownProps} from 'react-native-element-dropdown/lib/typescript/components/Dropdown/model';
 import {MultiSelectProps} from 'react-native-element-dropdown/lib/typescript/components/MultiSelect/model';
+import {fontStyles} from '@styles/common';
 
 // component to show when the options list is empty
 interface RenderEmptyProps {
@@ -155,12 +156,14 @@ export const FormSelectInput = <T, TForm extends FieldValues>({
     placeholderStyle: [
       {color: theme.colors.primaryContainer},
       theme.fonts.bodyLarge,
+      fontStyles.regularText,
       styles.placeholderStyle,
       placeholderStyle ?? null,
     ],
     selectedTextStyle: [
       {color: theme.colors.onPrimary},
       theme.fonts.bodyLarge,
+      fontStyles.regularText,
       styles.selectedTextStyle,
       selectedTextStyle ?? null,
     ],
@@ -270,13 +273,11 @@ const styles = StyleSheet.create({
     // borderBottomRightRadius: 12,
   },
   placeholderStyle: {
-    fontWeight: 'normal',
     // fontSize: 16,
     // // color: MD3LightTheme.colors.onSurfaceVariant,
     // fontSize: MD3LightTheme.fonts.bodyLarge.fontSize,
   },
   selectedTextStyle: {
-    fontWeight: 'normal',
     // fontSize: 14,
     // // color: MD3LightTheme.colors.primary,
     // fontSize: MD3LightTheme.fonts.bodyLarge.fontSize,

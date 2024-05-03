@@ -35,6 +35,12 @@ export const commonStyles = StyleSheet.create({
   },
 });
 
+export const fontStyles = StyleSheet.create({
+  regularText: {
+    fontWeight: 'normal',
+  },
+});
+
 export const logoStyles = StyleSheet.create({
   logoImage: {
     width: 250,

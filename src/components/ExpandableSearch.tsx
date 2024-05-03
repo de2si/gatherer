@@ -2,6 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, Animated, StyleSheet} from 'react-native';
 import {Searchbar, useTheme} from 'react-native-paper';
+import {fontStyles} from '@styles/common';
 
 interface ExpandableSearchProps {
   visible: boolean;
@@ -65,13 +66,13 @@ const ExpandableSearch = ({
             rippleColor={theme.colors.secondary}
             style={[
               {backgroundColor: theme.colors.secondary},
-              // styles.searchbar,
+              styles.searchbar,
             ]}
             inputStyle={[
               theme.fonts.bodyLarge,
-              styles.text,
+              fontStyles.regularText,
               {color: theme.colors.onSecondary},
-              // styles.searchbarInput,
+              styles.searchbarInput,
             ]}
             theme={{
               colors: {
@@ -90,16 +91,14 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
   },
-  text: {
-    fontWeight: 'normal',
+  searchbar: {
+    height: 40,
+    marginVertical: 8,
   },
-  // searchbar: {
-  //   height: 40,
-  // },
-  // searchbarInput: {
-  //   height: 40,
-  //   minHeight: 40,
-  // },
+  searchbarInput: {
+    height: 40,
+    minHeight: 40,
+  },
 });
 
 export default ExpandableSearch;

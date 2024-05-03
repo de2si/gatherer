@@ -8,7 +8,7 @@ const SearchIcon = ({
 }: SvgProps) => (
   <Svg
     {...props}
-    viewBox="0 0 29.14 29.14"
+    viewBox="0 0 29.145 29.145"
     preserveAspectRatio="xMidYMid meet"
     width={width}
     height={height}>
@@ -16,7 +16,7 @@ const SearchIcon = ({
       <ClipPath id="a">
         <Path
           fill="none"
-          d="M0 0h27.476v13.742H0z"
+          d="M0 0h29.145v29.145H0z"
           data-name="Rectangle 178808"
         />
       </ClipPath>

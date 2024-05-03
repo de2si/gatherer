@@ -9,7 +9,7 @@ import {
 } from 'react-native-paper';
 import {Controller, Control, FieldValues} from 'react-hook-form';
 import {convertToSentenceCase, formatDate} from '@helpers/formatters';
-import {commonStyles} from '@styles/common';
+import {commonStyles, fontStyles} from '@styles/common';
 
 interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -39,6 +39,7 @@ const FormTextInput = <TFieldValues extends FieldValues>({
       {backgroundColor: theme.colors.primary},
       theme.fonts.bodyLarge,
       styles.textInput,
+      fontStyles.regularText,
     ],
     outlineStyle: styles.outline,
     placeholderTextColor: theme.colors.primaryContainer,
@@ -98,7 +99,6 @@ const FormTextInput = <TFieldValues extends FieldValues>({
 const styles = StyleSheet.create({
   textInput: {
     height: 40,
-    fontWeight: 'normal',
   },
   outline: {
     borderRadius: 8,
