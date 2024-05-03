@@ -6,7 +6,7 @@ import {ActivityIndicator, Text, useTheme} from 'react-native-paper';
 
 // assets and styles
 import Logo from '@assets/logo.png';
-import {commonStyles, logoStyles} from '@styles/common';
+import {commonStyles, logoStyles, spacingStyles} from '@styles/common';
 
 const SplashScreen = () => {
   const theme = useTheme();
@@ -16,7 +16,7 @@ const SplashScreen = () => {
       <Text style={[theme.fonts.headlineLarge, logoStyles.gathererText]}>
         Gatherer
       </Text>
-      <ActivityIndicator size={'large'} style={commonStyles.mt48} />
+      <ActivityIndicator size={'large'} style={spacingStyles.mt48} />
     </View>
   );
 };

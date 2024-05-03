@@ -6,7 +6,7 @@ import {HelperText, Text, useTheme} from 'react-native-paper';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {Control, Controller, FieldValues} from 'react-hook-form';
 import {convertToSentenceCase} from '@helpers/formatters';
-import {commonStyles, fontStyles} from '@styles/common';
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 interface FormRadioInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name'];
@@ -37,7 +37,7 @@ const FormRadioInput = <TFieldValues extends FieldValues>({
           <Text style={[theme.fonts.bodyLarge, {color: theme.colors.outline}]}>
             {label}
           </Text>
-          <View style={[commonStyles.rowWrap, commonStyles.pv16]}>
+          <View style={[commonStyles.rowWrap, spacingStyles.pv16]}>
             {options.map((option, index) => (
               <BouncyCheckbox
                 key={index}

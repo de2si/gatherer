@@ -27,11 +27,43 @@ export const commonStyles = StyleSheet.create({
   width100: {
     width: '100%',
   },
+});
+
+export const cardStyles = StyleSheet.create({
+  card: {
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    borderBottomWidth: 1,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    paddingHorizontal: 0,
+  },
+  cardDataRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardSideItem: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    paddingHorizontal: 0,
+  },
+});
+
+export const spacingStyles = StyleSheet.create({
   pv16: {
     paddingVertical: 16,
   },
   mt48: {
     marginTop: 48,
+  },
+  mr16: {
+    marginRight: 16,
   },
 });
 
