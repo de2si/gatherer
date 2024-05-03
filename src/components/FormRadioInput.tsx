@@ -37,7 +37,7 @@ const FormRadioInput = <TFieldValues extends FieldValues>({
           <Text style={[theme.fonts.bodyLarge, {color: theme.colors.outline}]}>
             {label}
           </Text>
-          <View style={[commonStyles.rowWrap, spacingStyles.pv16]}>
+          <View style={[commonStyles.rowWrap]}>
             {options.map((option, index) => (
               <BouncyCheckbox
                 key={index}
@@ -61,7 +61,7 @@ const FormRadioInput = <TFieldValues extends FieldValues>({
                     ? theme.colors.primary
                     : theme.colors.outline
                 }
-                style={styles.radioContainer}
+                style={spacingStyles.mt8}
                 textStyle={[
                   styles.radioTextStyle,
                   theme.fonts.bodyLarge,
@@ -71,9 +71,11 @@ const FormRadioInput = <TFieldValues extends FieldValues>({
               />
             ))}
           </View>
-          <HelperText type="error" visible={error ? true : false}>
-            {error?.message ?? 'Error'}
-          </HelperText>
+          {error && (
+            <HelperText type="error" visible={error ? true : false}>
+              {error?.message ?? 'Error'}
+            </HelperText>
+          )}
         </View>
       )}
     />

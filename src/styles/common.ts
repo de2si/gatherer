@@ -9,6 +9,9 @@ export const commonStyles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
+  flex2: {
+    flex: 2,
+  },
   centeredContainer: {
     flex: 1,
     alignItems: 'center',
@@ -66,6 +69,9 @@ export const spacingStyles = StyleSheet.create({
   mt48: {
     marginTop: 48,
   },
+  mt8: {
+    marginTop: 8,
+  },
   mt16: {
     marginTop: 16,
   },
@@ -80,6 +86,18 @@ export const spacingStyles = StyleSheet.create({
   },
   mv12: {
     marginVertical: 12,
+  },
+  mv16: {
+    marginVertical: 16,
+  },
+  mb48: {
+    marginBottom: 48,
+  },
+  rowGap8: {
+    rowGap: 8,
+  },
+  colGap8: {
+    columnGap: 8,
   },
 });
 
@@ -111,6 +129,13 @@ export const detailStyles = StyleSheet.create({
 export const fontStyles = StyleSheet.create({
   regularText: {
     fontWeight: 'normal',
+  },
+  bodyXl: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 0,
+    lineHeight: 26,
   },
 });
 
