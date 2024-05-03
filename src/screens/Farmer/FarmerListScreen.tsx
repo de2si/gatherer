@@ -1,8 +1,7 @@
 // FarmerListScreen.tsx
 
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, RefreshControl, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {RefreshControl} from 'react-native-gesture-handler';
 import {Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
@@ -22,11 +21,12 @@ import FarmerListItem from '@components/FarmerListItem';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
-import SearchSheet from '@components/SearchSheet';
+import ExpandableSearch from '@components/ExpandableSearch';
 import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
+import {commonStyles} from '@styles/common';
 
 type FarmerListScreenProps = NativeStackScreenProps<
   FarmerStackScreenProps,
@@ -43,8 +43,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const theme = useTheme();
   const [filterBottomSheetVisible, setFilterBottomSheetVisible] =
     useState(false);
-  const [searchBottomSheetVisible, setSearchBottomSheetVisible] =
-    useState(false);
+  const [expandSearch, setExpandSearch] = useState(false);
   const [filters, setFilters] = useState(locationFilterDefaultValues);
   const [searchText, setSearchText] = useState('');
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -56,18 +55,14 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   const handleFilterPress = () => {
     setFilterBottomSheetVisible(true);
   };
-  const handleSearchPress = () => {
-    setSearchBottomSheetVisible(true);
-  };
-  const handleSearchClearPress = () => {
-    setSearchText('');
-  };
-
   const showDetailScreen = (farmer: FarmerPreview) => {
     navigation.navigate('FarmerDetail', {id: farmer.id});
   };
 
   useEffect(() => {
+    const handleSearchPress = () => {
+      setExpandSearch(val => !val);
+    };
     const handleAddPress = () => {
       navigation.navigate('FarmerAdd', {variant: 'add'});
     };
@@ -78,11 +73,11 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
           isSearchApplied,
           handleFilterPress,
           handleSearchPress,
-          handleSearchClearPress,
           handleAddPress,
+          theme,
         }),
     });
-  }, [isFilterApplied, isSearchApplied, navigation]);
+  }, [isFilterApplied, isSearchApplied, navigation, theme]);
 
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);
@@ -131,11 +126,21 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   }, [fetchData, filters, searchText, refresh, withAuth, showSnackbar]);
 
   return (
-    <View style={styles.container}>
+    <View>
+      <ExpandableSearch
+        visible={expandSearch}
+        applySearch={setSearchText}
+        placeholder="Search code, name, aadhaar, phone number..."
+      />
       <FlatList
         data={farmers}
         renderItem={({item}) => (
-          <FarmerListItem data={item} onPress={showDetailScreen} />
+          <FarmerListItem
+            data={item}
+            onPress={showDetailScreen}
+            color={theme.colors.primary}
+            borderColor={theme.colors.tertiary}
+          />
         )}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
@@ -147,7 +152,9 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
             Farmers not found
           </Text>
         }
-        contentContainerStyle={!farmers.length && styles.noData}
+        contentContainerStyle={
+          !farmers.length && commonStyles.centeredContainer
+        }
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -162,15 +169,6 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
         onClose={() => setFilterBottomSheetVisible(false)}
         applyFilters={setFilters}
       />
-      <SearchSheet
-        visible={searchBottomSheetVisible}
-        searchText={searchText}
-        onClose={() => setSearchBottomSheetVisible(false)}
-        applySearch={setSearchText}
-        helperText={
-          '\n• Search using farmer code\n• Search using aadhaar no.\n• Search using name\n• Search using phone number'
-        }
-      />
       <Snackbar
         visible={snackbarVisible}
         onDismiss={dismissSnackbar}
@@ -182,10 +180,3 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
 };
 
 export default FarmerListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-});
