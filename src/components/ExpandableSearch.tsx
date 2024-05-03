@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Animated, StyleSheet} from 'react-native';
 import {Searchbar, useTheme} from 'react-native-paper';
 import {fontStyles} from '@styles/common';
+import {truncateString} from '@helpers/formatters';
 
 interface ExpandableSearchProps {
   visible: boolean;
@@ -56,7 +57,7 @@ const ExpandableSearch = ({
       {visible && (
         <View>
           <Searchbar
-            placeholder={placeholder}
+            placeholder={truncateString(placeholder, 40)}
             value={searchQuery}
             onChangeText={setSearchQuery}
             onBlur={onSubmit} // Apply search

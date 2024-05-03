@@ -1,6 +1,6 @@
 import React from 'react';
 import {Pressable, StyleSheet} from 'react-native';
-import {useTheme} from 'react-native-paper';
+import {MD3Theme} from 'react-native-paper';
 
 // icons
 import {FilterIcon} from '@components/icons/FilterIcon';
@@ -14,6 +14,7 @@ interface ListScreenHeaderRightProps {
   handleFilterPress?: () => void;
   handleSearchPress?: () => void;
   handleAddPress?: () => void;
+  theme: MD3Theme;
 }
 
 export const ListScreenHeaderRight = ({
@@ -23,8 +24,8 @@ export const ListScreenHeaderRight = ({
   handleFilterPress = () => {},
   handleSearchPress = () => {},
   handleAddPress = () => {},
+  theme,
 }: ListScreenHeaderRightProps) => {
-  const theme = useTheme();
   const bgColor = (applied: boolean) =>
     applied ? theme.colors.secondary : theme.colors.background;
   const iconColor = (applied: boolean) =>
