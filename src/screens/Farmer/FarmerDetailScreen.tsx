@@ -1,6 +1,6 @@
 // FarmerDetailScreen.tsx
 
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
@@ -41,6 +41,15 @@ import {ApiImage} from '@typedefs/common';
 import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
 
+// styles
+import {
+  borderStyles,
+  cardStyles,
+  commonStyles,
+  detailStyles,
+  spacingStyles,
+} from '@styles/common';
+
 type FarmerDetailScreenProps = NativeStackScreenProps<
   FarmerStackScreenProps,
   'FarmerDetail'
@@ -49,13 +58,13 @@ type FarmerDetailScreenProps = NativeStackScreenProps<
 const FieldThumbnail = ({value, theme}: {value: ApiImage; theme: MD3Theme}) => (
   <View
     style={[
-      styles.thinBorder,
+      borderStyles.borderMinimal,
       {borderColor: theme.colors.outline, borderRadius: theme.roundness},
     ]}>
     <ImageWrapper
       flavor="regular"
       value={value}
-      style={styles.imageThumbnail}
+      style={detailStyles.imageThumbnail}
     />
   </View>
 );
@@ -112,7 +121,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
 
   if (loading) {
     return (
-      <View style={styles.centeredContainer}>
+      <View style={commonStyles.centeredContainer}>
         <ActivityIndicator />
       </View>
     );
@@ -129,17 +138,26 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
     : '-';
   return (
     <ScrollView>
-      <View style={[styles.container, {borderTopColor: theme.colors.tertiary}]}>
+      <View
+        style={[
+          commonStyles.flex1,
+          spacingStyles.mh16,
+          spacingStyles.mt16,
+          {borderTopColor: theme.colors.tertiary},
+        ]}>
         {farmer && (
           <>
-            <View style={styles.header}>
+            <View style={commonStyles.row}>
               <ImageWrapper
                 flavor="avatar"
                 value={farmer.profile_photo}
                 size={150}
-                style={[styles.thinBorder, {borderColor: theme.colors.outline}]}
+                style={[
+                  borderStyles.borderMinimal,
+                  {borderColor: theme.colors.outline},
+                ]}
               />
-              <View style={styles.fatherNameActions}>
+              <View style={detailStyles.colSide}>
                 <Text
                   style={[
                     theme.fonts.titleMedium,
@@ -150,7 +168,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                 <Text style={theme.fonts.titleLarge}>
                   {farmer.guardian_name}
                 </Text>
-                <Pressable style={styles.editBtn} onPress={handleEditPress}>
+                <Pressable style={spacingStyles.mt12} onPress={handleEditPress}>
                   <EditIcon
                     height={18}
                     width={18}
@@ -159,7 +177,9 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                 </Pressable>
               </View>
             </View>
-            <Text variant="headlineLarge" style={{color: theme.colors.primary}}>
+            <Text
+              variant="headlineLarge"
+              style={[{color: theme.colors.primary}, spacingStyles.mt12]}>
               {farmer.name}
             </Text>
             <List.Section>
@@ -188,7 +208,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                 value={farmer.gender}
                 theme={theme}
               />
-              <View style={styles.aadhaarRow}>
+              <View style={[cardStyles.cardDataRow, spacingStyles.mv12]}>
                 <FieldThumbnail value={farmer.id_front_image} theme={theme} />
                 <FieldThumbnail value={farmer.id_back_image} theme={theme} />
               </View>
@@ -207,7 +227,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
                 <DetailFieldItem
                   label="Land"
                   valueComponent={
-                    <View style={styles.linkRow}>
+                    <View style={detailStyles.linkRow}>
                       {farmer.land_parcels.map(landItem => (
                         <Pressable
                           key={landItem.id}
@@ -280,43 +300,3 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
 };
 
 export default FarmerDetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginHorizontal: 16,
-    borderTopWidth: 2,
-  },
-  centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  header: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingTop: 24,
-  },
-  imageThumbnail: {
-    width: 170,
-    height: 110,
-  },
-  thinBorder: {
-    borderWidth: 1,
-  },
-  linkRow: {
-    flexDirection: 'row',
-    columnGap: 12,
-  },
-  fatherNameActions: {
-    flex: 1,
-    alignItems: 'flex-end',
-    rowGap: 4,
-  },
-  editBtn: {
-    marginTop: 12,
-  },
-  aadhaarRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    columnGap: 24,
-    marginVertical: 12,
-  },
-});
