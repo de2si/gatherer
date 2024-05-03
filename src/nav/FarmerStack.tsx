@@ -40,6 +40,9 @@ const FarmerStack = (): React.JSX.Element => {
         contentStyle: {
           flex: 1,
           backgroundColor: theme.colors.background,
+          borderRadius: 20,
+          borderTopWidth: 2,
+          borderTopColor: theme.colors.tertiary,
         },
       }}>
       <Stack.Screen
