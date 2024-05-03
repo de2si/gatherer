@@ -19,7 +19,7 @@ interface RoundSingleViewProps {
 const RoundSingleView = ({uri = ''}: RoundSingleViewProps) => {
   const theme = useTheme();
   return (
-    <View style={[commonStyles.row, styles.container]}>
+    <View style={[commonStyles.rowCentered, styles.container]}>
       {uri ? (
         <SingleImage styleVariant="round" uri={uri} />
       ) : (

@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, Animated, StyleSheet} from 'react-native';
 import {Searchbar, useTheme} from 'react-native-paper';
-import {fontStyles} from '@styles/common';
+import {fontStyles, spacingStyles} from '@styles/common';
 import {truncateString} from '@helpers/formatters';
 
 interface ExpandableSearchProps {
@@ -68,6 +68,7 @@ const ExpandableSearch = ({
             style={[
               {backgroundColor: theme.colors.secondary},
               styles.searchbar,
+              spacingStyles.mh16,
             ]}
             inputStyle={[
               theme.fonts.bodyLarge,

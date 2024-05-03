@@ -17,6 +17,10 @@ export const commonStyles = StyleSheet.create({
   row: {
     flex: 1,
     flexDirection: 'row',
+  },
+  rowCentered: {
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -62,8 +66,45 @@ export const spacingStyles = StyleSheet.create({
   mt48: {
     marginTop: 48,
   },
+  mt16: {
+    marginTop: 16,
+  },
   mr16: {
     marginRight: 16,
+  },
+  mh16: {
+    marginHorizontal: 16,
+  },
+  mt12: {
+    marginTop: 12,
+  },
+  mv12: {
+    marginVertical: 12,
+  },
+});
+
+export const borderStyles = StyleSheet.create({
+  borderMinimal: {
+    borderWidth: 0.4,
+  },
+  border1: {
+    borderWidth: 1,
+  },
+});
+
+export const detailStyles = StyleSheet.create({
+  imageThumbnail: {
+    width: 170,
+    height: 110,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    columnGap: 12,
+  },
+  colSide: {
+    flex: 1,
+    alignItems: 'flex-end',
+    rowGap: 4,
   },
 });
 

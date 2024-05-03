@@ -38,7 +38,7 @@ const FarmerListItem: React.FC<FarmerListItemProps> = ({
   <Card
     mode="contained"
     onPress={() => onPress(data)}
-    style={[cardStyles.card, {borderColor}]}>
+    style={[cardStyles.card, {borderColor}, spacingStyles.mh16]}>
     <Card.Content style={cardStyles.cardContent}>
       <ImageWrapper
         flavor="avatar"

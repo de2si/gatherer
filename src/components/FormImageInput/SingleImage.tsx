@@ -2,6 +2,7 @@ import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {useTheme} from 'react-native-paper';
 import {EditIcon} from '@components/icons/EditIcon';
+import {borderStyles} from '@styles/common';
 
 interface SingleImageProps {
   styleVariant?: 'round' | 'square';
@@ -22,7 +23,7 @@ const SingleImage = ({
   const theme = useTheme();
   const containerStyles = [
     styles.container,
-    styles.border,
+    borderStyles.borderMinimal,
     {
       borderColor: theme.colors.outline,
       borderRadius:
@@ -56,9 +57,6 @@ export default SingleImage;
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-  },
-  border: {
-    borderWidth: 0.4,
   },
   editIcon: {
     position: 'absolute',
