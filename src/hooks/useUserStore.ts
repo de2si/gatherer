@@ -5,7 +5,7 @@ import {api} from '@api/axios';
 import {filterDefaultValues} from '@components/FilterSheet';
 
 // helpers
-import {maskPhoneNumber} from '@helpers/formatters';
+import {formatIdAsCode, formatPhoneNumber} from '@helpers/formatters';
 import {buildFilterQueryParams} from '@helpers/formHelpers';
 
 // types
@@ -18,6 +18,7 @@ export interface UserPreview {
   id: number;
   name: string;
   photo: ApiImage;
+  code: string;
   phone: string;
   projects: Project[];
 }
@@ -47,7 +48,8 @@ const transformApiUser = (apiResponse: ApiUserType): UserPreview => {
     id: apiResponse.id,
     name: apiResponse.name,
     photo: {id: 0, url: '', hash: ''},
-    phone: maskPhoneNumber(apiResponse.phone_number),
+    code: formatIdAsCode('U', apiResponse.id),
+    phone: formatPhoneNumber(apiResponse.phone_number),
     projects: Object.entries(apiResponse.projects).map(([id, {name}]) => ({
       id: parseInt(id, 10),
       name,
