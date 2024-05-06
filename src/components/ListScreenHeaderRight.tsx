@@ -1,11 +1,12 @@
 import React from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import {Pressable} from 'react-native';
 import {MD3Theme} from 'react-native-paper';
 
 // icons
 import {FilterIcon} from '@components/icons/FilterIcon';
 import {SearchIcon} from '@components/icons/SearchIcon';
 import {AddIcon} from '@components/icons/AddIcon';
+import {headerStyles} from '@styles/common';
 
 interface ListScreenHeaderRightProps {
   showFilterBtn?: boolean;
@@ -37,7 +38,7 @@ export const ListScreenHeaderRight = ({
           onPress={handleFilterPress}
           style={[
             {backgroundColor: bgColor(isFilterApplied)},
-            styles.pressable,
+            headerStyles.pressable,
           ]}>
           <FilterIcon
             height={24}
@@ -50,8 +51,10 @@ export const ListScreenHeaderRight = ({
         onPress={handleSearchPress}
         style={[
           {backgroundColor: bgColor(isSearchApplied)},
-          styles.pressable,
-          isSearchApplied ? styles.searchApplied : styles.searchUnapplied,
+          headerStyles.pressable,
+          isSearchApplied
+            ? headerStyles.searchApplied
+            : headerStyles.searchUnapplied,
         ]}>
         <SearchIcon
           height={isSearchApplied ? 24 : 32}
@@ -59,23 +62,9 @@ export const ListScreenHeaderRight = ({
           color={iconColor(isSearchApplied)}
         />
       </Pressable>
-      <Pressable onPress={handleAddPress} style={styles.pressable}>
+      <Pressable onPress={handleAddPress} style={headerStyles.pressable}>
         <AddIcon height={24} width={24} color={iconColor(false)} />
       </Pressable>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  pressable: {
-    padding: 8,
-    borderRadius: 500,
-  },
-  searchApplied: {
-    margin: 8,
-  },
-  searchUnapplied: {
-    marginLeft: 8,
-    marginTop: 4,
-  },
-});

@@ -208,3 +208,17 @@ export const tableStyles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
 });
+
+export const headerStyles = StyleSheet.create({
+  pressable: {
+    padding: 8,
+    borderRadius: 500,
+  },
+  searchApplied: {
+    margin: 8,
+  },
+  searchUnapplied: {
+    marginLeft: 8,
+    marginTop: 4,
+  },
+});
