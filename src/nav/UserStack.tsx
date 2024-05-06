@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
-import CustomBackBtn from '@components/CustomBackBtn';
+import CustomBackBtn from '@components/nav/CustomBackBtn';
 
 // navigation
 import {
@@ -90,7 +90,7 @@ const UserStack: React.FC<UserStackProps> = ({route}) => {
         component={UserListScreen}
         initialParams={{userType}}
         options={{
-          title: `${userTypeSentenceCase}s`,
+          title: '', // `${userTypeSentenceCase}s`,
         }}
       />
       <Stack.Screen

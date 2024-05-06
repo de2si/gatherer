@@ -2,9 +2,13 @@
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
+import CustomTopBar from '@components/nav/CustomTopBar';
 
 // navigation
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {
+  createMaterialTopTabNavigator,
+  MaterialTopTabBarProps,
+} from '@react-navigation/material-top-tabs';
 import UserStack from '@nav/UserStack';
 
 // stores
@@ -23,27 +27,18 @@ export type UserTabsNavProps = {
   Surveyor: UserTabParams;
 };
 
+const CustomUserBar = (props: MaterialTopTabBarProps) => {
+  const theme = useTheme();
+  return <CustomTopBar theme={theme} {...props} />;
+};
+
 // create navigation tab
 const Tab = createMaterialTopTabNavigator<UserTabsNavProps>();
 
 const UserTabs = () => {
-  const theme = useTheme();
   let loggedUser = useProfileStore(store => store.data);
   return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarStyle: {
-          backgroundColor: theme.colors.background,
-        },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
-        tabBarLabelStyle: {
-          fontWeight: 'normal',
-        },
-        tabBarIndicatorStyle: {
-          backgroundColor: theme.colors.primary,
-        },
-      }}>
+    <Tab.Navigator tabBar={CustomUserBar} screenOptions={{}}>
       {loggedUser.userType === UserType.ADMIN && (
         <>
           <Tab.Screen

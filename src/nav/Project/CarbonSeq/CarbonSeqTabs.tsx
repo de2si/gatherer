@@ -4,9 +4,13 @@ import React from 'react';
 import {useTheme} from 'react-native-paper';
 
 // navigation
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {
+  createMaterialTopTabNavigator,
+  MaterialTopTabBarProps,
+} from '@react-navigation/material-top-tabs';
 import ActivityStack from '@nav/Project/CarbonSeq/ActivityStack';
 import ParticipantStack from '@nav/Project/CarbonSeq/ParticipantStack';
+import CustomTopBar from '@components/nav/CustomTopBar';
 
 // define screen params
 export type CarbonSeqTabsNavProps = {
@@ -14,26 +18,19 @@ export type CarbonSeqTabsNavProps = {
   Participant: {};
 };
 
+const CustomBar = (props: MaterialTopTabBarProps) => {
+  const theme = useTheme();
+  return (
+    <CustomTopBar theme={theme} rightSide={true} maxWidth={100} {...props} />
+  );
+};
+
 // create navigation tab
 const Tab = createMaterialTopTabNavigator<CarbonSeqTabsNavProps>();
 
 const CarbonSeqTabs = () => {
-  const theme = useTheme();
   return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarStyle: {
-          backgroundColor: theme.colors.background,
-        },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
-        tabBarLabelStyle: {
-          fontWeight: 'normal',
-        },
-        tabBarIndicatorStyle: {
-          backgroundColor: theme.colors.primary,
-        },
-      }}>
+    <Tab.Navigator tabBar={CustomBar}>
       <Tab.Screen name="Activity" component={ActivityStack} />
       <Tab.Screen name="Participant" component={ParticipantStack} />
     </Tab.Navigator>

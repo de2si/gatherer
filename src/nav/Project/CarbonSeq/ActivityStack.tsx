@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
-import CustomBackBtn from '@components/CustomBackBtn';
+import CustomBackBtn from '@components/nav/CustomBackBtn';
 
 // navigation
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -24,7 +24,7 @@ const ActivityStack = (): React.JSX.Element => {
   const theme = useTheme();
   return (
     <Stack.Navigator
-      screenOptions={{
+      screenOptions={({route}) => ({
         headerBackTitleVisible: false,
         headerShadowVisible: false,
         headerStyle: {backgroundColor: theme.colors.background},
@@ -35,10 +35,10 @@ const ActivityStack = (): React.JSX.Element => {
           flex: 1,
           backgroundColor: theme.colors.background,
           borderRadius: 20,
-          borderTopWidth: 2,
+          borderTopWidth: route.name === 'ActivityTable' ? 2 : 0,
           borderTopColor: theme.colors.tertiary,
         },
-      }}>
+      })}>
       <Stack.Screen
         name="ActivityList"
         component={ActivityListScreen}

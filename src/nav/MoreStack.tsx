@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {useTheme} from 'react-native-paper';
-import CustomBackBtn from '@components/CustomBackBtn';
+import CustomBackBtn from '@components/nav/CustomBackBtn';
 
 // navigation
 import {

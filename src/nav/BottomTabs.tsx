@@ -5,7 +5,7 @@ import {Pressable, StyleSheet, View} from 'react-native';
 import {MD3Theme, Text, useTheme} from 'react-native-paper';
 
 // components
-import CustomBottomTabIcon from '@components/CustomBottomTabIcon';
+import CustomBottomTabIcon from '@components/nav/CustomBottomTabIcon';
 import {AccountIcon} from '@components/icons/AccountIcon';
 import {DataIcon} from '@components/icons/DataIcon';
 import {UsersIcon} from '@components/icons/UsersIcon';
