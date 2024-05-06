@@ -1,21 +1,27 @@
-// CoordinatesDrawer.tsx
-
 import React from 'react';
-import {StyleSheet} from 'react-native';
 import {MD3Theme} from 'react-native-paper';
-import Svg, {Circle, Polygon} from 'react-native-svg';
+import Svg, {Circle, Polygon, Text as SvgText} from 'react-native-svg';
+
 import {Coordinate} from '@typedefs/common';
+import {ALPHABETS} from '@helpers/constants';
+import {borderStyles, commonStyles} from '@styles/common';
+
+interface CoordinatesDrawerProps {
+  coordinates: Coordinate[];
+  theme: MD3Theme;
+  width?: number;
+  height?: number;
+}
 
 const CoordinatesDrawer = ({
   coordinates,
+  width = 130,
+  height = 130,
   theme,
-}: {
-  coordinates: Coordinate[];
-  theme: MD3Theme;
-}) => {
+}: CoordinatesDrawerProps) => {
   const svgPadding = 10;
-  const svgWidth = 130;
-  const svgHeight = 130;
+  const svgWidth = width;
+  const svgHeight = height;
 
   // Find the min and max latitude and longitude from the coordinates
   const minLatitude = Math.min(...coordinates.map(coord => coord.latitude));
@@ -51,43 +57,44 @@ const CoordinatesDrawer = ({
       height={svgHeight + 2 * svgPadding}
       width={svgWidth + 2 * svgPadding}
       style={[
-        styles.svg,
+        commonStyles.flex1,
+        borderStyles.border1,
+        borderStyles.radius8,
         {
-          backgroundColor: theme.colors.tertiaryContainer,
-          borderRadius: theme.roundness,
+          backgroundColor: theme.colors.primary,
           borderColor: theme.colors.outline,
         },
       ]}>
       {/* Draw the polygon */}
       <Polygon
         points={polygonPoints}
-        fill={theme.colors.secondaryContainer}
-        stroke={theme.colors.secondary}
+        fill={theme.colors.elevation.level4}
+        stroke={theme.colors.onPrimary}
         strokeWidth="2"
       />
 
-      {/* Draw circles at each coordinate */}
+      {/* Draw circles and text at each coordinate */}
       {coordinates.map((coord, index) => (
-        <Circle
-          key={index}
-          cx={mapLongitudeToX(coord.longitude)}
-          cy={mapLatitudeToY(coord.latitude)}
-          r="4"
-          fill={theme.colors.tertiaryContainer}
-          stroke={theme.colors.tertiary}
-          strokeWidth={3}
-        />
+        <React.Fragment key={index}>
+          <Circle
+            cx={mapLongitudeToX(coord.longitude)}
+            cy={mapLatitudeToY(coord.latitude)}
+            r="4"
+            fill={theme.colors.primary}
+            stroke={theme.colors.onPrimary}
+            strokeWidth={3}
+          />
+          <SvgText
+            x={mapLongitudeToX(coord.longitude) + 8} // adjust text position
+            y={mapLatitudeToY(coord.latitude) + 4} // adjust text position
+            fill={theme.colors.onPrimary} // set text color
+            fontSize="10">
+            {ALPHABETS[index]}
+          </SvgText>
+        </React.Fragment>
       ))}
     </Svg>
   );
 };
 
 export default CoordinatesDrawer;
-
-const styles = StyleSheet.create({
-  svg: {
-    flex: 1,
-    borderWidth: 1,
-    position: 'relative',
-  },
-});

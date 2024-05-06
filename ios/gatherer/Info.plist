@@ -37,6 +37,8 @@
 	<string>Select location for geo traces</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Select location for geo traces</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Select location for geo traces</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Select image/video from photos</string>
 	<key>UIAppFonts</key>

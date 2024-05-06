@@ -9,7 +9,7 @@ const appLightTheme = {
     onPrimaryContainer: 'rgb(65, 0, 7)',
     secondary: '#809A7D',
     onSecondary: 'rgb(255, 255, 255)',
-    secondaryContainer: 'rgb(167, 245, 167)',
+    secondaryContainer: '#DDF0DB',
     onSecondaryContainer: 'rgb(0, 33, 6)',
     tertiary: '#707070',
     onTertiary: 'rgb(255, 255, 255)',

@@ -1,20 +1,36 @@
 // FormLandInput.tsx
 
-import React from 'react';
-import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Pressable,
+} from 'react-native';
 import {
   Button,
   HelperText,
-  IconButton,
   Portal,
-  Searchbar,
   Snackbar,
   Text,
   useTheme,
 } from 'react-native-paper';
 import {Control, Controller, FieldValues} from 'react-hook-form';
+
 import LandListItem from '@components/LandListItem';
+import ExpandableSearch from '@components/ExpandableSearch';
+import {SearchIcon} from '@components/icons/SearchIcon';
+import {BackIcon} from '@components/icons/BackIcon';
+
 import {useLandSearch} from '@hooks/useLandSearch';
+
+import {
+  borderStyles,
+  commonStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
 
 interface FormLandInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name'];
@@ -29,8 +45,7 @@ const FormLandInput = <TFieldValues extends FieldValues>({
   label = 'Land',
   onLayout = () => {},
 }: FormLandInputProps<TFieldValues>) => {
-  const [showLandPicker, setShowLandPicker] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [showLandPicker, setShowLandPicker] = useState(false);
   const theme = useTheme();
   const {
     loading,
@@ -40,20 +55,6 @@ const FormLandInput = <TFieldValues extends FieldValues>({
     snackbarMessage,
     dismissSnackbar,
   } = useLandSearch();
-
-  const renderSearchRightButton = () => (
-    <>
-      {searchQuery && (
-        <IconButton icon="close" onPress={() => setSearchQuery('')} />
-      )}
-      <IconButton
-        icon="account-search"
-        mode="contained-tonal"
-        onPress={() => setSearchText(searchQuery)}
-        selected
-      />
-    </>
-  );
 
   const renderLoadingIndicator = () => {
     return loading ? (
@@ -70,28 +71,36 @@ const FormLandInput = <TFieldValues extends FieldValues>({
           onLayout={event => {
             onLayout({name, y: event.nativeEvent.layout.y});
           }}>
-          <View style={[styles.container, styles.rowContainer]}>
-            <Text style={[styles.label, theme.fonts.labelLarge]}>{label}</Text>
-            <View style={styles.colContainer}>
-              <View style={[styles.rowContainer, styles.wrap]}>
-                <Text style={[theme.fonts.bodyMedium]}>
-                  {value ? value.name : ''}
-                </Text>
-                <Button
-                  icon="shape-polygon-plus"
-                  onPress={() => {
-                    setShowLandPicker(true);
-                  }}
-                  mode="contained-tonal"
-                  buttonColor={
-                    error
-                      ? theme.colors.errorContainer
-                      : theme.colors.tertiaryContainer
-                  }
-                  textColor={theme.colors.primary}>
-                  Search & add
-                </Button>
-              </View>
+          <View style={[commonStyles.row]}>
+            <Text
+              style={[
+                theme.fonts.bodyLarge,
+                {color: theme.colors.outline},
+                tableStyles.w90,
+              ]}>
+              {label}
+            </Text>
+            <View style={commonStyles.row}>
+              <Button
+                icon={props => SearchIcon({height: 20, width: 20, ...props})}
+                onPress={() => {
+                  setShowLandPicker(true);
+                }}
+                buttonColor={theme.colors.primary}
+                textColor={
+                  value ? theme.colors.onPrimary : theme.colors.primaryContainer
+                }
+                style={[
+                  borderStyles.radius8,
+                  error ? borderStyles.border2 : borderStyles.border1,
+                  {
+                    borderColor: error
+                      ? theme.colors.error
+                      : theme.colors.tertiary,
+                  },
+                ]}>
+                {value ? value.name : 'Search and add'}
+              </Button>
             </View>
             {showLandPicker && (
               <Portal>
@@ -100,35 +109,43 @@ const FormLandInput = <TFieldValues extends FieldValues>({
                     StyleSheet.absoluteFill,
                     {backgroundColor: theme.colors.background},
                   ]}>
-                  <View style={styles.row}>
-                    <IconButton
-                      icon="arrow-left"
-                      size={24}
-                      onPress={() => setShowLandPicker(false)}
-                    />
-                    <View style={styles.searchContainer}>
-                      <Searchbar
-                        placeholder="Aadhaar, code, name, phone..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        right={renderSearchRightButton}
-                        onBlur={() => setSearchText(searchQuery)}
-                        autoFocus={true}
+                  <View
+                    style={[
+                      commonStyles.rowCentered,
+                      commonStyles.h40,
+                      spacingStyles.mh16,
+                    ]}>
+                    <Pressable onPress={() => setShowLandPicker(false)}>
+                      <BackIcon
+                        color={theme.colors.tertiary}
+                        height={24}
+                        width={24}
+                      />
+                    </Pressable>
+                    <View style={commonStyles.flex1}>
+                      <ExpandableSearch
+                        visible={true}
+                        applySearch={setSearchText}
+                        placeholder="Search code, khasra no, name..."
                       />
                     </View>
                   </View>
 
-                  <View style={styles.searchListContainer}>
+                  <View style={[commonStyles.flex1, spacingStyles.mv16]}>
                     <FlatList
                       data={data}
                       renderItem={({item}) => (
                         <LandListItem
                           data={item}
                           onPress={land => {
-                            onChange({id: land.id, name: land.khasra_number});
+                            onChange({
+                              id: land.id,
+                              name: land.code + ' - ' + land.farmer.name,
+                            });
                             setShowLandPicker(false);
                           }}
-                          theme={theme}
+                          color={theme.colors.primary}
+                          borderColor={theme.colors.tertiary}
                         />
                       )}
                       keyExtractor={item => item.id.toString()}
@@ -142,7 +159,9 @@ const FormLandInput = <TFieldValues extends FieldValues>({
                         </Text>
                       }
                       ListFooterComponent={renderLoadingIndicator}
-                      contentContainerStyle={!data.length && styles.noData}
+                      contentContainerStyle={
+                        !data.length && commonStyles.centeredContainer
+                      }
                     />
                   </View>
                   <Snackbar
@@ -163,39 +182,5 @@ const FormLandInput = <TFieldValues extends FieldValues>({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  label: {
-    minWidth: 70,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 12,
-    rowGap: 12,
-  },
-  wrap: {
-    flexWrap: 'wrap',
-  },
-  colContainer: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  row: {
-    flexDirection: 'row',
-  },
-  searchContainer: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  searchListContainer: {
-    flex: 1,
-    marginVertical: 24,
-  },
-});
 
 export default FormLandInput;

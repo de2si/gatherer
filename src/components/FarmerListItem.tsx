@@ -21,6 +21,7 @@ interface FarmerListItemProps {
   onPress: (farmer: FarmerPreview) => void;
   color: string;
   borderColor: string;
+  dialEnabled?: boolean;
 }
 
 const handleDialPress = (phoneNumber: string) => {
@@ -34,6 +35,7 @@ const FarmerListItem: React.FC<FarmerListItemProps> = ({
   onPress,
   color,
   borderColor,
+  dialEnabled = true,
 }) => (
   <Card
     mode="contained"
@@ -61,7 +63,7 @@ const FarmerListItem: React.FC<FarmerListItemProps> = ({
           </Text>
           <Pressable
             style={cardStyles.cardSideItem}
-            onPress={() => handleDialPress(data.phone)}>
+            onPress={() => (dialEnabled ? handleDialPress(data.phone) : {})}>
             <PhoneIcon height={24} width={24} color={color} />
             <Text variant="bodyLarge" style={[{color}, fontStyles.regularText]}>
               {data.phone}

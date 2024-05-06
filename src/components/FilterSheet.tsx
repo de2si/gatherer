@@ -1,7 +1,6 @@
 // FilterSheet.tsx
 
 import React, {useEffect, useRef} from 'react';
-import {StyleSheet} from 'react-native';
 import {Portal, Button, useTheme} from 'react-native-paper';
 import {useReducedMotion} from 'react-native-reanimated';
 import BottomSheet, {
@@ -33,6 +32,7 @@ import {
 import {BottomSheetBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 import {Filter, LocationFilter} from '@typedefs/common';
 import {UserType} from '@helpers/constants';
+import {commonStyles, spacingStyles} from '@styles/common';
 
 interface FilterSheetProps {
   visible: boolean;
@@ -141,7 +141,7 @@ const FilterSheet = ({
             onClose={handleBottomSheetClose}
             animateOnMount={!reducedMotion}>
             <BottomSheetScrollView>
-              <BottomSheetView style={styles.formContainer}>
+              <BottomSheetView style={spacingStyles.mh16}>
                 {variant.includes('(SD)B') &&
                   (loggedUser.userType === UserType.ADMIN ? (
                     <>
@@ -187,18 +187,24 @@ const FilterSheet = ({
                     variant="multiple"
                   />
                 )}
-                <BottomSheetView style={styles.row}>
+                <BottomSheetView
+                  style={[
+                    commonStyles.rowCentered,
+                    spacingStyles.colGap24,
+                    spacingStyles.mv12,
+                  ]}>
                   <Button
                     onPress={onClear}
-                    style={styles.button}
-                    textColor={theme.colors.onTertiaryContainer}
-                    buttonColor={theme.colors.tertiaryContainer}>
+                    style={commonStyles.w120}
+                    textColor={theme.colors.onTertiary}
+                    buttonColor={theme.colors.tertiary}>
                     Clear
                   </Button>
                   <Button
                     onPress={handleSubmit(onSubmit)}
-                    mode="contained"
-                    style={styles.button}>
+                    style={commonStyles.w120}
+                    textColor={theme.colors.onSecondary}
+                    buttonColor={theme.colors.secondary}>
                     Apply filter
                   </Button>
                 </BottomSheetView>
@@ -210,24 +216,5 @@ const FilterSheet = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    marginHorizontal: 24,
-  },
-  row: {
-    flexDirection: 'row',
-    marginVertical: 6,
-    justifyContent: 'center',
-    columnGap: 24,
-    alignItems: 'flex-end',
-  },
-  button: {
-    minWidth: 100,
-  },
-});
 
 export default FilterSheet;

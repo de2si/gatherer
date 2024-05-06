@@ -1,15 +1,24 @@
 // FormCoordinatesInput.tsx
 
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import {Button, Chip, HelperText, Text, useTheme} from 'react-native-paper';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import Geolocation, {
   GeolocationError,
   GeolocationResponse,
 } from '@react-native-community/geolocation';
+// import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import CoordinatesDrawer from '@components/CoordinatesDrawer';
+import {LocationIcon} from '@components/icons/LocationIcon';
 import {Coordinate} from '@typedefs/common';
+import {
+  borderStyles,
+  commonStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
+import {ALPHABETS} from '@helpers/constants';
 
 interface FormCoordinatesInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name'];
@@ -17,6 +26,27 @@ interface FormCoordinatesInputProps<TFieldValues extends FieldValues> {
   label?: string;
   onLayout?: (fieldY: {name: string; y: number}) => void;
 }
+
+// function checkPermission() {
+//   check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+//     .then(result => {
+//       switch (result) {
+//         case RESULTS.UNAVAILABLE:
+//           return 'This feature is not available (on this device / in this context)';
+//         case RESULTS.DENIED:
+//           return 'The permission has not been requested / is denied but requestable';
+//         case RESULTS.LIMITED:
+//           return 'The permission is limited: some actions are possible';
+//         case RESULTS.GRANTED:
+//           return 'The permission is granted';
+//         case RESULTS.BLOCKED:
+//           return 'The permission is denied and not requestable anymore';
+//       }
+//     })
+//     .catch(() => {
+//       return "The permission can't be checked";
+//     });
+// }
 
 const FormCoordinatesInput = <TFieldValues extends FieldValues>({
   name,
@@ -38,37 +68,34 @@ const FormCoordinatesInput = <TFieldValues extends FieldValues>({
   const [locationError, setLocationError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    try {
-      Geolocation.setRNConfiguration({
-        skipPermissionRequests: false,
-        locationProvider: 'playServices',
-      });
-    } catch (err) {
-      setLocationError(err as string);
-    }
-  }, []);
-
-  const addCurrentLocation = useCallback(() => {
+  const addCurrentLocation = () => {
     setLocationError(null);
     setLoading(true);
-    Geolocation.getCurrentPosition(
-      (position: GeolocationResponse) => {
-        const {latitude, longitude} = position.coords;
-        setCoordinates(coords => [...coords, {latitude, longitude}]);
-        onChange(JSON.stringify(coordinates));
-        setLoading(false);
-      },
-      (geoError: GeolocationError) => {
-        setLocationError(geoError.message);
-        setLoading(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 1000,
-      },
-    );
+    try {
+      Geolocation.getCurrentPosition(
+        (position: GeolocationResponse) => {
+          const {latitude, longitude} = position.coords;
+          setCoordinates(coords => [...coords, {latitude, longitude}]);
+          setLoading(false);
+        },
+        (geoError: GeolocationError) => {
+          setLocationError(geoError.message);
+          setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          // timeout: 15000,
+          maximumAge: 1000,
+        },
+      );
+    } catch (err) {
+      setLoading(false);
+      setLocationError('Unable to retrieve location');
+    }
+  };
+
+  useEffect(() => {
+    onChange(JSON.stringify(coordinates));
   }, [coordinates, onChange]);
 
   const deleteCoordinate = useCallback(
@@ -84,53 +111,73 @@ const FormCoordinatesInput = <TFieldValues extends FieldValues>({
   );
 
   const renderedChips = useMemo(() => {
-    return coordinates.map((coord, index) => (
+    return coordinates.map((_coord, index) => (
       <Chip
         key={index}
         onClose={() => {
           deleteCoordinate(index);
-        }}>
+        }}
+        style={[
+          spacingStyles.m4,
+          {backgroundColor: theme.colors.primaryContainer},
+        ]}
+        textStyle={{color: theme.colors.onPrimaryContainer}}>
         <Text>
-          {coord.latitude.toFixed(6)},{coord.longitude.toFixed(6)}
+          {ALPHABETS[index]}
+          {/* {coord.latitude.toFixed(6)},{coord.longitude.toFixed(6)} */}
         </Text>
       </Chip>
     ));
-  }, [coordinates, deleteCoordinate]);
+  }, [
+    coordinates,
+    deleteCoordinate,
+    theme.colors.onPrimaryContainer,
+    theme.colors.primaryContainer,
+  ]);
+
   return (
     <View
       onLayout={event => {
         onLayout({name, y: event.nativeEvent.layout.y});
       }}>
-      <View style={[styles.container, styles.rowContainer]}>
-        <Text style={[styles.label, theme.fonts.labelLarge]}>{label}</Text>
+      <View style={[commonStyles.row]}>
+        <Text
+          style={[
+            theme.fonts.bodyLarge,
+            {color: theme.colors.outline},
+            tableStyles.w90,
+          ]}>
+          {label}
+        </Text>
         <Button
-          icon="map-marker-radius-outline"
-          mode="contained-tonal"
-          buttonColor={
-            error ? theme.colors.errorContainer : theme.colors.tertiaryContainer
-          }
-          textColor={theme.colors.primary}
+          icon={props => LocationIcon({height: 20, width: 20, ...props})}
           onPress={addCurrentLocation}
           loading={loading}
           disabled={loading}
-          style={styles.addBtn}>
+          mode="contained"
+          buttonColor={theme.colors.primary}
+          textColor={theme.colors.onPrimary}
+          style={[
+            borderStyles.radius8,
+            error ? borderStyles.border2 : borderStyles.border1,
+            {borderColor: error ? theme.colors.error : theme.colors.tertiary},
+          ]}>
           Add location
         </Button>
       </View>
       {coordinates.length > 0 && (
-        <View
-          style={[
-            styles.container,
-            styles.rowContainer,
-            styles.outputContainer,
-          ]}>
-          <CoordinatesDrawer coordinates={coordinates} theme={theme} />
-          <ScrollView contentContainerStyle={styles.chipContainer}>
+        <View style={spacingStyles.mt8}>
+          <CoordinatesDrawer
+            coordinates={coordinates}
+            theme={theme}
+            width={300}
+            height={150}
+          />
+          <View style={[commonStyles.rowWrap, spacingStyles.mt8]}>
             {renderedChips}
-          </ScrollView>
+          </View>
         </View>
       )}
-
       <HelperText type="error" visible={locationError || error ? true : false}>
         {locationError || error?.message || 'Error'}
       </HelperText>
@@ -139,30 +186,3 @@ const FormCoordinatesInput = <TFieldValues extends FieldValues>({
 };
 
 export default FormCoordinatesInput;
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  label: {
-    minWidth: 70,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 12,
-  },
-  outputContainer: {
-    height: 150,
-    marginVertical: 8,
-  },
-  addBtn: {
-    marginLeft: 12,
-  },
-  chipContainer: {
-    flex: 1,
-    alignItems: 'flex-start',
-    rowGap: 4,
-    flexGrow: 1,
-  },
-});

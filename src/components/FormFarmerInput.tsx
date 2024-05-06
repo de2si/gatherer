@@ -1,20 +1,36 @@
 // FormFarmerInput.tsx
 
 import React from 'react';
-import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Pressable,
+} from 'react-native';
 import {
   Button,
   HelperText,
-  IconButton,
   Portal,
-  Searchbar,
   Snackbar,
   Text,
   useTheme,
 } from 'react-native-paper';
 import {Control, Controller, FieldValues} from 'react-hook-form';
+
 import FarmerListItem from '@components/FarmerListItem';
+import ExpandableSearch from '@components/ExpandableSearch';
+import {SearchIcon} from '@components/icons/SearchIcon';
+import {BackIcon} from '@components/icons/BackIcon';
+
 import {useFarmerSearch} from '@hooks/useFarmerSearch';
+
+import {
+  borderStyles,
+  commonStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
 
 interface FormFarmerInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name'];
@@ -30,7 +46,6 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
   onLayout = () => {},
 }: FormFarmerInputProps<TFieldValues>) => {
   const [showFarmerPicker, setShowFarmerPicker] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
   const theme = useTheme();
   const {
     loading,
@@ -40,20 +55,6 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
     snackbarMessage,
     dismissSnackbar,
   } = useFarmerSearch();
-
-  const renderSearchRightButton = () => (
-    <>
-      {searchQuery && (
-        <IconButton icon="close" onPress={() => setSearchQuery('')} />
-      )}
-      <IconButton
-        icon="account-search"
-        mode="contained-tonal"
-        onPress={() => setSearchText(searchQuery)}
-        selected
-      />
-    </>
-  );
 
   const renderLoadingIndicator = () => {
     return loading ? (
@@ -70,28 +71,36 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
           onLayout={event => {
             onLayout({name, y: event.nativeEvent.layout.y});
           }}>
-          <View style={[styles.container, styles.rowContainer]}>
-            <Text style={[styles.label, theme.fonts.labelLarge]}>{label}</Text>
-            <View style={styles.colContainer}>
-              <View style={[styles.rowContainer, styles.wrap]}>
-                <Text style={[theme.fonts.bodyMedium]}>
-                  {value ? value.name : ''}
-                </Text>
-                <Button
-                  icon="badge-account-horizontal-outline"
-                  onPress={() => {
-                    setShowFarmerPicker(true);
-                  }}
-                  mode="contained-tonal"
-                  buttonColor={
-                    error
-                      ? theme.colors.errorContainer
-                      : theme.colors.tertiaryContainer
-                  }
-                  textColor={theme.colors.primary}>
-                  Search & add
-                </Button>
-              </View>
+          <View style={commonStyles.row}>
+            <Text
+              style={[
+                theme.fonts.bodyLarge,
+                {color: theme.colors.outline},
+                tableStyles.w90,
+              ]}>
+              {label}
+            </Text>
+            <View style={commonStyles.row}>
+              <Button
+                icon={props => SearchIcon({height: 20, width: 20, ...props})}
+                onPress={() => {
+                  setShowFarmerPicker(true);
+                }}
+                buttonColor={theme.colors.primary}
+                textColor={
+                  value ? theme.colors.onPrimary : theme.colors.primaryContainer
+                }
+                style={[
+                  borderStyles.radius8,
+                  error ? borderStyles.border2 : borderStyles.border1,
+                  {
+                    borderColor: error
+                      ? theme.colors.error
+                      : theme.colors.tertiary,
+                  },
+                ]}>
+                {value ? value.name : 'Search and add'}
+              </Button>
             </View>
             {showFarmerPicker && (
               <Portal>
@@ -100,25 +109,29 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
                     StyleSheet.absoluteFill,
                     {backgroundColor: theme.colors.background},
                   ]}>
-                  <View style={styles.row}>
-                    <IconButton
-                      icon="arrow-left"
-                      size={24}
-                      onPress={() => setShowFarmerPicker(false)}
-                    />
-                    <View style={styles.searchContainer}>
-                      <Searchbar
-                        placeholder="Aadhaar, code, name, phone..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        right={renderSearchRightButton}
-                        onBlur={() => setSearchText(searchQuery)}
-                        autoFocus={true}
+                  <View
+                    style={[
+                      commonStyles.rowCentered,
+                      commonStyles.h40,
+                      spacingStyles.mh16,
+                    ]}>
+                    <Pressable onPress={() => setShowFarmerPicker(false)}>
+                      <BackIcon
+                        color={theme.colors.tertiary}
+                        height={24}
+                        width={24}
+                      />
+                    </Pressable>
+                    <View style={commonStyles.flex1}>
+                      <ExpandableSearch
+                        visible={true}
+                        applySearch={setSearchText}
+                        placeholder="Search code, name, aadhaar..."
                       />
                     </View>
                   </View>
 
-                  <View style={styles.searchListContainer}>
+                  <View style={[commonStyles.flex1, spacingStyles.mv16]}>
                     <FlatList
                       data={data}
                       renderItem={({item}) => (
@@ -128,6 +141,9 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
                             onChange({id: farmer.id, name: farmer.name});
                             setShowFarmerPicker(false);
                           }}
+                          color={theme.colors.primary}
+                          borderColor={theme.colors.tertiary}
+                          dialEnabled={false}
                         />
                       )}
                       keyExtractor={item => item.id.toString()}
@@ -141,7 +157,9 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
                         </Text>
                       }
                       ListFooterComponent={renderLoadingIndicator}
-                      contentContainerStyle={!data.length && styles.noData}
+                      contentContainerStyle={
+                        !data.length && commonStyles.centeredContainer
+                      }
                     />
                   </View>
                   <Snackbar
@@ -162,39 +180,5 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  label: {
-    minWidth: 70,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: 12,
-    rowGap: 12,
-  },
-  wrap: {
-    flexWrap: 'wrap',
-  },
-  colContainer: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  row: {
-    flexDirection: 'row',
-  },
-  searchContainer: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  searchListContainer: {
-    flex: 1,
-    marginVertical: 24,
-  },
-});
 
 export default FormFarmerInput;

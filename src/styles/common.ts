@@ -34,6 +34,17 @@ export const commonStyles = StyleSheet.create({
   width100: {
     width: '100%',
   },
+  h40: {
+    height: 40,
+    maxHeight: 40,
+  },
+  hw40: {
+    height: 40,
+    width: 40,
+  },
+  w120: {
+    minWidth: 120,
+  },
 });
 
 export const cardStyles = StyleSheet.create({
@@ -60,9 +71,21 @@ export const cardStyles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 0,
   },
+  cardThumbnail: {
+    height: 90,
+    width: 110,
+    marginRight: 16,
+    borderRadius: 18,
+  },
 });
 
 export const spacingStyles = StyleSheet.create({
+  p8: {
+    padding: 8,
+  },
+  m4: {
+    margin: 4,
+  },
   pv16: {
     paddingVertical: 16,
   },
@@ -99,6 +122,9 @@ export const spacingStyles = StyleSheet.create({
   colGap8: {
     columnGap: 8,
   },
+  colGap24: {
+    columnGap: 24,
+  },
 });
 
 export const borderStyles = StyleSheet.create({
@@ -107,6 +133,12 @@ export const borderStyles = StyleSheet.create({
   },
   border1: {
     borderWidth: 1,
+  },
+  border2: {
+    borderWidth: 1,
+  },
+  radius8: {
+    borderRadius: 8,
   },
 });
 
@@ -151,5 +183,28 @@ export const logoStyles = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: 1,
     textAlign: 'center',
+  },
+});
+
+export const tableStyles = StyleSheet.create({
+  w40: {
+    width: 40,
+  },
+  w50: {
+    width: 50,
+  },
+  w70: {
+    width: 70,
+  },
+  w90: {
+    width: 90,
+  },
+  dataRow: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    verticalAlign: 'top',
+  },
+  flexStart: {
+    justifyContent: 'flex-start',
   },
 });

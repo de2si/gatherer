@@ -1,6 +1,6 @@
 // FormTextInput.tsx
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import {
   HelperText,
   TextInput,
@@ -9,7 +9,7 @@ import {
 } from 'react-native-paper';
 import {Controller, Control, FieldValues} from 'react-hook-form';
 import {convertToSentenceCase, formatDate} from '@helpers/formatters';
-import {commonStyles, fontStyles} from '@styles/common';
+import {borderStyles, commonStyles, fontStyles} from '@styles/common';
 
 interface FormTextInputProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -38,10 +38,10 @@ const FormTextInput = <TFieldValues extends FieldValues>({
     style: [
       {backgroundColor: theme.colors.primary},
       theme.fonts.bodyLarge,
-      styles.textInput,
       fontStyles.regularText,
+      commonStyles.h40,
     ],
-    outlineStyle: styles.outline,
+    outlineStyle: borderStyles.radius8,
     placeholderTextColor: theme.colors.primaryContainer,
     selectionColor: theme.colors.onPrimary,
     textColor: theme.colors.onPrimary,
@@ -95,14 +95,5 @@ const FormTextInput = <TFieldValues extends FieldValues>({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  textInput: {
-    height: 40,
-  },
-  outline: {
-    borderRadius: 8,
-  },
-});
 
 export default FormTextInput;

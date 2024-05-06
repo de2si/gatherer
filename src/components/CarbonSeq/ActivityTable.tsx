@@ -1,10 +1,16 @@
 // ActivityTable.tsx
 
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {DataTable} from 'react-native-paper';
+import {View} from 'react-native';
+import {DataTable, Text, useTheme} from 'react-native-paper';
 import {ScrollView} from 'react-native-gesture-handler';
 import {ActivityTableRow, MODELS} from '@hooks/carbonSeqHooks';
+import {
+  commonStyles,
+  fontStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
 
 interface ActivityTableProps {
   data: ActivityTableRow[];
@@ -12,6 +18,7 @@ interface ActivityTableProps {
 }
 
 const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
+  const theme = useTheme();
   const [page, setPage] = React.useState<number>(0);
   const [numberOfItemsPerPageList] = React.useState([20, 50, 100]);
   const [itemsPerPage, onItemsPerPageChange] = React.useState(
@@ -23,36 +30,70 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
     setPage(0);
   }
 
+  const titleStyle = [theme.fonts.bodyLarge, {color: theme.colors.primary}];
+  const cellStyle = [theme.fonts.bodyLarge, fontStyles.regularText];
+
   return (
-    <View style={styles.container}>
+    <View style={[commonStyles.flex1, spacingStyles.mh16]}>
       <ScrollView horizontal>
         <DataTable>
           <DataTable.Header>
-            <DataTable.Title style={styles.indexCol}>#</DataTable.Title>
-            <DataTable.Title style={styles.landCol}>Land</DataTable.Title>
-            <DataTable.Title style={styles.farmerCol}>Farmer</DataTable.Title>
+            <DataTable.Title style={tableStyles.w40} textStyle={titleStyle}>
+              #
+            </DataTable.Title>
+            <DataTable.Title style={tableStyles.w70} textStyle={titleStyle}>
+              Land
+            </DataTable.Title>
+            <DataTable.Title style={tableStyles.w90} textStyle={titleStyle}>
+              Farmer
+            </DataTable.Title>
             {['Total', ...MODELS].map(colTitle => (
-              <DataTable.Title key={colTitle} style={styles.numberCol}>
+              <DataTable.Title
+                key={colTitle}
+                style={tableStyles.w50}
+                textStyle={titleStyle}>
                 {colTitle.replace('MODEL_', '').replace(/_/g, '.')}
               </DataTable.Title>
             ))}
           </DataTable.Header>
           {data.slice(from, to).map((row, rowIndex) => (
-            <DataTable.Row key={row.id} onPress={() => onPress(row.id)}>
-              <DataTable.Title style={styles.indexCol}>
+            <DataTable.Row
+              key={row.id}
+              onPress={() => onPress(row.id)}
+              style={[
+                {
+                  backgroundColor:
+                    rowIndex % 2
+                      ? theme.colors.elevation.level4
+                      : theme.colors.secondaryContainer,
+                },
+                spacingStyles.mt8,
+                spacingStyles.pv16,
+                tableStyles.dataRow,
+              ]}>
+              <DataTable.Cell
+                style={[tableStyles.w40, tableStyles.dataRow]}
+                textStyle={cellStyle}>
                 {rowIndex + 1}
-              </DataTable.Title>
-              <DataTable.Cell style={styles.landCol}>
+              </DataTable.Cell>
+              <DataTable.Cell
+                style={[tableStyles.w70, tableStyles.dataRow]}
+                textStyle={cellStyle}>
                 {row.landCode}
               </DataTable.Cell>
-              <DataTable.Cell style={styles.farmerCol}>
-                {row.farmerName}
+              <DataTable.Cell style={[tableStyles.w90, tableStyles.dataRow]}>
+                <Text style={cellStyle}>{row.farmerName}</Text>
               </DataTable.Cell>
-              <DataTable.Cell style={styles.numberCol}>
+              <DataTable.Cell
+                style={[tableStyles.w50, tableStyles.dataRow]}
+                textStyle={cellStyle}>
                 {row.total}
               </DataTable.Cell>
               {MODELS.map(colKey => (
-                <DataTable.Cell key={row.id + colKey} style={styles.numberCol}>
+                <DataTable.Cell
+                  key={row.id + colKey}
+                  style={[tableStyles.w50, tableStyles.dataRow]}
+                  textStyle={cellStyle}>
                   {row[colKey]}
                 </DataTable.Cell>
               ))}
@@ -62,12 +103,20 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
             page={page}
             numberOfPages={Math.ceil(data.length / itemsPerPage)}
             onPageChange={newPage => setPage(newPage)}
-            label={`${from + 1}-${to} of ${data.length}`}
+            label={`Page ${page + 1}`}
             numberOfItemsPerPageList={numberOfItemsPerPageList}
             numberOfItemsPerPage={itemsPerPage}
             onItemsPerPageChange={onItemsPerPageChange}
-            showFastPaginationControls
-            selectPageDropdownLabel={'Rows per page'}
+            selectPageDropdownLabel={'Rows'}
+            style={tableStyles.flexStart}
+            theme={{
+              colors: {
+                outline: theme.colors.tertiary,
+                onSurface: theme.colors.primary,
+              },
+              roundness: 2,
+            }}
+            // showFastPaginationControls
           />
         </DataTable>
       </ScrollView>
@@ -76,18 +125,3 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
 };
 
 export default ActivityTable;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-  },
-  indexCol: {
-    width: 40,
-  },
-  landCol: {
-    width: 70,
-  },
-  farmerCol: {width: 90},
-  numberCol: {width: 50},
-});

@@ -2,6 +2,7 @@
 
 // ubiquitous constants
 export const GENDER = ['MALE', 'FEMALE'] as const;
+export const ALPHABETS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 // farmer constants
 export const CATEGORY = ['GENERAL', 'OBC', 'SC', 'ST', 'MINORITIES'] as const;

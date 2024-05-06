@@ -2,19 +2,21 @@
 import React, {useEffect, useState} from 'react';
 import {View, Animated, StyleSheet} from 'react-native';
 import {Searchbar, useTheme} from 'react-native-paper';
-import {fontStyles, spacingStyles} from '@styles/common';
 import {truncateString} from '@helpers/formatters';
+import {fontStyles, spacingStyles} from '@styles/common';
 
 interface ExpandableSearchProps {
   visible: boolean;
   placeholder?: string;
   applySearch?: (searchText: string) => void;
+  noMargin?: boolean;
 }
 
 const ExpandableSearch = ({
   visible = false,
   placeholder = 'Type to search',
   applySearch = () => {},
+  noMargin = false,
 }: ExpandableSearchProps) => {
   const [animation] = useState(new Animated.Value(0));
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,7 +70,7 @@ const ExpandableSearch = ({
             style={[
               {backgroundColor: theme.colors.secondary},
               styles.searchbar,
-              spacingStyles.mh16,
+              noMargin ? null : spacingStyles.mh16,
             ]}
             inputStyle={[
               theme.fonts.bodyLarge,
