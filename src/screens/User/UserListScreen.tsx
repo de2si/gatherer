@@ -1,9 +1,8 @@
 // UserListScreen.tsx
 
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, Pressable, RefreshControl, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {RefreshControl} from 'react-native-gesture-handler';
-import {Avatar, Card, Snackbar, Text, useTheme} from 'react-native-paper';
+import {Avatar, Card, Snackbar, useTheme} from 'react-native-paper';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -16,11 +15,15 @@ import {useAuthStore} from '@hooks/useAuthStore';
 // helpers
 import {areFiltersEqual} from '@helpers/comparators';
 import {getErrorMessage} from '@helpers/formHelpers';
+import {handleDialPress} from '@components/FarmerListItem';
 
 // components
 import FilterSheet, {filterDefaultValues} from '@components/FilterSheet';
-import SearchSheet from '@components/SearchSheet';
 import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
+import {PhoneIcon} from '@components/icons/PhoneIcon';
+import {Text} from '@components/Text';
+import ImageWrapper from '@components/ImageWrapper';
+import ExpandableSearch from '@components/ExpandableSearch';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
@@ -28,32 +31,67 @@ import useSnackbar from '@hooks/useSnackbar';
 //types
 import {UserType} from '@helpers/constants';
 
-const Item = ({
-  data: {id, name, photo, phone, projects},
-  onPress,
-}: {
+// styles
+import {
+  cardStyles,
+  commonStyles,
+  fontStyles,
+  spacingStyles,
+} from '@styles/common';
+
+interface ItemProps {
   data: UserPreview;
   onPress: any;
-}) => (
-  <Card mode="elevated" onPress={() => onPress(id)}>
-    <Card.Content style={styles.row}>
+  color: string;
+  borderColor: string;
+}
+
+const Item = ({
+  data: {id, name, photo, code, phone, projects},
+  onPress,
+  color,
+  borderColor,
+}: ItemProps) => (
+  <Card
+    mode="contained"
+    onPress={() => onPress(id)}
+    style={[cardStyles.card, {borderColor}, spacingStyles.mh16]}>
+    <Card.Content style={cardStyles.cardContent}>
       {photo.url ? (
-        <Avatar.Image source={{uri: photo.url}} style={styles.avatar} />
+        <ImageWrapper
+          flavor="avatar"
+          value={photo}
+          size={70}
+          style={spacingStyles.mr16}
+        />
       ) : (
-        <Avatar.Text style={styles.avatar} label={name[0]} />
+        <Avatar.Text style={spacingStyles.mr16} label={name[0]} />
       )}
 
-      <View style={styles.cardTextContent}>
-        <View style={styles.cardDataRow}>
-          <Text variant="titleSmall">{name}</Text>
-          <Text variant="bodySmall">{phone}</Text>
+      <View style={commonStyles.flex1}>
+        <View style={cardStyles.cardDataRow}>
+          <Text variant="bodyXl" style={{color}}>
+            {name}
+          </Text>
+          <Text variant="bodyXl" style={{color}}>
+            {code}
+          </Text>
         </View>
-        <View style={styles.cardDataRow}>
-          {projects.map(project => (
-            <Text key={project.id} variant="bodySmall">
-              {project.name}
+        <View style={cardStyles.cardDataRow}>
+          <View style={commonStyles.row}>
+            <Text variant="bodySmall" style={{color: borderColor}}>
+              {projects.length ? projects[0].name : ''}
+              {projects.length > 1 ? `+ ${projects.length - 1}  projects` : ''}
             </Text>
-          ))}
+          </View>
+          <Pressable
+            style={cardStyles.cardSideItem}
+            onPress={() => handleDialPress(phone)}>
+            <PhoneIcon height={24} width={24} color={color} />
+            <Text variant="bodyLarge" style={[{color}, fontStyles.regularText]}>
+              {phone}
+            </Text>
+          </Pressable>
         </View>
       </View>
     </Card.Content>
@@ -79,8 +117,7 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
   const theme = useTheme();
   const [filterBottomSheetVisible, setFilterBottomSheetVisible] =
     useState(false);
-  const [searchBottomSheetVisible, setSearchBottomSheetVisible] =
-    useState(false);
+  const [expandSearch, setExpandSearch] = useState(false);
   const [filters, setFilters] = useState(filterDefaultValues);
   const [searchText, setSearchText] = useState('');
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -92,18 +129,15 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
   const handleFilterPress = () => {
     setFilterBottomSheetVisible(true);
   };
-  const handleSearchPress = () => {
-    setSearchBottomSheetVisible(true);
-  };
-  const handleSearchClearPress = () => {
-    setSearchText('');
-  };
 
   const showDetailScreen = (id: number) => {
     navigation.navigate('UserDetail', {id, userType});
   };
 
   useEffect(() => {
+    const handleSearchPress = () => {
+      setExpandSearch(val => !val);
+    };
     const handleAddPress = () => {
       navigation.navigate('UserAdd', {variant: 'add', userType});
     };
@@ -115,11 +149,11 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
           isSearchApplied,
           handleFilterPress,
           handleSearchPress,
-          handleSearchClearPress,
           handleAddPress,
+          theme,
         }),
     });
-  }, [isFilterApplied, isSearchApplied, navigation, userType]);
+  }, [isFilterApplied, isSearchApplied, navigation, theme, userType]);
 
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);
@@ -176,10 +210,22 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
   ]);
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.flex1}>
+      <ExpandableSearch
+        visible={expandSearch}
+        applySearch={setSearchText}
+        placeholder="Search name, phone number..."
+      />
       <FlatList
         data={users[userType]}
-        renderItem={({item}) => <Item data={item} onPress={showDetailScreen} />}
+        renderItem={({item}) => (
+          <Item
+            data={item}
+            onPress={showDetailScreen}
+            color={theme.colors.primary}
+            borderColor={theme.colors.tertiary}
+          />
+        )}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
           <Text
@@ -190,7 +236,9 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
             Users not found
           </Text>
         }
-        contentContainerStyle={!users[userType].length && styles.noData}
+        contentContainerStyle={
+          !users[userType].length && commonStyles.centeredContainer
+        }
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -206,13 +254,6 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
         onClose={() => setFilterBottomSheetVisible(false)}
         applyFilters={setFilters}
       />
-      <SearchSheet
-        visible={searchBottomSheetVisible}
-        searchText={searchText}
-        onClose={() => setSearchBottomSheetVisible(false)}
-        applySearch={setSearchText}
-        helperText={'\n• Search using name\n• Search using phone number'}
-      />
       <Snackbar
         visible={snackbarVisible}
         onDismiss={dismissSnackbar}
@@ -224,24 +265,3 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
 };
 
 export default UserListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  row: {
-    flexDirection: 'row',
-  },
-  avatar: {
-    marginRight: 16,
-  },
-  cardTextContent: {
-    flex: 1,
-  },
-  cardDataRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-});
