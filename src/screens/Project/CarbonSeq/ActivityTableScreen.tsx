@@ -1,9 +1,9 @@
 // ActivityTableScreen.tsx
 
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {RefreshControl, ScrollView} from 'react-native-gesture-handler';
-import {IconButton, Snackbar, Text, useTheme} from 'react-native-paper';
+import {Pressable, RefreshControl, View} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
+import {MD3Theme, Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -25,28 +25,39 @@ import {StoreApi, UseBoundStore} from 'zustand';
 import {areFiltersEqual} from '@helpers/comparators';
 import {getErrorMessage} from '@helpers/formHelpers';
 
-// components, constants
+// components, constants, styles
 import ActivityTable from '@components/CarbonSeq/ActivityTable';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
+import {FilterIcon} from '@components/icons/FilterIcon';
 import {ACTIVITY_NAMES} from '@screens/Project/CarbonSeq/ActivityListScreen';
+import {commonStyles, headerStyles} from '@styles/common';
 
 const activityTableHeaderRight = ({
   isFilterApplied = false,
   handleFilterPress = () => {},
+  theme,
 }: {
   isFilterApplied?: boolean;
   handleFilterPress?: () => void;
-}) => (
-  <IconButton
-    icon="filter-outline"
-    size={24}
-    onPress={handleFilterPress}
-    selected={isFilterApplied}
-    mode={isFilterApplied ? 'contained' : undefined}
-  />
-);
+  theme: MD3Theme;
+}) => {
+  const bgColor = (applied: boolean) =>
+    applied ? theme.colors.secondary : theme.colors.background;
+  const iconColor = (applied: boolean) =>
+    applied ? theme.colors.onSecondary : theme.colors.primary;
+  return (
+    <Pressable
+      onPress={handleFilterPress}
+      style={[
+        {backgroundColor: bgColor(isFilterApplied)},
+        headerStyles.pressable,
+      ]}>
+      <FilterIcon height={24} width={24} color={iconColor(isFilterApplied)} />
+    </Pressable>
+  );
+};
 
 type ActivityTableScreenProps = NativeStackScreenProps<
   ActivityStackScreenProps,
@@ -104,9 +115,9 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
     navigation.setOptions({
       title: name,
       headerRight: () =>
-        activityTableHeaderRight({isFilterApplied, handleFilterPress}),
+        activityTableHeaderRight({isFilterApplied, handleFilterPress, theme}),
     });
-  }, [isFilterApplied, name, navigation]);
+  }, [isFilterApplied, name, navigation, theme]);
 
   const initialLoad = useRef(false);
   const prevFilters = useRef({...filters});
@@ -150,7 +161,7 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
 
   if (activityRows.length === 0) {
     return (
-      <View style={styles.noData}>
+      <View style={commonStyles.centeredContainer}>
         <Text
           style={[
             theme.fonts.titleLarge,
@@ -163,7 +174,7 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.flex1}>
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -192,10 +203,3 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
 };
 
 export default ActivityTableScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-});
