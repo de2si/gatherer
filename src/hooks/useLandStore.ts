@@ -13,6 +13,7 @@ import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useProfileStore';
 import {ApiImage, LocationFilter} from '@typedefs/common';
 import {Ownership} from '@helpers/constants';
+import {formatIdAsCode} from '@helpers/formatters';
 
 export interface ApiLand {
   id: number;
@@ -71,7 +72,7 @@ export const transformApiLand = (apiResponse: ApiLand): LandPreview => {
     id,
     farmer: {id: farmer, name: farmer_name},
     picture: pictures[0] ?? null,
-    code: 'LX9854',
+    code: formatIdAsCode('L', id),
     village: {name: village.name, code: village.code},
     ownership_type,
     khasra_number,

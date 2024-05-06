@@ -5,7 +5,7 @@ import {api} from '@api/axios';
 import {locationFilterDefaultValues} from '@components/FilterSheet';
 
 // helpers
-import {formatPhoneNumber} from '@helpers/formatters';
+import {formatIdAsCode, formatPhoneNumber} from '@helpers/formatters';
 import {calculateHash} from '@helpers/cryptoHelpers';
 import {CATEGORY, GENDER, INCOME_LEVELS} from '@helpers/constants';
 import {buildFilterQueryParams} from '@helpers/formHelpers';
@@ -69,7 +69,7 @@ export const transformApiFarmer = (apiResponse: ApiFarmer): FarmerPreview => {
     id: apiResponse.farmer_id,
     name: apiResponse.name,
     photo: apiResponse.profile_photo,
-    code: 'AA9854',
+    code: formatIdAsCode('F', apiResponse.farmer_id),
     village: {name: apiResponse.village.name, code: apiResponse.village.code},
     guardian: apiResponse.guardian_name,
     phone: formatPhoneNumber(apiResponse.phone_number),
