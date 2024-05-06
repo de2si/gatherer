@@ -1,9 +1,8 @@
 // ParticipantListScreen.tsx
 
+import {FlatList, RefreshControl, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Image, StyleSheet, View} from 'react-native';
-import {RefreshControl} from 'react-native-gesture-handler';
-import {Card, MD3Theme, Snackbar, Text, useTheme} from 'react-native-paper';
+import {Card, Snackbar, useTheme} from 'react-native-paper';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -21,60 +20,67 @@ import {formatNumber, truncateString} from '@helpers/formatters';
 
 // components, constants
 import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
-import SearchSheet from '@components/SearchSheet';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
+import {Text} from '@components/Text';
+import ExpandableSearch from '@components/ExpandableSearch';
+import ImageWrapper from '@components/ImageWrapper';
 import {Ownership} from '@helpers/constants';
 
-const Item = ({
-  data,
-  onPress,
-  theme,
-}: {
+import {cardStyles, commonStyles, spacingStyles} from '@styles/common';
+
+interface ItemProps {
   data: ParticipantPreview;
   onPress: any;
-  theme: MD3Theme;
-}) => (
-  <Card mode="elevated" onPress={() => onPress(data)}>
-    <Card.Content style={styles.row}>
-      <Image
-        source={{uri: data.land.picture.url}}
-        style={[
-          styles.farmThumbnail,
-          {
-            backgroundColor: theme.colors.primary,
-            borderRadius: theme.roundness,
-          },
-        ]}
+  color: string;
+  borderColor: string;
+}
+
+const Item = ({data, onPress, color, borderColor}: ItemProps) => (
+  <Card
+    mode="contained"
+    onPress={() => onPress(data)}
+    style={[cardStyles.card, {borderColor}, spacingStyles.mh16]}>
+    <Card.Content style={cardStyles.cardContent}>
+      <ImageWrapper
+        flavor="regular"
+        value={data.land.picture}
+        style={[cardStyles.cardThumbnail, {backgroundColor: color}]}
       />
-      <View style={styles.cardTextContent}>
-        <View style={styles.cardDataRow}>
-          <Text variant="titleSmall">
+      <View style={commonStyles.flex1}>
+        <View style={cardStyles.cardDataRow}>
+          <Text variant="bodyXl" style={{color}}>
             {data.land.ownership_type === Ownership.PRIVATE
               ? truncateString(data.land.farmer.name)
               : data.land.ownership_type}
           </Text>
-          <Text variant="titleSmall">{data.land.code}</Text>
+          <Text variant="bodyXl" style={{color}}>
+            {data.land.code}
+          </Text>
         </View>
-        <View style={styles.cardDataRow}>
-          <Text variant="bodySmall">{data.land.village.name}</Text>
-          <Text variant="bodySmall">{data.land.khasra_number}</Text>
+        <View style={cardStyles.cardDataRow}>
+          <Text variant="bodySmall" style={{color}}>
+            {data.land.village.name}
+          </Text>
+          <Text variant="bodySmall" style={{color}}>
+            {data.land.khasra_number}
+          </Text>
         </View>
-        <View style={styles.cardDataRow}>
+        <View style={cardStyles.cardDataRow}>
           {Object.entries({
             Target: data.total_pits_target,
             Dug: data.total_pits_dug,
             Fertilized: data.total_pits_fertilized,
             Planted: data.total_pits_planted,
           }).map(([title, value]) => (
-            <View style={styles.listItem} key={title}>
-              <Text
-                variant="bodySmall"
-                style={{color: theme.colors.inverseSurface}}>
+            <View key={title}>
+              <Text variant="bodySmall" style={{color}}>
                 {title}
               </Text>
-              <Text variant="bodySmall">{formatNumber(value)}</Text>
+              <Text variant="bodySmall" style={{color}}>
+                {formatNumber(value)}
+              </Text>
             </View>
           ))}
         </View>
@@ -102,8 +108,7 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
 
   const [filterBottomSheetVisible, setFilterBottomSheetVisible] =
     useState(false);
-  const [searchBottomSheetVisible, setSearchBottomSheetVisible] =
-    useState(false);
+  const [expandSearch, setExpandSearch] = useState(false);
   const [filters, setFilters] = useState(locationFilterDefaultValues);
   const [searchText, setSearchText] = useState('');
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -115,18 +120,14 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
   const handleFilterPress = () => {
     setFilterBottomSheetVisible(true);
   };
-  const handleSearchPress = () => {
-    setSearchBottomSheetVisible(true);
-  };
-  const handleSearchClearPress = () => {
-    setSearchText('');
-  };
-
   const showDetailScreen = (participant: ParticipantPreview) => {
     navigation.navigate('ParticipantDetail', {id: participant.id});
   };
 
   useEffect(() => {
+    const handleSearchPress = () => {
+      setExpandSearch(val => !val);
+    };
     const handleAddPress = () => {
       navigation.navigate('ParticipantAdd', {});
     };
@@ -137,11 +138,11 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
           isSearchApplied,
           handleFilterPress,
           handleSearchPress,
-          handleSearchClearPress,
           handleAddPress,
+          theme,
         }),
     });
-  }, [isFilterApplied, isSearchApplied, navigation]);
+  }, [isFilterApplied, isSearchApplied, navigation, theme]);
 
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);
@@ -190,11 +191,21 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
   }, [fetchData, filters, searchText, refresh, withAuth, showSnackbar]);
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.flex1}>
+      <ExpandableSearch
+        visible={expandSearch}
+        applySearch={setSearchText}
+        placeholder="Search code, name, aadhaar, phone number..."
+      />
       <FlatList
         data={participants}
         renderItem={({item}) => (
-          <Item data={item} onPress={showDetailScreen} theme={theme} />
+          <Item
+            data={item}
+            onPress={showDetailScreen}
+            color={theme.colors.primary}
+            borderColor={theme.colors.tertiary}
+          />
         )}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
@@ -206,7 +217,9 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
             Participants not found
           </Text>
         }
-        contentContainerStyle={!participants.length && styles.noData}
+        contentContainerStyle={
+          !participants.length && commonStyles.centeredContainer
+        }
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -221,15 +234,6 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
         onClose={() => setFilterBottomSheetVisible(false)}
         applyFilters={setFilters}
       />
-      <SearchSheet
-        visible={searchBottomSheetVisible}
-        searchText={searchText}
-        onClose={() => setSearchBottomSheetVisible(false)}
-        applySearch={setSearchText}
-        helperText={
-          '\n• Search using farmer code\n• Search using aadhaar no.\n• Search using name\n• Search using phone number'
-        }
-      />
       <Snackbar
         visible={snackbarVisible}
         onDismiss={dismissSnackbar}
@@ -241,30 +245,3 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
 };
 
 export default ParticipantListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  row: {
-    flexDirection: 'row',
-  },
-  cardDataRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  farmThumbnail: {
-    height: 80,
-    width: 80,
-    marginRight: 16,
-  },
-  cardTextContent: {
-    flex: 1,
-  },
-  listItem: {
-    justifyContent: 'center',
-    paddingVertical: 4,
-  },
-});
