@@ -24,7 +24,7 @@ interface FarmerListItemProps {
   dialEnabled?: boolean;
 }
 
-const handleDialPress = (phoneNumber: string) => {
+export const handleDialPress = (phoneNumber: string) => {
   if (phoneNumber) {
     Linking.openURL(`tel:${phoneNumber}`);
   }
