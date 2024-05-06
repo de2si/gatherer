@@ -126,7 +126,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
   }, [fetchData, filters, searchText, refresh, withAuth, showSnackbar]);
 
   return (
-    <View>
+    <View style={commonStyles.flex1}>
       <ExpandableSearch
         visible={expandSearch}
         applySearch={setSearchText}

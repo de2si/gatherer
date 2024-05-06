@@ -1,8 +1,7 @@
 // LandListScreen.tsx
 
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, RefreshControl, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {RefreshControl} from 'react-native-gesture-handler';
 import {Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
@@ -21,12 +20,14 @@ import {getErrorMessage} from '@helpers/formHelpers';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
-import SearchSheet from '@components/SearchSheet';
+import ExpandableSearch from '@components/ExpandableSearch';
 import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
 import LandListItem from '@components/LandListItem';
+
+import {commonStyles} from '@styles/common';
 
 type LandListScreenProps = NativeStackScreenProps<
   LandStackScreenProps,
@@ -43,8 +44,7 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
   const theme = useTheme();
   const [filterBottomSheetVisible, setFilterBottomSheetVisible] =
     useState(false);
-  const [searchBottomSheetVisible, setSearchBottomSheetVisible] =
-    useState(false);
+  const [expandSearch, setExpandSearch] = useState(false);
   const [filters, setFilters] = useState(locationFilterDefaultValues);
   const [searchText, setSearchText] = useState('');
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -56,18 +56,14 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
   const handleFilterPress = () => {
     setFilterBottomSheetVisible(true);
   };
-  const handleSearchPress = () => {
-    setSearchBottomSheetVisible(true);
-  };
-  const handleSearchClearPress = () => {
-    setSearchText('');
-  };
-
   const showDetailScreen = (id: number) => {
     navigation.navigate('LandDetail', {id});
   };
 
   useEffect(() => {
+    const handleSearchPress = () => {
+      setExpandSearch(val => !val);
+    };
     const handleAddPress = () => {
       navigation.navigate('LandAdd', {variant: 'add'});
     };
@@ -78,11 +74,11 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
           isSearchApplied,
           handleFilterPress,
           handleSearchPress,
-          handleSearchClearPress,
           handleAddPress,
+          theme,
         }),
     });
-  }, [isFilterApplied, isSearchApplied, navigation]);
+  }, [isFilterApplied, isSearchApplied, navigation, theme]);
 
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);
@@ -131,14 +127,20 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
   }, [fetchData, filters, searchText, refresh, withAuth, showSnackbar]);
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.flex1}>
+      <ExpandableSearch
+        visible={expandSearch}
+        applySearch={setSearchText}
+        placeholder="Search code, name, aadhaar, phone number..."
+      />
       <FlatList
         data={lands}
         renderItem={({item}) => (
           <LandListItem
             data={item}
             onPress={land => showDetailScreen(land.id)}
-            theme={theme}
+            color={theme.colors.primary}
+            borderColor={theme.colors.tertiary}
           />
         )}
         keyExtractor={item => item.id.toString()}
@@ -151,7 +153,7 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
             Lands not found
           </Text>
         }
-        contentContainerStyle={!lands.length && styles.noData}
+        contentContainerStyle={!lands.length && commonStyles.centeredContainer}
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -166,15 +168,6 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
         onClose={() => setFilterBottomSheetVisible(false)}
         applyFilters={setFilters}
       />
-      <SearchSheet
-        visible={searchBottomSheetVisible}
-        searchText={searchText}
-        onClose={() => setSearchBottomSheetVisible(false)}
-        applySearch={setSearchText}
-        helperText={
-          '\n• Search using farmer code\n• Search using aadhaar no.\n• Search using name\n• Search using phone number'
-        }
-      />
       <Snackbar
         visible={snackbarVisible}
         onDismiss={dismissSnackbar}
@@ -186,10 +179,3 @@ const LandListScreen: React.FC<LandListScreenProps> = ({navigation}) => {
 };
 
 export default LandListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-});

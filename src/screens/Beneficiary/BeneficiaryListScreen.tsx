@@ -1,8 +1,7 @@
 // BeneficiaryListScreen.tsx
 
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, RefreshControl, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {RefreshControl} from 'react-native-gesture-handler';
 import {Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
@@ -26,8 +25,10 @@ import BeneficiaryListItem from '@components/FarmerListItem';
 import FilterSheet, {
   locationFilterDefaultValues,
 } from '@components/FilterSheet';
-import SearchSheet from '@components/SearchSheet';
+import ExpandableSearch from '@components/ExpandableSearch';
 import {ListScreenHeaderRight} from '@components/ListScreenHeaderRight';
+
+import {commonStyles} from '@styles/common';
 
 type BeneficiaryListScreenProps = NativeStackScreenProps<
   BeneficiaryStackScreenProps,
@@ -48,8 +49,7 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
 
   const [filterBottomSheetVisible, setFilterBottomSheetVisible] =
     useState(false);
-  const [searchBottomSheetVisible, setSearchBottomSheetVisible] =
-    useState(false);
+  const [expandSearch, setExpandSearch] = useState(false);
   const [filters, setFilters] = useState(locationFilterDefaultValues);
   const [searchText, setSearchText] = useState('');
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -61,18 +61,15 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
   const handleFilterPress = () => {
     setFilterBottomSheetVisible(true);
   };
-  const handleSearchPress = () => {
-    setSearchBottomSheetVisible(true);
-  };
-  const handleSearchClearPress = () => {
-    setSearchText('');
-  };
 
   const showDetailScreen = (beneficiary: BeneficiaryPreview) => {
     navigation.navigate('BeneficiaryDetail', {id: beneficiary.id});
   };
 
   useEffect(() => {
+    const handleSearchPress = () => {
+      setExpandSearch(val => !val);
+    };
     const handleAddPress = () => {
       navigation.navigate('BeneficiaryAdd', {variant: 'add'});
     };
@@ -83,11 +80,11 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
           isSearchApplied,
           handleFilterPress,
           handleSearchPress,
-          handleSearchClearPress,
           handleAddPress,
+          theme,
         }),
     });
-  }, [isFilterApplied, isSearchApplied, navigation]);
+  }, [isFilterApplied, isSearchApplied, navigation, theme]);
 
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);
@@ -136,11 +133,21 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
   }, [fetchData, filters, searchText, refresh, withAuth, showSnackbar]);
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.flex1}>
+      <ExpandableSearch
+        visible={expandSearch}
+        applySearch={setSearchText}
+        placeholder="Search code, name, aadhaar, phone number..."
+      />
       <FlatList
         data={beneficiaries}
         renderItem={({item}) => (
-          <BeneficiaryListItem data={item} onPress={showDetailScreen} />
+          <BeneficiaryListItem
+            data={item}
+            onPress={showDetailScreen}
+            color={theme.colors.primary}
+            borderColor={theme.colors.tertiary}
+          />
         )}
         keyExtractor={item => item.id.toString()}
         ListEmptyComponent={
@@ -152,7 +159,9 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
             Beneficiaries not found
           </Text>
         }
-        contentContainerStyle={!beneficiaries.length && styles.noData}
+        contentContainerStyle={
+          !beneficiaries.length && commonStyles.centeredContainer
+        }
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -167,15 +176,6 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
         onClose={() => setFilterBottomSheetVisible(false)}
         applyFilters={setFilters}
       />
-      <SearchSheet
-        visible={searchBottomSheetVisible}
-        searchText={searchText}
-        onClose={() => setSearchBottomSheetVisible(false)}
-        applySearch={setSearchText}
-        helperText={
-          '\n• Search using farmer code\n• Search using aadhaar no.\n• Search using name\n• Search using phone number'
-        }
-      />
       <Snackbar
         visible={snackbarVisible}
         onDismiss={dismissSnackbar}
@@ -187,10 +187,3 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
 };
 
 export default BeneficiaryListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  noData: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-});
