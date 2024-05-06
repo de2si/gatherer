@@ -1,8 +1,9 @@
 // ProjectScreen.tsx
 
 import React, {useEffect} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
-import {Card, Text, useTheme} from 'react-native-paper';
+import {View, ScrollView} from 'react-native';
+import {List, useTheme} from 'react-native-paper';
+import {ProjectIcon} from '@components/icons/ProjectIcon';
 
 // nav
 import {ProjectStackScreenProps} from '@nav/ProjectStack';
@@ -10,6 +11,9 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 // hooks
 import {useProjectStore} from '@hooks/useProjectStore';
+
+// styles
+import {cardStyles, fontStyles, spacingStyles} from '@styles/common';
 
 type ProjectScreenProps = NativeStackScreenProps<
   ProjectStackScreenProps,
@@ -32,45 +36,30 @@ const ProjectScreen: React.FC<ProjectScreenProps> = ({navigation}) => {
     }
   };
   return (
-    <View style={styles.container}>
+    <View>
       <ScrollView>
-        <View style={styles.cardContainer}>
+        <List.Section style={spacingStyles.mh16}>
           {projects.map(project => (
-            <Card
-              style={[styles.card, {backgroundColor: theme.colors.primary}]}
-              elevation={2}
+            <List.Item
               key={project.id}
-              onPress={() => handlePress(project.id)}>
-              <Text
-                variant="titleMedium"
-                style={{color: theme.colors.onPrimary}}>
-                {project.name}
-              </Text>
-            </Card>
+              title={project.name}
+              left={props =>
+                ProjectIcon({
+                  width: 42,
+                  height: 42,
+                  ...props,
+                  color: theme.colors.primary,
+                })
+              }
+              onPress={() => handlePress(project.id)}
+              titleStyle={[fontStyles.bodyXl, {color: theme.colors.primary}]}
+              style={[cardStyles.card, {borderColor: theme.colors.tertiary}]}
+            />
           ))}
-        </View>
+        </List.Section>
       </ScrollView>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  card: {
-    margin: 4,
-    padding: 8,
-    height: 200,
-    width: '44%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default ProjectScreen;
