@@ -12,7 +12,7 @@ import PlaceholderScreen from '@screens/PlaceholderScreen';
 // define screen params
 export type AppStackScreenProps = {
   BottomTabs: {};
-  FarmerSearch: {name: string};
+  Placeholder: {name: string};
 };
 
 // create navigation stack
@@ -23,9 +23,9 @@ const AppStack = (): React.JSX.Element => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="BottomTabs" component={BottomTabs} />
       <Stack.Screen
-        name="FarmerSearch"
+        name="Placeholder"
         component={PlaceholderScreen}
-        initialParams={{name: 'Farmer Search'}}
+        initialParams={{name: 'Placeholder'}}
       />
     </Stack.Navigator>
   );
