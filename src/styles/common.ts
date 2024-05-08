@@ -45,6 +45,10 @@ export const commonStyles = StyleSheet.create({
   w120: {
     minWidth: 120,
   },
+  h30: {
+    height: 30,
+    maxHeight: 30,
+  },
 });
 
 export const cardStyles = StyleSheet.create({
@@ -121,6 +125,9 @@ export const spacingStyles = StyleSheet.create({
   },
   colGap8: {
     columnGap: 8,
+  },
+  colGap16: {
+    columnGap: 16,
   },
   colGap24: {
     columnGap: 24,

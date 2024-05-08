@@ -1,22 +1,24 @@
 // UserDetailScreen.tsx
 
-import {StyleSheet, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
   Avatar,
-  Button,
   Divider,
-  IconButton,
   List,
-  Menu,
   Portal,
   Snackbar,
+  Text,
   useTheme,
 } from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 import DetailFieldItem from '@components/DetailFieldItem';
+import ImageWrapper from '@components/ImageWrapper';
+import {EditIcon} from '@components/icons/EditIcon';
+import {ResetPasswordIcon} from '@components/icons/ResetPasswordIcon';
+import {DeactivateIcon} from '@components/icons/DeactivateIcon';
 
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -27,7 +29,11 @@ import {api} from '@api/axios';
 
 // helpers
 import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
-import {formatDate, formatPhoneNumber} from '@helpers/formatters';
+import {
+  convertToSentenceCase,
+  formatDate,
+  formatPhoneNumber,
+} from '@helpers/formatters';
 
 // types
 import {ApiUserType, useProfileStore} from '@hooks/useProfileStore';
@@ -38,54 +44,17 @@ import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
 import {MoreStackScreenProps} from '@nav/MoreStack';
 
+// styles
+import {
+  borderStyles,
+  commonStyles,
+  detailStyles,
+  spacingStyles,
+} from '@styles/common';
+
 type UserDetailScreenProps =
   | NativeStackScreenProps<UserStackScreenProps, 'UserDetail'>
   | NativeStackScreenProps<MoreStackScreenProps, 'ProfileDetail'>;
-
-const UserDetailHeaderRight = ({
-  isActive = true,
-  handleStatusChange = () => {},
-  handleEditPress,
-  menuVisible,
-  handleMenuVisibility,
-  handlePasswordChange,
-  routeName,
-}: {
-  isActive: boolean;
-  handleStatusChange: () => void;
-  handleEditPress: () => void;
-  menuVisible: boolean;
-  handleMenuVisibility: (show: boolean) => void;
-  handlePasswordChange: () => void;
-  routeName: 'UserDetail' | 'ProfileDetail';
-}) => {
-  return (
-    <>
-      <Button mode="contained-tonal" onPress={handleEditPress}>
-        Edit
-      </Button>
-      <Menu
-        visible={menuVisible}
-        onDismiss={() => handleMenuVisibility(false)}
-        anchorPosition="bottom"
-        anchor={
-          <IconButton
-            icon="dots-vertical"
-            size={24}
-            onPress={() => handleMenuVisibility(true)}
-          />
-        }>
-        <Menu.Item onPress={handlePasswordChange} title="Change password" />
-        {routeName === 'UserDetail' && (
-          <Menu.Item
-            onPress={handleStatusChange}
-            title={isActive ? 'Deactivate user' : 'Activate user'}
-          />
-        )}
-      </Menu>
-    </>
-  );
-};
 
 const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
   route: {params, name: routeName},
@@ -126,86 +95,55 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
     }
   });
 
-  const [menuVisible, setMenuVisible] = useState(false);
-  useEffect(() => {
-    const handleEditPress = () => {
-      if (routeName === 'ProfileDetail') {
-        (navigation as any).navigate('ProfileEdit', {});
-      } else {
-        user &&
-          (navigation as any).navigate('UserEdit', {
-            variant: 'edit',
-            user,
-            userType,
-          });
-      }
-    };
-    const handlePasswordChange = () => {
-      handleMenuVisibility(false);
-      if (routeName === 'ProfileDetail') {
-        user && (navigation as any).navigate('ProfilePassword', {id: user.id});
-      } else {
-        user &&
-          (navigation as any).navigate('UserPassword', {id: user.id, userType});
-      }
-    };
-    const handleMenuVisibility = (show: boolean) => {
-      setMenuVisible(show);
-    };
-    const handleStatusChange = async () => {
-      handleMenuVisibility(false);
-      setPageLoading(true);
-      try {
-        await withAuth(async () => {
-          try {
-            await api.put(
-              `users/${user?.id}/${
-                user?.is_active ? 'deactivate' : 'activate'
-              }/`,
-            );
-            setUser(prevUser =>
-              prevUser
-                ? {
-                    ...prevUser,
-                    is_active: !prevUser.is_active,
-                  }
-                : undefined,
-            );
-          } catch (error) {
-            throw error;
-          }
+  const handleEditPress = () => {
+    if (routeName === 'ProfileDetail') {
+      (navigation as any).navigate('ProfileEdit', {});
+    } else {
+      user &&
+        (navigation as any).navigate('UserEdit', {
+          variant: 'edit',
+          user,
+          userType,
         });
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        typeof errorMessage === 'string'
-          ? showSnackbar(errorMessage)
-          : showSnackbar('Error in changing activation status');
-      } finally {
-        setPageLoading(false);
-      }
-    };
-
-    navigation.setOptions({
-      headerRight: () =>
-        UserDetailHeaderRight({
-          isActive: user?.is_active ?? false,
-          handleStatusChange,
-          handleEditPress,
-          menuVisible,
-          handleMenuVisibility,
-          handlePasswordChange,
-          routeName,
-        }),
-    });
-  }, [
-    user,
-    navigation,
-    userType,
-    menuVisible,
-    withAuth,
-    showSnackbar,
-    routeName,
-  ]);
+    }
+  };
+  const handlePasswordChange = () => {
+    if (routeName === 'ProfileDetail') {
+      user && (navigation as any).navigate('ProfilePassword', {id: user.id});
+    } else {
+      user &&
+        (navigation as any).navigate('UserPassword', {id: user.id, userType});
+    }
+  };
+  const handleStatusChange = async () => {
+    setPageLoading(true);
+    try {
+      await withAuth(async () => {
+        try {
+          await api.put(
+            `users/${user?.id}/${user?.is_active ? 'deactivate' : 'activate'}/`,
+          );
+          setUser(prevUser =>
+            prevUser
+              ? {
+                  ...prevUser,
+                  is_active: !prevUser.is_active,
+                }
+              : undefined,
+          );
+        } catch (error) {
+          throw error;
+        }
+      });
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      typeof errorMessage === 'string'
+        ? showSnackbar(errorMessage)
+        : showSnackbar('Error in changing activation status');
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -242,46 +180,87 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
   }, [id, propUser]); // intentionally removing showSnackbar from dependencies
   if (loading) {
     return (
-      <View style={styles.centeredContainer}>
+      <View style={commonStyles.centeredContainer}>
         <ActivityIndicator />
       </View>
     );
   }
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View
+        style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
         {user && (
           <>
-            <List.Section
-              style={[
-                styles.headerRow,
-                {backgroundColor: theme.colors.primary},
-              ]}>
-              <View style={styles.col}>
-                <List.Item
-                  title={user.name}
-                  description={user.user_type}
-                  titleStyle={[
-                    theme.fonts.titleMedium,
-                    {color: theme.colors.onPrimary},
-                  ]}
-                  descriptionStyle={[
-                    theme.fonts.labelLarge,
-                    {color: theme.colors.inverseOnSurface},
-                  ]}
-                />
-              </View>
-              <View style={styles.col}>
-                <Avatar.Text
-                  label={user.name[0]}
-                  size={120}
+            <View style={commonStyles.row}>
+              {user.profile_photo ? (
+                <ImageWrapper
+                  flavor="avatar"
+                  value={user.profile_photo}
+                  size={150}
                   style={[
-                    styles.thinBorder,
+                    borderStyles.borderMinimal,
                     {borderColor: theme.colors.outline},
                   ]}
                 />
+              ) : (
+                <Avatar.Text
+                  label={user.name[0]}
+                  size={150}
+                  style={[
+                    borderStyles.borderMinimal,
+                    {borderColor: theme.colors.outline},
+                  ]}
+                />
+              )}
+              <View style={detailStyles.colSide}>
+                <Text
+                  style={[
+                    theme.fonts.titleMedium,
+                    {color: theme.colors.primary},
+                  ]}>
+                  User type
+                </Text>
+                <Text style={theme.fonts.titleLarge}>
+                  {convertToSentenceCase(user.user_type)}
+                </Text>
+                <View
+                  style={[
+                    commonStyles.rowCentered,
+                    detailStyles.colSide,
+                    spacingStyles.colGap16,
+                    commonStyles.h30,
+                  ]}>
+                  <Pressable onPress={handleEditPress}>
+                    <EditIcon
+                      height={16}
+                      width={16}
+                      color={theme.colors.primary}
+                    />
+                  </Pressable>
+                  <Pressable onPress={handlePasswordChange}>
+                    <ResetPasswordIcon
+                      height={26}
+                      width={20}
+                      color={theme.colors.primary}
+                    />
+                  </Pressable>
+                  {routeName === 'UserDetail' && (
+                    <Pressable onPress={handleStatusChange}>
+                      <DeactivateIcon
+                        height={19}
+                        width={19}
+                        color={theme.colors.primary}
+                      />
+                    </Pressable>
+                  )}
+                </View>
               </View>
-            </List.Section>
+            </View>
+            <Text
+              variant="headlineLarge"
+              style={[{color: theme.colors.primary}, spacingStyles.mt12]}>
+              {user.name}
+            </Text>
             <List.Section>
               <DetailFieldItem label="Email" value={user.email} theme={theme} />
               <DetailFieldItem
@@ -289,9 +268,6 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
                 value={formatPhoneNumber(user.phone_number)}
                 theme={theme}
               />
-            </List.Section>
-            <Divider />
-            <List.Section>
               <DetailFieldItem
                 label="Gender"
                 value={user.gender}
@@ -313,6 +289,14 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
               <>
                 <List.Section>
                   <DetailFieldItem
+                    label="Projects"
+                    value={projects.join(', ')}
+                    theme={theme}
+                  />
+                </List.Section>
+                <Divider />
+                <List.Section>
+                  <DetailFieldItem
                     label="States"
                     value={states.join(', ')}
                     theme={theme}
@@ -325,14 +309,6 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
                   <DetailFieldItem
                     label="Blocks"
                     value={blocks.join(', ')}
-                    theme={theme}
-                  />
-                </List.Section>
-                <Divider />
-                <List.Section>
-                  <DetailFieldItem
-                    label="Projects"
-                    value={projects.join(', ')}
                     theme={theme}
                   />
                 </List.Section>
@@ -354,31 +330,3 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
 };
 
 export default UserDetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  headerRow: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 24,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 0,
-  },
-  col: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    rowGap: 12,
-  },
-  imageThumbnail: {
-    width: 100,
-    height: 100,
-  },
-  thinBorder: {
-    borderWidth: 1,
-  },
-});
