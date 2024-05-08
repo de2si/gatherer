@@ -29,9 +29,11 @@ interface LandProgressTableProps {
     progressItem: ProgressItem | null,
     errorMessage: string | null,
   ) => Promise<void>;
+  editable: boolean;
 }
 
 const LandProgressTable: React.FC<LandProgressTableProps> = ({
+  editable: allowEdit,
   progress,
   onEdit,
 }) => {
@@ -151,7 +153,8 @@ const LandProgressTable: React.FC<LandProgressTableProps> = ({
                     setEditable({model: progressItem.model, col: colKey})
                   }
                   rippleColor={rowColor}>
-                  {editable &&
+                  {allowEdit &&
+                  editable &&
                   editable.model === progressItem.model &&
                   editable.col === colKey ? (
                     <TextInput
@@ -178,7 +181,7 @@ const LandProgressTable: React.FC<LandProgressTableProps> = ({
           fontStyles.italicText,
           fontStyles.regularText,
         ]}>
-        Tap on cells to edit values.
+        {allowEdit && 'Tap on cells to edit values.'}
       </HelperText>
     </View>
   );
