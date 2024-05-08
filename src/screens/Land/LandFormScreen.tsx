@@ -96,7 +96,9 @@ const landBasicValidation = {
       ? farmerValidator.nullable()
       : farmerValidator.required('Farmer is required');
   }),
-  geo_trace: Yup.string().required('Geo-trace is required'),
+  geo_trace: Yup.string()
+    .required('Geo-trace is required')
+    .test('is-coords', 'Geo-trace is required', value => value !== '[]'),
   area: Yup.number()
     .required('Area is required')
     .positive('Area must be valid')
