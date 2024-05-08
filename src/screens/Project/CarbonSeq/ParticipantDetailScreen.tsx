@@ -58,8 +58,37 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Participant detail error');
 
-  const isConcluded = false;
-  const handleStatusChange = async () => {};
+  const handleStatusChange = async () => {
+    setLoading(true);
+    try {
+      await withAuth(async () => {
+        try {
+          await api.put(
+            `/projects/1/${id}/${
+              participant?.is_active ? 'conclude' : 'restart'
+            }/`,
+          );
+          setParticipant(prevParticipant =>
+            prevParticipant
+              ? {
+                  ...prevParticipant,
+                  is_active: !prevParticipant.is_active,
+                }
+              : undefined,
+          );
+        } catch (error) {
+          throw error;
+        }
+      });
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      typeof errorMessage === 'string'
+        ? showSnackbar(errorMessage)
+        : showSnackbar('Error in changing activation status');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -194,7 +223,7 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
                     buttonColor={theme.colors.secondary}
                     labelStyle={fontStyles.bodyXl}
                     style={[borderStyles.radius12]}>
-                    {isConcluded ? 'Restart' : 'Conclude'}
+                    {participant.is_active ? 'Conclude' : 'Restart'}
                   </Button>
                 </View>
               </View>
@@ -240,6 +269,7 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
             </View>
             <View style={spacingStyles.mt16}>
               <LandProgressTable
+                editable={participant.is_active}
                 progress={participant.progress}
                 onEdit={onEdit}
               />
