@@ -120,5 +120,6 @@ const styles = StyleSheet.create({
   },
   sideTabContainer: {
     justifyContent: 'flex-end',
+    marginRight: 16,
   },
 });
