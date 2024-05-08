@@ -132,6 +132,9 @@ export const spacingStyles = StyleSheet.create({
   rowGap8: {
     rowGap: 8,
   },
+  rowGap16: {
+    rowGap: 16,
+  },
   colGap8: {
     columnGap: 8,
   },
@@ -159,6 +162,9 @@ export const borderStyles = StyleSheet.create({
   },
   radius8: {
     borderRadius: 8,
+  },
+  radius12: {
+    borderRadius: 14,
   },
 });
 

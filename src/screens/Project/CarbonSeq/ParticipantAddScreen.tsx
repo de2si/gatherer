@@ -1,8 +1,8 @@
 // ParticipantAddScreen.tsx
 
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Portal, Snackbar} from 'react-native-paper';
+import {ScrollView, View} from 'react-native';
+import {Button, Portal, Snackbar, useTheme} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
@@ -34,6 +34,9 @@ import {api} from '@api/axios';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ParticipantStackScreenProps} from '@nav/Project/CarbonSeq/ParticipantStack';
 import {useParticipantStore} from '@hooks/carbonSeqHooks';
+
+// styles
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 interface ParticipantBasicForm {
   land_parcel: {id: number; name: string};
@@ -104,6 +107,7 @@ type ParticipantAddScreenProps = NativeStackScreenProps<
 const ParticipantAddScreen: React.FC<ParticipantAddScreenProps> = ({
   navigation,
 }) => {
+  const theme = useTheme();
   const withAuth = useAuthStore(store => store.withAuth);
 
   const [loading, setLoading] = useState(false);
@@ -203,8 +207,13 @@ const ParticipantAddScreen: React.FC<ParticipantAddScreenProps> = ({
 
   return (
     <ScrollView ref={scrollViewRef}>
-      <View style={styles.container}>
-        <View style={styles.formContainer}>
+      <View style={commonStyles.flex1}>
+        <View
+          style={[
+            spacingStyles.mh16,
+            spacingStyles.pv16,
+            spacingStyles.rowGap8,
+          ]}>
           <FormLandInput
             name="land_parcel"
             control={control}
@@ -228,13 +237,21 @@ const ParticipantAddScreen: React.FC<ParticipantAddScreenProps> = ({
             control={control}
             onLayout={handleLayout}
           />
-          <Button
-            onPress={handleSubmit(onSubmit)}
-            mode="contained-tonal"
-            style={styles.button}
-            disabled={loading}>
-            Submit
-          </Button>
+          <View
+            style={[
+              commonStyles.centeredContainer,
+              spacingStyles.mt16,
+              spacingStyles.mb48,
+            ]}>
+            <Button
+              onPress={handleSubmit(onSubmit)}
+              mode="contained"
+              buttonColor={theme.colors.secondary}
+              disabled={loading}
+              labelStyle={fontStyles.bodyXl}>
+              Submit
+            </Button>
+          </View>
         </View>
         <Portal>{loading && <LoadingIndicator />}</Portal>
         <Portal>
@@ -251,18 +268,3 @@ const ParticipantAddScreen: React.FC<ParticipantAddScreenProps> = ({
 };
 
 export default ParticipantAddScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    rowGap: 24,
-    marginHorizontal: 24,
-  },
-  button: {
-    marginHorizontal: 48,
-    marginTop: 20,
-    marginBottom: 60,
-  },
-});

@@ -1,18 +1,15 @@
 // ParticipantDetailScreen.tsx
 
 import React, {useEffect, useState} from 'react';
-import {Linking, Pressable, StyleSheet, View} from 'react-native';
+import {Linking, Pressable, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
   Button,
-  Divider,
-  List,
   Snackbar,
   Text,
   useTheme,
 } from 'react-native-paper';
-import DetailFieldItem from '@components/DetailFieldItem';
 import LandProgressTable from '@components/CarbonSeq/LandProgressTable';
 
 // navigation
@@ -24,6 +21,7 @@ import {api} from '@api/axios';
 
 // helpers
 import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
+import {formatIdAsCode} from '@helpers/formatters';
 
 // types
 import {ApiParticipant, ProgressItem} from '@hooks/carbonSeqHooks';
@@ -32,26 +30,21 @@ import {ApiParticipant, ProgressItem} from '@hooks/carbonSeqHooks';
 import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
 
+// styles
+import {
+  borderStyles,
+  cardStyles,
+  commonStyles,
+  detailStyles,
+  fontStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
+
 type ParticipantDetailScreenProps = NativeStackScreenProps<
   ParticipantStackScreenProps,
   'ParticipantDetail'
 >;
-
-const participantDetailHeaderRight = ({
-  isConcluded,
-  handleStatusChange,
-}: {
-  isConcluded: boolean;
-  handleStatusChange: () => Promise<void>;
-}) => {
-  return (
-    <>
-      <Button mode="contained-tonal" onPress={handleStatusChange}>
-        {isConcluded ? 'Restart' : 'Conclude'}
-      </Button>
-    </>
-  );
-};
 
 const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
   route: {
@@ -66,13 +59,8 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Participant detail error');
 
-  useEffect(() => {
-    const handleStatusChange = async () => {};
-    navigation.setOptions({
-      headerRight: () =>
-        participantDetailHeaderRight({isConcluded: false, handleStatusChange}),
-    });
-  }, [navigation]);
+  const isConcluded = false;
+  const handleStatusChange = async () => {};
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -108,7 +96,7 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
   }, [id, propParticipant, showSnackbar, withAuth]);
   if (loading) {
     return (
-      <View style={styles.centeredContainer}>
+      <View style={commonStyles.centeredContainer}>
         <ActivityIndicator />
       </View>
     );
@@ -169,14 +157,22 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
 
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View
+        style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mv16]}>
         {participant && (
           <>
-            <List.Section>
-              <DetailFieldItem
-                label="Land"
-                value={participant.land_parcel.khasra_number}
-                valueComponent={
+            <View style={[spacingStyles.rowGap16, spacingStyles.mb16]}>
+              <View style={cardStyles.cardDataRow}>
+                <View style={commonStyles.rowCentered}>
+                  <Text
+                    variant="headlineSmall"
+                    style={[
+                      {color: theme.colors.tertiary},
+                      commonStyles.flex1,
+                      tableStyles.dataRow,
+                    ]}>
+                    Land
+                  </Text>
                   <Pressable
                     onPress={() => {
                       // Navigation too be resolved by parent
@@ -190,76 +186,71 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
                           },
                         },
                       });
-                    }}>
-                    <Text
-                      variant="labelLarge"
-                      style={{color: theme.colors.secondary}}>
-                      {participant.land_parcel.khasra_number}
+                    }}
+                    style={[commonStyles.flex1, tableStyles.dataRow]}>
+                    <Text variant="headlineSmall">
+                      {formatIdAsCode('L', participant.land_parcel.id)}
                     </Text>
                   </Pressable>
-                }
-                theme={theme}
-              />
-            </List.Section>
-            <Divider />
-            <List.Section>
-              <DetailFieldItem
-                label="Carbon waiver"
-                valueComponent={
-                  <Pressable
-                    onPress={() =>
-                      openFile(participant.carbon_waiver_document.url)
-                    }>
-                    <Text
-                      variant="labelLarge"
-                      style={{color: theme.colors.secondary}}>
-                      Open
-                    </Text>
-                  </Pressable>
-                }
-                theme={theme}
-              />
-              <DetailFieldItem
-                label="Agreement"
-                valueComponent={
-                  <Pressable
-                    onPress={() =>
-                      openFile(participant.agreement_document_type.url)
-                    }>
-                    <Text
-                      variant="labelLarge"
-                      style={{color: theme.colors.secondary}}>
-                      Open
-                    </Text>
-                  </Pressable>
-                }
-                theme={theme}
-              />
-              <DetailFieldItem
-                label="Gram panchayat resolution"
-                valueComponent={
-                  <Pressable
-                    onPress={() =>
-                      openFile(participant.gram_panchayat_resolution.url)
-                    }>
-                    <Text
-                      variant="labelLarge"
-                      style={{color: theme.colors.secondary}}>
-                      Open
-                    </Text>
-                  </Pressable>
-                }
-                theme={theme}
-              />
-            </List.Section>
-            <Divider />
-            <List.Section>
+                </View>
+
+                <View style={[detailStyles.colSide]}>
+                  <Button
+                    onPress={handleStatusChange}
+                    mode="contained"
+                    buttonColor={theme.colors.secondary}
+                    labelStyle={fontStyles.bodyXl}
+                    style={[borderStyles.radius12]}>
+                    {isConcluded ? 'Restart' : 'Conclude'}
+                  </Button>
+                </View>
+              </View>
+              <View style={cardStyles.cardDataRow}>
+                <Text
+                  variant="bodyLarge"
+                  style={{color: theme.colors.tertiary}}>
+                  Carbon waiver
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    openFile(participant.carbon_waiver_document.url)
+                  }>
+                  <Text variant="bodyLarge">Open</Text>
+                </Pressable>
+              </View>
+              <View style={cardStyles.cardDataRow}>
+                <Text
+                  variant="bodyLarge"
+                  style={{color: theme.colors.tertiary}}>
+                  Agreement
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    openFile(participant.agreement_document_type.url)
+                  }>
+                  <Text variant="bodyLarge">Open</Text>
+                </Pressable>
+              </View>
+              <View style={cardStyles.cardDataRow}>
+                <Text
+                  variant="bodyLarge"
+                  style={{color: theme.colors.tertiary}}>
+                  Gram panchayat resolution
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    openFile(participant.gram_panchayat_resolution.url)
+                  }>
+                  <Text variant="bodyLarge">Open</Text>
+                </Pressable>
+              </View>
+            </View>
+            <View style={spacingStyles.mt16}>
               <LandProgressTable
                 progress={participant.progress}
                 onEdit={onEdit}
               />
-            </List.Section>
-            <Divider />
+            </View>
           </>
         )}
         <Snackbar
@@ -274,10 +265,3 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
 };
 
 export default ParticipantDetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-});

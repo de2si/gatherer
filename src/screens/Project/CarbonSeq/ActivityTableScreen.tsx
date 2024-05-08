@@ -32,7 +32,7 @@ import FilterSheet, {
 } from '@components/FilterSheet';
 import {FilterIcon} from '@components/icons/FilterIcon';
 import {ACTIVITY_NAMES} from '@screens/Project/CarbonSeq/ActivityListScreen';
-import {commonStyles, headerStyles} from '@styles/common';
+import {commonStyles, headerStyles, spacingStyles} from '@styles/common';
 
 const activityTableHeaderRight = ({
   isFilterApplied = false,
@@ -183,7 +183,10 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
             colors={[theme.colors.primary]}
           />
         }>
-        <ActivityTable data={activityRows} onPress={showParticipantScreen} />
+        <View
+          style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
+          <ActivityTable data={activityRows} onPress={showParticipantScreen} />
+        </View>
       </ScrollView>
 
       <FilterSheet
