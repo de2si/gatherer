@@ -139,12 +139,7 @@ const FarmerDetailScreen: React.FC<FarmerDetailScreenProps> = ({
   return (
     <ScrollView>
       <View
-        style={[
-          commonStyles.flex1,
-          spacingStyles.mh16,
-          spacingStyles.mt16,
-          {borderTopColor: theme.colors.tertiary},
-        ]}>
+        style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
         {farmer && (
           <>
             <View style={commonStyles.row}>

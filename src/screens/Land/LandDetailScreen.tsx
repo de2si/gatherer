@@ -1,20 +1,20 @@
 // LandDetailScreen.tsx
 
-import {Image, Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
-  Button,
   Divider,
   List,
-  MD3Theme,
   Snackbar,
   Text,
   useTheme,
 } from 'react-native-paper';
 import DetailFieldItem from '@components/DetailFieldItem';
+import CarouselField from '@components/CarouselField';
 import CoordinatesDrawer from '@components/CoordinatesDrawer';
+import {EditIcon} from '@components/icons/EditIcon';
 
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -35,37 +35,13 @@ import {ApiLand} from '@hooks/useLandStore';
 import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
 
+// styles
+import {commonStyles, detailStyles, spacingStyles} from '@styles/common';
+
 type LandDetailScreenProps = NativeStackScreenProps<
   LandStackScreenProps,
   'LandDetail'
 >;
-
-const landDetailHeaderRight = ({
-  handleEditPress,
-}: {
-  handleEditPress: () => void;
-}) => {
-  return (
-    <>
-      <Button mode="contained-tonal" onPress={handleEditPress}>
-        Edit
-      </Button>
-    </>
-  );
-};
-
-const FieldThumbnail = ({url, theme}: {url: string; theme: MD3Theme}) => (
-  <View
-    style={[
-      styles.thinBorder,
-      {borderColor: theme.colors.outline, borderRadius: theme.roundness},
-    ]}>
-    <Image
-      source={{uri: url}}
-      style={[styles.imageThumbnail, {borderRadius: theme.roundness}]}
-    />
-  </View>
-);
 
 const LandDetailScreen: React.FC<LandDetailScreenProps> = ({
   route: {
@@ -75,22 +51,15 @@ const LandDetailScreen: React.FC<LandDetailScreenProps> = ({
 }) => {
   const theme = useTheme();
   const withAuth = useAuthStore(store => store.withAuth);
+
   const [loading, setLoading] = useState(false);
   const [land, setLand] = useState<ApiLand>();
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Land detail error');
 
-  useEffect(() => {
-    const handleEditPress = () => {
-      land && navigation.navigate('LandEdit', {variant: 'edit', land});
-    };
-    navigation.setOptions({
-      headerRight: () =>
-        landDetailHeaderRight({
-          handleEditPress,
-        }),
-    });
-  }, [land, navigation]);
+  const handleEditPress = () => {
+    land && navigation.navigate('LandEdit', {variant: 'edit', land});
+  };
 
   useEffect(() => {
     const fetchLand = async () => {
@@ -126,28 +95,23 @@ const LandDetailScreen: React.FC<LandDetailScreenProps> = ({
   }, [id, propLand, showSnackbar, withAuth]);
   if (loading) {
     return (
-      <View style={styles.centeredContainer}>
+      <View style={commonStyles.centeredContainer}>
         <ActivityIndicator />
       </View>
     );
   }
-
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View
+        style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
         {land && (
           <>
-            <List.Section>
-              <View
-                style={[
-                  styles.headerRow,
-                  {backgroundColor: theme.colors.primary},
-                ]}>
-                {land.pictures.map(pic => (
-                  <FieldThumbnail key={pic.id} url={pic.url} theme={theme} />
-                ))}
-              </View>
-            </List.Section>
+            <CarouselField value={land.pictures} theme={theme} />
+            <View style={detailStyles.colSide}>
+              <Pressable style={spacingStyles.mt16} onPress={handleEditPress}>
+                <EditIcon height={18} width={18} color={theme.colors.primary} />
+              </Pressable>
+            </View>
             <List.Section>
               <DetailFieldItem
                 label="Ownership"
@@ -167,7 +131,7 @@ const LandDetailScreen: React.FC<LandDetailScreenProps> = ({
                         });
                       }}>
                       <Text
-                        variant="labelLarge"
+                        variant="titleMedium"
                         style={{color: theme.colors.secondary}}>
                         {land.farmer_name}
                       </Text>
@@ -250,27 +214,3 @@ const LandDetailScreen: React.FC<LandDetailScreenProps> = ({
 };
 
 export default LandDetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  headerRow: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 24,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    rowGap: 12,
-    columnGap: 12,
-  },
-  imageThumbnail: {
-    width: 100,
-    height: 100,
-  },
-  thinBorder: {
-    borderWidth: 1,
-  },
-});

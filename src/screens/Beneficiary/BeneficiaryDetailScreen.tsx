@@ -1,12 +1,10 @@
 // BeneficiaryDetailScreen.tsx
 
-import {Image, Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
-  Avatar,
-  Button,
   Divider,
   List,
   MD3Theme,
@@ -15,6 +13,8 @@ import {
   useTheme,
 } from 'react-native-paper';
 import DetailFieldItem from '@components/DetailFieldItem';
+import ImageWrapper from '@components/ImageWrapper';
+import {EditIcon} from '@components/icons/EditIcon';
 
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -25,41 +25,45 @@ import {api} from '@api/axios';
 
 // helpers
 import {getErrorMessage, getFieldErrors} from '@helpers/formHelpers';
-import {formatDate, formatPhoneNumber} from '@helpers/formatters';
+import {
+  formatDate,
+  formatIdAsCode,
+  formatPhoneNumber,
+} from '@helpers/formatters';
 
 // types
 import {ApiBeneficiary} from '@hooks/useBeneficiaryStore';
+import {ApiImage} from '@typedefs/common';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
 import {useAuthStore} from '@hooks/useAuthStore';
+
+// styles
+import {
+  borderStyles,
+  cardStyles,
+  commonStyles,
+  detailStyles,
+  spacingStyles,
+} from '@styles/common';
 
 type BeneficiaryDetailScreenProps = NativeStackScreenProps<
   BeneficiaryStackScreenProps,
   'BeneficiaryDetail'
 >;
 
-const beneficiaryDetailHeaderRight = ({
-  handleEditPress,
-}: {
-  handleEditPress: () => void;
-}) => {
-  return (
-    <>
-      <Button mode="contained-tonal" onPress={handleEditPress}>
-        Edit
-      </Button>
-    </>
-  );
-};
-
-const FieldThumbnail = ({url, theme}: {url: string; theme: MD3Theme}) => (
+const FieldThumbnail = ({value, theme}: {value: ApiImage; theme: MD3Theme}) => (
   <View
     style={[
-      styles.thinBorder,
+      borderStyles.borderMinimal,
       {borderColor: theme.colors.outline, borderRadius: theme.roundness},
     ]}>
-    <Image source={{uri: url}} style={styles.imageThumbnail} />
+    <ImageWrapper
+      flavor="regular"
+      value={value}
+      style={detailStyles.imageThumbnail}
+    />
   </View>
 );
 
@@ -76,18 +80,10 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
     useSnackbar('Beneficiary detail error');
 
-  useEffect(() => {
-    const handleEditPress = () => {
-      beneficiary &&
-        navigation.navigate('BeneficiaryEdit', {variant: 'edit', beneficiary});
-    };
-    navigation.setOptions({
-      headerRight: () =>
-        beneficiaryDetailHeaderRight({
-          handleEditPress,
-        }),
-    });
-  }, [beneficiary, navigation]);
+  const handleEditPress = () => {
+    beneficiary &&
+      navigation.navigate('BeneficiaryEdit', {variant: 'edit', beneficiary});
+  };
 
   useEffect(() => {
     const fetchBeneficiary = async () => {
@@ -124,7 +120,7 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
 
   if (loading) {
     return (
-      <View style={styles.centeredContainer}>
+      <View style={commonStyles.centeredContainer}>
         <ActivityIndicator />
       </View>
     );
@@ -132,66 +128,87 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
 
   return (
     <ScrollView>
-      <View style={styles.container}>
+      <View
+        style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
         {beneficiary && (
           <>
-            <List.Section>
-              <View
+            <View style={commonStyles.row}>
+              <ImageWrapper
+                flavor="avatar"
+                value={beneficiary.profile_photo}
+                size={150}
                 style={[
-                  styles.headerRow,
-                  {backgroundColor: theme.colors.primary},
-                ]}>
-                <View style={styles.col}>
-                  <List.Item
-                    title={formatDate(new Date(beneficiary.date_of_birth))}
-                    description="Date of birth"
-                    titleStyle={[
-                      theme.fonts.titleMedium,
-                      {color: theme.colors.onPrimary},
-                    ]}
-                    descriptionStyle={[
-                      theme.fonts.labelLarge,
-                      {color: theme.colors.inverseOnSurface},
-                    ]}
+                  borderStyles.borderMinimal,
+                  {borderColor: theme.colors.outline},
+                ]}
+              />
+              <View style={detailStyles.colSide}>
+                <Pressable style={spacingStyles.mt12} onPress={handleEditPress}>
+                  <EditIcon
+                    height={18}
+                    width={18}
+                    color={theme.colors.primary}
                   />
-                  <Text
-                    variant="titleLarge"
-                    style={{color: theme.colors.onPrimary}}>
-                    {beneficiary.name}
-                  </Text>
-                </View>
-                <View style={styles.col}>
-                  <Avatar.Image
-                    source={{uri: beneficiary.profile_photo.url}}
-                    size={120}
-                    style={[
-                      styles.thinBorder,
-                      {borderColor: theme.colors.outline},
-                    ]}
-                  />
-                </View>
+                </Pressable>
+              </View>
+            </View>
+            <Text
+              variant="headlineLarge"
+              style={[{color: theme.colors.primary}, spacingStyles.mt12]}>
+              {beneficiary.name}
+            </Text>
+            <List.Section>
+              <DetailFieldItem
+                label="Code"
+                value={formatIdAsCode('B', parseInt(beneficiary.guardian, 10))}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Phone number"
+                value={formatPhoneNumber(beneficiary.phone_number)}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Date of birth"
+                value={formatDate(new Date(beneficiary.date_of_birth))}
+                theme={theme}
+              />
+              <DetailFieldItem
+                label="Gender"
+                value={beneficiary.gender}
+                theme={theme}
+              />
+              <View style={[cardStyles.cardDataRow, spacingStyles.mv12]}>
+                <FieldThumbnail
+                  value={beneficiary.id_front_image}
+                  theme={theme}
+                />
+                <FieldThumbnail
+                  value={beneficiary.id_back_image}
+                  theme={theme}
+                />
               </View>
             </List.Section>
+            <Divider />
             <List.Section>
-              <View style={styles.row}>
-                <Text
-                  style={[styles.labelText, {color: theme.colors.outline}]}
-                  variant="labelLarge">
-                  Aadhaar
-                </Text>
-                <FieldThumbnail
-                  url={beneficiary.id_front_image.url}
-                  theme={theme}
-                />
-                <FieldThumbnail
-                  url={beneficiary.id_back_image.url}
-                  theme={theme}
-                />
-              </View>
-              <DetailFieldItem label="Code" value="AA6543" theme={theme} />
               <DetailFieldItem
-                label="Phone"
-                value={formatPhoneNumber(beneficiary.phone_number)}
+                label="Farmer"
+                value={beneficiary.guardian}
+                valueComponent={
+                  <Pressable
+                    onPress={() => {
+                      // Navigation too be resolved by parent
+                      (navigation as any).navigate('FarmerDetail', {
+                        id: beneficiary.guardian,
+                      });
+                    }}>
+                    <Text
+                      variant="titleMedium"
+                      style={{color: theme.colors.secondary}}>
+                      {beneficiary.guardian}
+                    </Text>
+                  </Pressable>
+                }
                 theme={theme}
               />
             </List.Section>
@@ -224,36 +241,6 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
               />
             </List.Section>
             <Divider />
-            <List.Section>
-              <DetailFieldItem
-                label="Gender"
-                value={beneficiary.gender}
-                theme={theme}
-              />
-            </List.Section>
-            <Divider />
-            <List.Section>
-              <DetailFieldItem
-                label="Farmer"
-                value={beneficiary.guardian}
-                valueComponent={
-                  <Pressable
-                    onPress={() => {
-                      // Navigation too be resolved by parent
-                      (navigation as any).navigate('FarmerDetail', {
-                        id: beneficiary.guardian,
-                      });
-                    }}>
-                    <Text
-                      variant="labelLarge"
-                      style={{color: theme.colors.secondary}}>
-                      {beneficiary.guardian}
-                    </Text>
-                  </Pressable>
-                }
-                theme={theme}
-              />
-            </List.Section>
           </>
         )}
         <Snackbar
@@ -268,42 +255,3 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
 };
 
 export default BeneficiaryDetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centeredContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  headerRow: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 24,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: '95%',
-  },
-  col: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    rowGap: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    columnGap: 24,
-    paddingHorizontal: 32,
-    marginVertical: 12,
-  },
-  labelText: {
-    minWidth: 90,
-  },
-  imageThumbnail: {
-    width: 100,
-    height: 100,
-  },
-  thinBorder: {
-    borderWidth: 1,
-  },
-});
