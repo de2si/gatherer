@@ -17,6 +17,8 @@ import {useProfileStore} from '@hooks/useProfileStore';
 // types
 import {UserType} from '@helpers/constants';
 
+import {commonStyles} from '@styles/common';
+
 type UserTabParams = {
   userType: UserType;
 };
@@ -36,9 +38,15 @@ const CustomUserBar = (props: MaterialTopTabBarProps) => {
 const Tab = createMaterialTopTabNavigator<UserTabsNavProps>();
 
 const UserTabs = () => {
+  const theme = useTheme();
   let loggedUser = useProfileStore(store => store.data);
   return (
-    <Tab.Navigator tabBar={CustomUserBar} screenOptions={{}}>
+    <Tab.Navigator
+      tabBar={CustomUserBar}
+      sceneContainerStyle={[
+        commonStyles.flex1,
+        {backgroundColor: theme.colors.background},
+      ]}>
       {loggedUser.userType === UserType.ADMIN && (
         <>
           <Tab.Screen

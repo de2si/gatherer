@@ -12,6 +12,8 @@ import ActivityStack from '@nav/Project/CarbonSeq/ActivityStack';
 import ParticipantStack from '@nav/Project/CarbonSeq/ParticipantStack';
 import CustomTopBar from '@components/nav/CustomTopBar';
 
+import {commonStyles} from '@styles/common';
+
 // define screen params
 export type CarbonSeqTabsNavProps = {
   Activity: {};
@@ -29,8 +31,14 @@ const CustomBar = (props: MaterialTopTabBarProps) => {
 const Tab = createMaterialTopTabNavigator<CarbonSeqTabsNavProps>();
 
 const CarbonSeqTabs = () => {
+  const theme = useTheme();
   return (
-    <Tab.Navigator tabBar={CustomBar}>
+    <Tab.Navigator
+      tabBar={CustomBar}
+      sceneContainerStyle={[
+        commonStyles.flex1,
+        {backgroundColor: theme.colors.background},
+      ]}>
       <Tab.Screen name="Activity" component={ActivityStack} />
       <Tab.Screen name="Participant" component={ParticipantStack} />
     </Tab.Navigator>
