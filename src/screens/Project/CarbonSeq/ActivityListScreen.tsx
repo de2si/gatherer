@@ -1,10 +1,11 @@
 // ActivityListScreen.tsx
 
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import {Card, Text, useTheme} from 'react-native-paper';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ActivityStackScreenProps} from '@nav/Project/CarbonSeq/ActivityStack';
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 interface Activity {
   title: string;
@@ -42,12 +43,17 @@ const ActivityListScreen: React.FC<ActivityListScreenProps> = ({
   navigation,
 }) => {
   const theme = useTheme();
+  const textStyle = [{color: theme.colors.onPrimary}, fontStyles.regularText];
   return (
-    <View style={styles.container}>
+    <View style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
       {activities.map(activity => (
         <Card
           key={activity.title}
-          style={[styles.card]}
+          style={[
+            spacingStyles.mb16,
+            spacingStyles.p8,
+            {backgroundColor: theme.colors.primary},
+          ]}
           onPress={() => {
             navigation.navigate('ActivityTable', {
               name: activity.title,
@@ -55,13 +61,13 @@ const ActivityListScreen: React.FC<ActivityListScreenProps> = ({
           }}>
           <Card.Title
             title={activity.title}
-            titleVariant="headlineSmall"
-            titleStyle={{
-              color: theme.colors.primary,
-            }}
+            titleVariant="headlineMedium"
+            titleStyle={textStyle}
           />
           <Card.Content>
-            <Text variant="bodyMedium">{activity.description}</Text>
+            <Text variant="bodyLarge" style={[textStyle]}>
+              {activity.description}
+            </Text>
           </Card.Content>
         </Card>
       ))}
@@ -70,12 +76,3 @@ const ActivityListScreen: React.FC<ActivityListScreenProps> = ({
 };
 
 export default ActivityListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 4,
-  },
-  card: {
-    margin: 4,
-  },
-});
