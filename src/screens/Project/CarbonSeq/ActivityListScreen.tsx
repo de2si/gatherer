@@ -1,7 +1,7 @@
 // ActivityListScreen.tsx
 
 import React from 'react';
-import {View} from 'react-native';
+import {View, ScrollView} from 'react-native';
 import {Card, Text, useTheme} from 'react-native-paper';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {ActivityStackScreenProps} from '@nav/Project/CarbonSeq/ActivityStack';
@@ -45,33 +45,36 @@ const ActivityListScreen: React.FC<ActivityListScreenProps> = ({
   const theme = useTheme();
   const textStyle = [{color: theme.colors.onPrimary}, fontStyles.regularText];
   return (
-    <View style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
-      {activities.map(activity => (
-        <Card
-          key={activity.title}
-          style={[
-            spacingStyles.mb16,
-            spacingStyles.p8,
-            {backgroundColor: theme.colors.primary},
-          ]}
-          onPress={() => {
-            navigation.navigate('ActivityTable', {
-              name: activity.title,
-            });
-          }}>
-          <Card.Title
-            title={activity.title}
-            titleVariant="headlineMedium"
-            titleStyle={textStyle}
-          />
-          <Card.Content>
-            <Text variant="bodyLarge" style={[textStyle]}>
-              {activity.description}
-            </Text>
-          </Card.Content>
-        </Card>
-      ))}
-    </View>
+    <ScrollView>
+      <View
+        style={[commonStyles.flex1, spacingStyles.mh16, spacingStyles.mt16]}>
+        {activities.map(activity => (
+          <Card
+            key={activity.title}
+            style={[
+              spacingStyles.mb16,
+              spacingStyles.p8,
+              {backgroundColor: theme.colors.primary},
+            ]}
+            onPress={() => {
+              navigation.navigate('ActivityTable', {
+                name: activity.title,
+              });
+            }}>
+            <Card.Title
+              title={activity.title}
+              titleVariant="headlineMedium"
+              titleStyle={textStyle}
+            />
+            <Card.Content>
+              <Text variant="bodyLarge" style={[textStyle]}>
+                {activity.description}
+              </Text>
+            </Card.Content>
+          </Card>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 

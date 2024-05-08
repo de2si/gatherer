@@ -38,7 +38,6 @@ import {
   detailStyles,
   fontStyles,
   spacingStyles,
-  tableStyles,
 } from '@styles/common';
 
 type ParticipantDetailScreenProps = NativeStackScreenProps<
@@ -154,7 +153,6 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
       setLoading(false);
     }
   };
-
   return (
     <ScrollView>
       <View
@@ -163,14 +161,10 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
           <>
             <View style={[spacingStyles.rowGap16, spacingStyles.mb16]}>
               <View style={cardStyles.cardDataRow}>
-                <View style={commonStyles.rowCentered}>
+                <View style={[commonStyles.row, spacingStyles.colGap16]}>
                   <Text
                     variant="headlineSmall"
-                    style={[
-                      {color: theme.colors.tertiary},
-                      commonStyles.flex1,
-                      tableStyles.dataRow,
-                    ]}>
+                    style={[{color: theme.colors.tertiary}]}>
                     Land
                   </Text>
                   <Pressable
@@ -186,8 +180,7 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
                           },
                         },
                       });
-                    }}
-                    style={[commonStyles.flex1, tableStyles.dataRow]}>
+                    }}>
                     <Text variant="headlineSmall">
                       {formatIdAsCode('L', participant.land_parcel.id)}
                     </Text>
