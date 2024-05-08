@@ -90,6 +90,9 @@ export const spacingStyles = StyleSheet.create({
   m4: {
     margin: 4,
   },
+  pv0: {
+    paddingVertical: 0,
+  },
   pv16: {
     paddingVertical: 16,
   },
@@ -98,6 +101,9 @@ export const spacingStyles = StyleSheet.create({
   },
   mt8: {
     marginTop: 8,
+  },
+  mt2: {
+    marginTop: 2,
   },
   mt16: {
     marginTop: 16,
@@ -141,6 +147,10 @@ export const borderStyles = StyleSheet.create({
   borderMinimal: {
     borderWidth: 0.4,
   },
+  verticalMinimal: {
+    borderTopWidth: 0.4,
+    borderBottomWidth: 0.4,
+  },
   border1: {
     borderWidth: 1,
   },
@@ -171,6 +181,9 @@ export const detailStyles = StyleSheet.create({
 export const fontStyles = StyleSheet.create({
   regularText: {
     fontWeight: 'normal',
+  },
+  italicText: {
+    fontStyle: 'italic',
   },
   bodyXl: {
     fontFamily: 'Roboto-Regular',

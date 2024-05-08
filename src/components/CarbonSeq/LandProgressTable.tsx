@@ -1,14 +1,27 @@
 // LandProgressTable.tsx
 
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {DataTable, HelperText, TextInput, useTheme} from 'react-native-paper';
+import {View} from 'react-native';
+import {
+  DataTable,
+  HelperText,
+  TextInput,
+  TextInputProps,
+  useTheme,
+} from 'react-native-paper';
 import {
   ACTIVITY_KEYS,
   ActivityKey,
   Model,
   ProgressItem,
 } from '@hooks/carbonSeqHooks';
+import {
+  borderStyles,
+  commonStyles,
+  fontStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
 
 interface LandProgressTableProps {
   progress: ProgressItem[];
@@ -69,46 +82,92 @@ const LandProgressTable: React.FC<LandProgressTableProps> = ({
     setValue('');
   };
 
+  const titleTextStyle = [theme.fonts.bodyLarge, {color: theme.colors.primary}];
+  const cellTextStyle = [theme.fonts.bodyLarge, fontStyles.regularText];
+  const textInputProps: TextInputProps = {
+    autoFocus: true,
+    keyboardType: 'numeric',
+    mode: 'outlined',
+    style: [
+      {backgroundColor: theme.colors.primary},
+      theme.fonts.bodyLarge,
+      fontStyles.regularText,
+      commonStyles.h40,
+    ],
+    outlineStyle: borderStyles.radius8,
+    placeholderTextColor: theme.colors.primaryContainer,
+    selectionColor: theme.colors.onPrimary,
+    textColor: theme.colors.onPrimary,
+    cursorColor: theme.colors.onPrimary,
+    outlineColor: theme.colors.tertiary,
+    activeOutlineColor: theme.colors.onPrimaryContainer,
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.flex1}>
       <DataTable>
-        <DataTable.Header>
-          <DataTable.Title>Model</DataTable.Title>
+        <DataTable.Header
+          style={[
+            borderStyles.verticalMinimal,
+            {borderColor: theme.colors.primary},
+          ]}>
+          <DataTable.Title style={spacingStyles.pv0} textStyle={titleTextStyle}>
+            Model
+          </DataTable.Title>
           {['Target', 'Dug', 'Fertilized', 'Planted'].map((colTitle, index) => (
-            <DataTable.Title key={index} style={styles.cellStyle}>
+            <DataTable.Title
+              key={index}
+              style={[commonStyles.centeredContainer, spacingStyles.pv0]}
+              textStyle={titleTextStyle}>
               {colTitle}
             </DataTable.Title>
           ))}
         </DataTable.Header>
-        {progress.map(progressItem => (
-          <DataTable.Row key={progressItem.id}>
-            <DataTable.Title>
-              {progressItem.model.replace('MODEL_', '').replace(/_/g, '.')}
-            </DataTable.Title>
-            {ACTIVITY_KEYS.map(colKey => (
-              <DataTable.Cell
-                style={styles.cellStyle}
-                key={colKey}
-                onPress={() =>
-                  setEditable({model: progressItem.model, col: colKey})
-                }>
-                {editable &&
-                editable.model === progressItem.model &&
-                editable.col === colKey ? (
-                  <TextInput
-                    autoFocus
-                    keyboardType="numeric"
-                    value={value}
-                    onChangeText={setValue}
-                    onBlur={() => handleEdit(progressItem)}
-                  />
-                ) : (
-                  progressItem[colKey]
-                )}
+        {progress.map((progressItem, rowIndex) => {
+          const rowColor =
+            rowIndex % 2
+              ? theme.colors.elevation.level4
+              : theme.colors.secondaryContainer;
+          return (
+            <DataTable.Row
+              key={progressItem.id}
+              style={[
+                {
+                  backgroundColor: rowColor,
+                },
+                spacingStyles.mt8,
+                spacingStyles.pv16,
+                tableStyles.dataRow,
+              ]}>
+              <DataTable.Cell textStyle={cellTextStyle}>
+                {progressItem.model.replace('MODEL_', '').replace(/_/g, '.')}
               </DataTable.Cell>
-            ))}
-          </DataTable.Row>
-        ))}
+              {ACTIVITY_KEYS.map(colKey => (
+                <DataTable.Cell
+                  style={commonStyles.centeredContainer}
+                  textStyle={cellTextStyle}
+                  key={colKey}
+                  onPress={() =>
+                    setEditable({model: progressItem.model, col: colKey})
+                  }
+                  rippleColor={rowColor}>
+                  {editable &&
+                  editable.model === progressItem.model &&
+                  editable.col === colKey ? (
+                    <TextInput
+                      value={value}
+                      onChangeText={setValue}
+                      onBlur={() => handleEdit(progressItem)}
+                      {...textInputProps}
+                    />
+                  ) : (
+                    progressItem[colKey]
+                  )}
+                </DataTable.Cell>
+              ))}
+            </DataTable.Row>
+          );
+        })}
       </DataTable>
       <HelperText
         type="info"
@@ -116,26 +175,13 @@ const LandProgressTable: React.FC<LandProgressTableProps> = ({
         style={[
           {color: theme.colors.tertiary},
           theme.fonts.bodyMedium,
-          styles.helperText,
+          fontStyles.italicText,
+          fontStyles.regularText,
         ]}>
-        Tap cells to edit values.
+        Tap on cells to edit values.
       </HelperText>
     </View>
   );
 };
 
 export default LandProgressTable;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-  },
-  helperText: {
-    marginLeft: 12,
-  },
-  cellStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

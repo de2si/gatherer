@@ -6,6 +6,7 @@ import {DataTable, Text, useTheme} from 'react-native-paper';
 import {ScrollView} from 'react-native-gesture-handler';
 import {ActivityTableRow, MODELS} from '@hooks/carbonSeqHooks';
 import {
+  borderStyles,
   commonStyles,
   fontStyles,
   spacingStyles,
@@ -30,28 +31,39 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
     setPage(0);
   }
 
-  const titleStyle = [theme.fonts.bodyLarge, {color: theme.colors.primary}];
-  const cellStyle = [theme.fonts.bodyLarge, fontStyles.regularText];
+  const titleTextStyle = [theme.fonts.bodyLarge, {color: theme.colors.primary}];
+  const cellTextStyle = [theme.fonts.bodyLarge, fontStyles.regularText];
 
   return (
-    <View style={[commonStyles.flex1, spacingStyles.mh16]}>
+    <View style={commonStyles.flex1}>
       <ScrollView horizontal>
         <DataTable>
-          <DataTable.Header>
-            <DataTable.Title style={tableStyles.w40} textStyle={titleStyle}>
+          <DataTable.Header
+            style={[
+              borderStyles.verticalMinimal,
+              {borderColor: theme.colors.primary},
+              spacingStyles.mt2,
+            ]}>
+            <DataTable.Title
+              style={[spacingStyles.pv0, tableStyles.w40]}
+              textStyle={titleTextStyle}>
               #
             </DataTable.Title>
-            <DataTable.Title style={tableStyles.w70} textStyle={titleStyle}>
+            <DataTable.Title
+              style={[spacingStyles.pv0, tableStyles.w70]}
+              textStyle={titleTextStyle}>
               Land
             </DataTable.Title>
-            <DataTable.Title style={tableStyles.w90} textStyle={titleStyle}>
+            <DataTable.Title
+              style={[spacingStyles.pv0, tableStyles.w90]}
+              textStyle={titleTextStyle}>
               Farmer
             </DataTable.Title>
             {['Total', ...MODELS].map(colTitle => (
               <DataTable.Title
                 key={colTitle}
-                style={tableStyles.w50}
-                textStyle={titleStyle}>
+                style={[spacingStyles.pv0, tableStyles.w50]}
+                textStyle={titleTextStyle}>
                 {colTitle.replace('MODEL_', '').replace(/_/g, '.')}
               </DataTable.Title>
             ))}
@@ -73,27 +85,27 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
               ]}>
               <DataTable.Cell
                 style={[tableStyles.w40, tableStyles.dataRow]}
-                textStyle={cellStyle}>
+                textStyle={cellTextStyle}>
                 {rowIndex + 1}
               </DataTable.Cell>
               <DataTable.Cell
                 style={[tableStyles.w70, tableStyles.dataRow]}
-                textStyle={cellStyle}>
+                textStyle={cellTextStyle}>
                 {row.landCode}
               </DataTable.Cell>
               <DataTable.Cell style={[tableStyles.w90, tableStyles.dataRow]}>
-                <Text style={cellStyle}>{row.farmerName}</Text>
+                <Text style={cellTextStyle}>{row.farmerName}</Text>
               </DataTable.Cell>
               <DataTable.Cell
                 style={[tableStyles.w50, tableStyles.dataRow]}
-                textStyle={cellStyle}>
+                textStyle={cellTextStyle}>
                 {row.total}
               </DataTable.Cell>
               {MODELS.map(colKey => (
                 <DataTable.Cell
                   key={row.id + colKey}
                   style={[tableStyles.w50, tableStyles.dataRow]}
-                  textStyle={cellStyle}>
+                  textStyle={cellTextStyle}>
                   {row[colKey]}
                 </DataTable.Cell>
               ))}
