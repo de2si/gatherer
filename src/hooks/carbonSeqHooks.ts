@@ -42,6 +42,7 @@ export interface ProgressItem extends ProgressItemActivity {
 
 export interface ApiParticipant {
   id: number;
+  is_active: boolean;
   land_parcel: ApiLand;
   carbon_waiver_document: ApiImage;
   agreement_document_type: ApiImage;
