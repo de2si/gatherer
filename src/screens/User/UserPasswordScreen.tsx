@@ -1,8 +1,8 @@
 // UserPasswordScreen.tsx
 
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Button, Snackbar, Portal} from 'react-native-paper';
+import {ScrollView, View} from 'react-native';
+import {Button, Snackbar, Portal, useTheme} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // navigation
@@ -29,6 +29,9 @@ interface UserPasswordForm {
   password: string;
 }
 
+// styles
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
+
 // Define a generic type for the route parameters
 type UserPasswordScreenProps =
   | NativeStackScreenProps<UserStackScreenProps, 'UserPassword'>
@@ -48,6 +51,7 @@ const UserPasswordScreen: React.FC<UserPasswordScreenProps> = ({
   route: {params, name: routeName},
   navigation,
 }) => {
+  const theme = useTheme();
   const id = params.id;
 
   const withAuth = useAuthStore(store => store.withAuth);
@@ -95,45 +99,46 @@ const UserPasswordScreen: React.FC<UserPasswordScreenProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.formContainer}>
-        <FormTextInput
-          name="password"
-          control={control}
-          inputProps={{placeholder: 'Password', secureTextEntry: true}}
-        />
-        <Button
-          mode="contained-tonal"
-          onPress={handleSubmit(onSubmit)}
-          style={styles.button}>
-          Submit
-        </Button>
+    <ScrollView>
+      <View style={commonStyles.flex1}>
+        <View
+          style={[
+            spacingStyles.mh16,
+            spacingStyles.pv16,
+            spacingStyles.rowGap8,
+          ]}>
+          <FormTextInput
+            name="password"
+            control={control}
+            inputProps={{placeholder: 'Password*', secureTextEntry: true}}
+          />
+          <View
+            style={[
+              commonStyles.centeredContainer,
+              spacingStyles.mt16,
+              spacingStyles.mb48,
+            ]}>
+            <Button
+              onPress={handleSubmit(onSubmit)}
+              mode="contained"
+              buttonColor={theme.colors.secondary}
+              disabled={loading}
+              labelStyle={fontStyles.bodyXl}>
+              Submit
+            </Button>
+          </View>
+        </View>
+
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={dismissSnackbar}
+          duration={Snackbar.DURATION_SHORT}>
+          {snackbarMessage}
+        </Snackbar>
+        <Portal>{loading && <LoadingIndicator />}</Portal>
       </View>
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={dismissSnackbar}
-        duration={Snackbar.DURATION_SHORT}>
-        {snackbarMessage}
-      </Snackbar>
-      <Portal>{loading && <LoadingIndicator />}</Portal>
-    </View>
+    </ScrollView>
   );
 };
 
 export default UserPasswordScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    rowGap: 24,
-    marginHorizontal: 24,
-    marginTop: 24,
-  },
-  button: {
-    marginHorizontal: 48,
-    marginTop: 20,
-    marginBottom: 60,
-  },
-});

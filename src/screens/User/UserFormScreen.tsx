@@ -1,8 +1,15 @@
 // UserFormScreen.tsx
 
 import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Portal, Snackbar, Text} from 'react-native-paper';
+import {ScrollView, View} from 'react-native';
+import {
+  Button,
+  Divider,
+  Portal,
+  Snackbar,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
@@ -52,6 +59,7 @@ import {ApiUserType} from '@hooks/useProfileStore';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {UserStackScreenProps} from '@nav/UserStack';
 import {MoreStackScreenProps} from '@nav/MoreStack';
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 // types
 interface UserBasicForm {
@@ -257,6 +265,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
   route: {params, name: routeName},
   navigation,
 }) => {
+  const theme = useTheme();
   const variant = 'variant' in params ? params.variant : 'edit';
   let user = 'user' in params ? params.user : undefined;
   const userType = 'userType' in params ? params.userType : UserType.ADMIN;
@@ -343,7 +352,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
 
   if (variant === 'edit' && !user) {
     return (
-      <View style={styles.container}>
+      <View style={commonStyles.flex1}>
         <Text variant="titleLarge">User not found error</Text>
       </View>
     );
@@ -436,8 +445,13 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
 
   return (
     <ScrollView ref={scrollViewRef}>
-      <View style={styles.container}>
-        <View style={styles.formContainer}>
+      <View style={commonStyles.flex1}>
+        <View
+          style={[
+            spacingStyles.mh16,
+            spacingStyles.pv16,
+            spacingStyles.rowGap8,
+          ]}>
           <FormImageInput
             name="photo"
             control={control}
@@ -447,44 +461,51 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
             name="name"
             control={control}
             sentenceCase
-            inputProps={{placeholder: 'Name', autoCapitalize: 'words'}}
+            inputProps={{placeholder: 'Name*', autoCapitalize: 'words'}}
             onLayout={handleLayout}
           />
           <FormTextInput
             name="phone_number"
             control={control}
-            inputProps={{placeholder: 'Phone number', keyboardType: 'numeric'}}
+            inputProps={{placeholder: 'Phone number*', keyboardType: 'numeric'}}
             onLayout={handleLayout}
           />
           <FormTextInput
             name="email"
             control={control}
-            inputProps={{placeholder: 'Email'}}
+            inputProps={{placeholder: 'Email*'}}
             onLayout={handleLayout}
           />
           {variant === 'add' && (
             <FormTextInput
               name="password"
               control={control}
-              inputProps={{placeholder: 'Password', secureTextEntry: true}}
+              inputProps={{placeholder: 'Password*', secureTextEntry: true}}
               onLayout={handleLayout}
             />
           )}
+          <Divider style={spacingStyles.mb16} bold />
           <FormRadioInput
             name="gender"
             control={control}
             label="Gender"
             options={transformToLabelValuePair(GENDER)}
             onLayout={handleLayout}
+            largeLabel
           />
+          <Divider style={spacingStyles.mv16} bold />
           {variant === 'edit' && routeName !== 'ProfileEdit' && (
-            <FormRadioInput
-              name="user_type"
-              control={control}
-              label="User Type"
-              options={transformToLabelValuePair(Object.values(UserType))}
-              onLayout={handleLayout}
-            />
+            <>
+              <FormRadioInput
+                name="user_type"
+                control={control}
+                label="User Type"
+                options={transformToLabelValuePair(Object.values(UserType))}
+                onLayout={handleLayout}
+                largeLabel
+              />
+              <Divider style={spacingStyles.mv16} bold />
+            </>
           )}
 
           {formUserType !== UserType.ADMIN && routeName !== 'ProfileEdit' && (
@@ -532,13 +553,21 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
             </>
           )}
 
-          <Button
-            onPress={handleSubmit(onSubmit)}
-            mode="contained-tonal"
-            style={styles.button}
-            disabled={loading}>
-            Submit
-          </Button>
+          <View
+            style={[
+              commonStyles.centeredContainer,
+              spacingStyles.mt16,
+              spacingStyles.mb48,
+            ]}>
+            <Button
+              onPress={handleSubmit(onSubmit)}
+              mode="contained"
+              buttonColor={theme.colors.secondary}
+              disabled={loading}
+              labelStyle={fontStyles.bodyXl}>
+              Submit
+            </Button>
+          </View>
         </View>
         <Portal>{loading && <LoadingIndicator />}</Portal>
         <Portal>
@@ -555,25 +584,3 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
 };
 
 export default UserFormScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 12,
-  },
-  formContainer: {
-    rowGap: 24,
-    marginHorizontal: 24,
-  },
-  imgRow: {
-    flexDirection: 'row',
-    marginVertical: 6,
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-  },
-  button: {
-    marginHorizontal: 48,
-    marginTop: 20,
-    marginBottom: 40,
-  },
-});
