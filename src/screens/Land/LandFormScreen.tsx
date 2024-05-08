@@ -1,8 +1,15 @@
 // LandFormScreen.tsx
 
 import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Portal, Snackbar, Text} from 'react-native-paper';
+import {ScrollView, View} from 'react-native';
+import {
+  Button,
+  HelperText,
+  Portal,
+  Snackbar,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import LoadingIndicator from '@components/LoadingIndicator';
 
 // form and form components
@@ -52,6 +59,9 @@ import {FormImage} from '@typedefs/common';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {LandStackScreenProps} from '@nav/LandStack';
+
+// styles
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 // types
 interface LandBasicForm {
@@ -218,6 +228,7 @@ type LandFormScreenProps = NativeStackScreenProps<
 >;
 
 const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
+  const theme = useTheme();
   const {variant} = route.params;
   const land = 'land' in route.params ? route.params.land : undefined;
 
@@ -300,7 +311,7 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
 
   if (variant === 'edit' && !land) {
     return (
-      <View style={styles.container}>
+      <View style={commonStyles.flex1}>
         <Text variant="titleLarge">Land not found error</Text>
       </View>
     );
@@ -396,13 +407,18 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
   let ownership_type = watch('ownership_type');
   return (
     <ScrollView ref={scrollViewRef}>
-      <View style={styles.container}>
-        <View style={styles.formContainer}>
+      <View style={commonStyles.flex1}>
+        <View
+          style={[
+            spacingStyles.mh16,
+            spacingStyles.pv16,
+            spacingStyles.rowGap8,
+          ]}>
           <FormTextInput
             name="khasra_number"
             control={control}
             inputProps={{
-              placeholder: 'Khasra no.',
+              placeholder: 'Khasra no.*',
               autoCapitalize: 'characters',
             }}
             onLayout={handleLayout}
@@ -414,6 +430,7 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
             options={transformToLabelValuePair(Object.values(Ownership))}
             onLayout={handleLayout}
           />
+          <HelperText children={undefined} type={'error'} />
           {ownership_type === Ownership.PRIVATE && (
             <FormFarmerInput
               name="farmer"
@@ -427,7 +444,7 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
             onLayout={handleLayout}
           />
           <View
-            style={styles.areaRow}
+            style={[commonStyles.row, spacingStyles.colGap8]}
             onLayout={event => {
               handleLayout({
                 name: 'area',
@@ -438,18 +455,18 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
                 y: event.nativeEvent.layout.y,
               });
             }}>
-            <View style={styles.areaRowItem}>
+            <View style={commonStyles.flex1}>
               <FormTextInput
                 name="area"
                 control={control}
                 numericValue
                 inputProps={{
-                  placeholder: 'Area',
+                  placeholder: 'Area*',
                   keyboardType: 'numeric',
                 }}
               />
             </View>
-            <View style={styles.areaRowItem}>
+            <View style={commonStyles.flex1}>
               <FormStandardSelectInput
                 name="area_unit"
                 control={control}
@@ -465,7 +482,7 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
             control={control}
             numericValue
             inputProps={{
-              placeholder: 'No. of farm workers',
+              placeholder: 'No. of farm workers*',
               keyboardType: 'numeric',
             }}
             onLayout={handleLayout}
@@ -520,13 +537,21 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
             onLayout={handleLayout}
             label={'Pictures'}
           />
-          <Button
-            onPress={handleSubmit(onSubmit)}
-            mode="contained-tonal"
-            style={styles.button}
-            disabled={loading}>
-            Submit
-          </Button>
+          <View
+            style={[
+              commonStyles.centeredContainer,
+              spacingStyles.mt16,
+              spacingStyles.mb48,
+            ]}>
+            <Button
+              onPress={handleSubmit(onSubmit)}
+              mode="contained"
+              buttonColor={theme.colors.secondary}
+              disabled={loading}
+              labelStyle={fontStyles.bodyXl}>
+              Submit
+            </Button>
+          </View>
         </View>
         <Portal>{loading && <LoadingIndicator />}</Portal>
         <Portal>
@@ -543,27 +568,3 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
 };
 
 export default LandFormScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    rowGap: 24,
-    marginHorizontal: 24,
-  },
-  button: {
-    marginHorizontal: 48,
-    marginTop: 20,
-    marginBottom: 60,
-  },
-  areaRow: {
-    flexDirection: 'row',
-    marginVertical: 6,
-    columnGap: 12,
-    alignItems: 'center',
-  },
-  areaRowItem: {
-    flex: 1,
-  },
-});

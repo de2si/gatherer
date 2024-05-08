@@ -487,7 +487,6 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
             spacingStyles.mh16,
             spacingStyles.pv16,
             spacingStyles.rowGap8,
-            {borderColor: theme.colors.tertiary},
           ]}>
           <FormImageInput
             name="profile_photo"
@@ -634,7 +633,7 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
           <FormTextInput
             name="address"
             control={control}
-            inputProps={{placeholder: 'Home address', autoCapitalize: 'words'}}
+            inputProps={{placeholder: 'Home address*', autoCapitalize: 'words'}}
             onLayout={handleLayout}
           />
 
