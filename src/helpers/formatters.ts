@@ -31,7 +31,7 @@ export const maskPhoneNumber = (phoneNumber: string) => {
   // Extract the last 4 digits
   const lastFourDigits = cleanedNumber.slice(-4);
   // Create the masked phone number
-  const maskedPhoneNumber = `XXXXXX${lastFourDigits}`;
+  const maskedPhoneNumber = `XXX${lastFourDigits}`;
   return maskedPhoneNumber;
 };
 

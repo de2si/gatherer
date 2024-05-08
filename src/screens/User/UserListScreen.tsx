@@ -16,6 +16,7 @@ import {useAuthStore} from '@hooks/useAuthStore';
 import {areFiltersEqual} from '@helpers/comparators';
 import {getErrorMessage} from '@helpers/formHelpers';
 import {handleDialPress} from '@components/FarmerListItem';
+import {maskPhoneNumber} from '@helpers/formatters';
 
 // components
 import FilterSheet, {filterDefaultValues} from '@components/FilterSheet';
@@ -89,7 +90,7 @@ const Item = ({
             onPress={() => handleDialPress(phone)}>
             <PhoneIcon height={24} width={24} color={color} />
             <Text variant="bodyLarge" style={[{color}, fontStyles.regularText]}>
-              {phone}
+              {maskPhoneNumber(phone)}
             </Text>
           </Pressable>
         </View>

@@ -8,7 +8,7 @@ import {PhoneIcon} from '@components/icons/PhoneIcon';
 import ImageWrapper from '@components/ImageWrapper';
 
 import {FarmerPreview} from '@hooks/useFarmerStore';
-import {truncateString} from '@helpers/formatters';
+import {maskPhoneNumber, truncateString} from '@helpers/formatters';
 import {
   cardStyles,
   commonStyles,
@@ -66,7 +66,7 @@ const FarmerListItem: React.FC<FarmerListItemProps> = ({
             onPress={() => (dialEnabled ? handleDialPress(data.phone) : {})}>
             <PhoneIcon height={24} width={24} color={color} />
             <Text variant="bodyLarge" style={[{color}, fontStyles.regularText]}>
-              {data.phone}
+              {maskPhoneNumber(data.phone)}
             </Text>
           </Pressable>
         </View>
