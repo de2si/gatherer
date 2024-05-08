@@ -145,7 +145,8 @@ const FormCoordinatesInput = <TFieldValues extends FieldValues>({
           style={[
             theme.fonts.bodyLarge,
             {color: theme.colors.outline},
-            tableStyles.w90,
+            tableStyles.w120,
+            spacingStyles.mr16,
           ]}>
           {label}
         </Text>
@@ -161,7 +162,9 @@ const FormCoordinatesInput = <TFieldValues extends FieldValues>({
             borderStyles.radius8,
             error ? borderStyles.border2 : borderStyles.border1,
             {borderColor: error ? theme.colors.error : theme.colors.tertiary},
-          ]}>
+            commonStyles.flex1,
+          ]}
+          contentStyle={tableStyles.flexStart}>
           Add location
         </Button>
       </View>

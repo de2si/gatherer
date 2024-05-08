@@ -145,7 +145,7 @@ export const borderStyles = StyleSheet.create({
     borderWidth: 1,
   },
   border2: {
-    borderWidth: 1,
+    borderWidth: 2,
   },
   radius8: {
     borderRadius: 8,
@@ -208,6 +208,9 @@ export const tableStyles = StyleSheet.create({
   },
   w90: {
     width: 90,
+  },
+  w120: {
+    width: 120,
   },
   dataRow: {
     justifyContent: 'flex-start',

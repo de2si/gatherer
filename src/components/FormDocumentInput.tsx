@@ -1,7 +1,7 @@
 // FormDocumentInput.tsx
 
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import {
   Button,
   HelperText,
@@ -16,8 +16,13 @@ import DocumentPicker, {
 } from 'react-native-document-picker';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import useSnackbar from '@hooks/useSnackbar';
-import {truncateString} from '@helpers/formatters';
 import {calculateHash} from '@helpers/cryptoHelpers';
+import {
+  borderStyles,
+  commonStyles,
+  spacingStyles,
+  tableStyles,
+} from '@styles/common';
 
 interface FormDocumentInputProps<TFieldValues extends FieldValues> {
   name: FieldValues['name'];
@@ -84,28 +89,36 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
       onLayout={event => {
         onLayout({name, y: event.nativeEvent.layout.y});
       }}>
-      <View style={[styles.container, styles.rowContainer]}>
-        <Text style={[styles.documentInputLabel, theme.fonts.labelLarge]}>
+      <View style={commonStyles.row}>
+        <Text
+          style={[
+            theme.fonts.bodyLarge,
+            {color: theme.colors.outline},
+            tableStyles.w120,
+            spacingStyles.mr16,
+          ]}>
           {label}
         </Text>
-        <View style={styles.colContainer}>
-          <View style={[styles.rowContainer, styles.wrap]}>
-            <Text style={[theme.fonts.bodyMedium]}>
-              {value?.name ? truncateString(value?.name, 35) : ''}
-            </Text>
-            <Button
-              icon="file-document"
-              mode="contained-tonal"
-              onPress={handleDocumentPick}
-              buttonColor={
-                error
-                  ? theme.colors.errorContainer
-                  : theme.colors.tertiaryContainer
-              }
-              textColor={theme.colors.primary}>
-              Pick document
-            </Button>
-          </View>
+        <View style={commonStyles.row}>
+          <Button
+            icon="file-document"
+            onPress={handleDocumentPick}
+            buttonColor={theme.colors.primary}
+            textColor={
+              value ? theme.colors.onPrimary : theme.colors.primaryContainer
+            }
+            style={[
+              borderStyles.radius8,
+              error ? borderStyles.border2 : borderStyles.border1,
+              {
+                borderColor: error ? theme.colors.error : theme.colors.tertiary,
+              },
+              commonStyles.h40,
+              commonStyles.flex1,
+            ]}
+            contentStyle={tableStyles.flexStart}>
+            {value ? value.name : 'Pick document'}
+          </Button>
         </View>
       </View>
       <HelperText type="error" visible={error ? true : false}>
@@ -122,27 +135,5 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  documentInputLabel: {
-    width: 90,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    rowGap: 12,
-    columnGap: 12,
-  },
-  colContainer: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  wrap: {
-    flexWrap: 'wrap',
-  },
-});
 
 export default FormDocumentInput;
