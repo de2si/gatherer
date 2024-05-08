@@ -1,7 +1,7 @@
 // ThemeScreen.tsx
 
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import {List, useTheme} from 'react-native-paper';
 
 import {ThemeMode, useSettingStore} from '@hooks/useSettingStore';
@@ -12,18 +12,23 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {MoreStackScreenProps} from '@nav/MoreStack';
 
 //types
+import {Style} from 'react-native-paper/lib/typescript/components/List/utils';
 type ThemeScreenProps = NativeStackScreenProps<
   MoreStackScreenProps,
   'ThemeSelect'
 >;
 
-interface RenderIconProps {
-  color?: string;
-  size?: number;
-}
-const renderIcon = (props: RenderIconProps, iconName: string) => (
-  <List.Icon {...props} icon={iconName} />
-);
+// styles
+import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
+
+const renderIcon = (
+  props: {
+    color: string;
+    style: Style;
+  },
+  iconName: string,
+  color: string,
+) => <List.Icon color={color} icon={iconName} style={props.style} />;
 
 const themes: {
   name: ThemeMode;
@@ -52,40 +57,35 @@ const ThemeScreen: React.FC<ThemeScreenProps> = () => {
   const selectedTheme = useSettingStore(store => store.theme);
   const setTheme = useSettingStore(store => store.setTheme);
   return (
-    <View
-      style={[styles.container, {backgroundColor: theme.colors.background}]}>
-      <List.Section style={styles.list}>
-        {themes.map(item => (
-          <List.Item
-            key={item.name}
-            titleStyle={
-              selectedTheme === item.name ? {color: theme.colors.primary} : null
-            }
-            title={convertToSentenceCase(item.name)}
-            description={item.description}
-            left={props =>
-              renderIcon(
-                selectedTheme === item.name
-                  ? {...props, color: theme.colors.primary}
-                  : props,
-                item.icon,
-              )
-            }
-            onPress={() => setTheme(item.name)}
-          />
-        ))}
+    <View style={[commonStyles.flex1, spacingStyles.mh16]}>
+      <List.Section>
+        {themes.map(item => {
+          const itemColor =
+            selectedTheme === item.name
+              ? theme.colors.primary
+              : theme.colors.tertiary;
+          return (
+            <List.Item
+              key={item.name}
+              title={convertToSentenceCase(item.name)}
+              description={item.description}
+              left={props =>
+                renderIcon(
+                  selectedTheme === item.name
+                    ? {...props, color: theme.colors.primary}
+                    : props,
+                  item.icon,
+                  itemColor,
+                )
+              }
+              onPress={() => setTheme(item.name)}
+              titleStyle={[{color: itemColor}, fontStyles.bodyXl]}
+              descriptionStyle={[{color: itemColor}, theme.fonts.bodyLarge]}
+            />
+          );
+        })}
       </List.Section>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    marginTop: 0,
-  },
-});
-
 export default ThemeScreen;
