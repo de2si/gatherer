@@ -117,6 +117,9 @@ export const spacingStyles = StyleSheet.create({
   mv16: {
     marginVertical: 16,
   },
+  mb16: {
+    marginBottom: 16,
+  },
   mb48: {
     marginBottom: 48,
   },
