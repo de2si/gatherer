@@ -139,7 +139,10 @@ const FilterSheet = ({
             enablePanDownToClose
             backdropComponent={renderBackdrop}
             onClose={handleBottomSheetClose}
-            animateOnMount={!reducedMotion}>
+            animateOnMount={!reducedMotion}
+            backgroundStyle={{
+              backgroundColor: theme.colors.background,
+            }}>
             <BottomSheetScrollView>
               <BottomSheetView style={spacingStyles.mh16}>
                 {variant.includes('(SD)B') &&

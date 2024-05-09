@@ -184,7 +184,10 @@ const FormImageInput = <TFieldValues extends FieldValues>({
             enablePanDownToClose
             backdropComponent={renderBackdrop}
             onClose={handleBottomSheetClose}
-            animateOnMount={!reducedMotion}>
+            animateOnMount={!reducedMotion}
+            backgroundStyle={{
+              backgroundColor: theme.colors.background,
+            }}>
             <View style={styles.bottomSheetRow}>
               <Button
                 buttonColor={theme.colors.secondary}
