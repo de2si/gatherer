@@ -6,6 +6,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
   Button,
+  Portal,
   Snackbar,
   Text,
   useTheme,
@@ -276,12 +277,14 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
             </View>
           </>
         )}
-        <Snackbar
-          visible={snackbarVisible}
-          onDismiss={dismissSnackbar}
-          duration={Snackbar.DURATION_SHORT}>
-          {snackbarMessage}
-        </Snackbar>
+        <Portal>
+          <Snackbar
+            visible={snackbarVisible}
+            onDismiss={dismissSnackbar}
+            duration={Snackbar.DURATION_SHORT}>
+            {snackbarMessage}
+          </Snackbar>
+        </Portal>
       </View>
     </ScrollView>
   );
