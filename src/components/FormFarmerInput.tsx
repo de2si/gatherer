@@ -129,7 +129,6 @@ const FormFarmerInput = <TFieldValues extends FieldValues>({
                       <ExpandableSearch
                         visible={true}
                         applySearch={setSearchText}
-                        placeholder="Search code, name, aadhaar..."
                       />
                     </View>
                   </View>

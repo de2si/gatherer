@@ -14,7 +14,7 @@ interface ExpandableSearchProps {
 
 const ExpandableSearch = ({
   visible = false,
-  placeholder = 'Type to search',
+  placeholder = 'Search name, phone...',
   applySearch = () => {},
   noMargin = false,
 }: ExpandableSearchProps) => {
@@ -81,7 +81,7 @@ const ExpandableSearch = ({
             theme={{
               colors: {
                 primary: theme.colors.primary, // cursor color/selection color
-                onSurface: theme.colors.onSurfaceVariant, // placeholder text color
+                onSurface: theme.colors.onPrimary, // placeholder text color
               },
             }}
           />

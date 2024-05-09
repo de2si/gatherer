@@ -129,7 +129,6 @@ const FormLandInput = <TFieldValues extends FieldValues>({
                       <ExpandableSearch
                         visible={true}
                         applySearch={setSearchText}
-                        placeholder="Search code, khasra no, name..."
                       />
                     </View>
                   </View>
