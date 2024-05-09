@@ -192,11 +192,7 @@ const ParticipantListScreen: React.FC<ParticipantListScreenProps> = ({
 
   return (
     <View style={commonStyles.flex1}>
-      <ExpandableSearch
-        visible={expandSearch}
-        applySearch={setSearchText}
-        placeholder="Search code, name, aadhaar, phone number..."
-      />
+      <ExpandableSearch visible={expandSearch} applySearch={setSearchText} />
       <FlatList
         data={participants}
         renderItem={({item}) => (

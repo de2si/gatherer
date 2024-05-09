@@ -134,11 +134,7 @@ const BeneficiaryListScreen: React.FC<BeneficiaryListScreenProps> = ({
 
   return (
     <View style={commonStyles.flex1}>
-      <ExpandableSearch
-        visible={expandSearch}
-        applySearch={setSearchText}
-        placeholder="Search code, name, aadhaar, phone number..."
-      />
+      <ExpandableSearch visible={expandSearch} applySearch={setSearchText} />
       <FlatList
         data={beneficiaries}
         renderItem={({item}) => (

@@ -212,11 +212,7 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
 
   return (
     <View style={commonStyles.flex1}>
-      <ExpandableSearch
-        visible={expandSearch}
-        applySearch={setSearchText}
-        placeholder="Search name, phone number..."
-      />
+      <ExpandableSearch visible={expandSearch} applySearch={setSearchText} />
       <FlatList
         data={users[userType]}
         renderItem={({item}) => (

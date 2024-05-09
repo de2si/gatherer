@@ -127,11 +127,7 @@ const FarmerListScreen: React.FC<FarmerListScreenProps> = ({navigation}) => {
 
   return (
     <View style={commonStyles.flex1}>
-      <ExpandableSearch
-        visible={expandSearch}
-        applySearch={setSearchText}
-        placeholder="Search code, name, aadhaar, phone number..."
-      />
+      <ExpandableSearch visible={expandSearch} applySearch={setSearchText} />
       <FlatList
         data={farmers}
         renderItem={({item}) => (
