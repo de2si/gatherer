@@ -51,7 +51,7 @@ import {useAuthStore} from '@hooks/useAuthStore';
 import {api} from '@api/axios';
 
 // types
-import {FormImage} from '@typedefs/common';
+import {FormFile} from '@typedefs/common';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -66,9 +66,9 @@ import {
 
 // types
 interface FarmerBasicForm {
-  profile_photo: FormImage;
-  id_front_image: FormImage;
-  id_back_image: FormImage;
+  profile_photo: FormFile;
+  id_front_image: FormFile;
+  id_back_image: FormFile;
   state: number;
   district: number;
   block: number;

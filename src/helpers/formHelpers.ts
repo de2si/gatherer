@@ -1,5 +1,5 @@
 import {AxiosError} from 'axios';
-import {Filter, FormImage, LV} from '@typedefs/common';
+import {Filter, FormFile, LV} from '@typedefs/common';
 import {AreaUnit} from '@helpers/constants';
 
 // Function to remove specified keys from an object
@@ -10,7 +10,7 @@ export const removeKeys = (obj: any, keysToRemove: (string | number)[]) => {
 };
 
 // Function to generate nested image object
-export const formatToUrlKey = (imageData: FormImage) => ({
+export const formatToUrlKey = (imageData: FormFile) => ({
   url: imageData.uri,
   hash: imageData.hash,
 });

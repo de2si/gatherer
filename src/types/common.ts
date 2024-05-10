@@ -4,17 +4,16 @@ export interface ApiImage {
   hash: string;
 }
 
-export interface FormImage {
+export interface FormFile {
   uri: string;
   hash: string;
   type?: string;
   name?: string;
 }
 
-export interface FormDoc {
-  uri: string;
+export interface UploadedFile {
+  url: string;
   hash: string;
-  name: string;
 }
 
 export interface LocationFilter {

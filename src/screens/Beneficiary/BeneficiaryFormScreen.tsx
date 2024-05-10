@@ -49,7 +49,7 @@ import {useFormErrorScroll} from '@hooks/useFormErrorScroll';
 import {useAuthStore} from '@hooks/useAuthStore';
 import {useProfileStore} from '@hooks/useProfileStore';
 import {ApiBeneficiary, useBeneficiaryStore} from '@hooks/useBeneficiaryStore';
-import {FormImage} from '@typedefs/common';
+import {FormFile} from '@typedefs/common';
 
 // api
 import {api} from '@api/axios';
@@ -67,9 +67,9 @@ import {
 } from '@styles/common';
 
 interface BeneficiaryBasicForm {
-  profile_photo: FormImage;
-  id_front_image: FormImage;
-  id_back_image: FormImage;
+  profile_photo: FormFile;
+  id_front_image: FormFile;
+  id_back_image: FormFile;
   farmer: {id: number; name: string} | null;
   name: string;
   state?: number;

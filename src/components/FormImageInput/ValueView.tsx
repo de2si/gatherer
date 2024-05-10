@@ -4,11 +4,11 @@ import {ScrollView, StyleSheet} from 'react-native';
 import RoundSingleView from '@components/FormImageInput/RoundSingleView';
 import SingleImage from '@components/FormImageInput/SingleImage';
 
-import {FormImage} from '@typedefs/common';
+import {FormFile} from '@typedefs/common';
 
 interface ValueImageProps {
   styleVariant?: 'round' | 'square';
-  value: null | FormImage | FormImage[];
+  value: null | FormFile | FormFile[];
 }
 
 const ValueImage = ({styleVariant = 'round', value}: ValueImageProps) => {
@@ -17,7 +17,7 @@ const ValueImage = ({styleVariant = 'round', value}: ValueImageProps) => {
       horizontal
       showsHorizontalScrollIndicator={true}
       contentContainerStyle={styles.multiImageScrollView}>
-      {value.map((image: FormImage, index: number) => (
+      {value.map((image: FormFile, index: number) => (
         <SingleImage
           key={index}
           showEditIcon={true}

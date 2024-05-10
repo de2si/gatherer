@@ -52,7 +52,7 @@ import {useBlockStore, useDistrictStore} from '@hooks/locationHooks';
 import {api} from '@api/axios';
 
 // types
-import {FormImage} from '@typedefs/common';
+import {FormFile} from '@typedefs/common';
 import {ApiUserType} from '@hooks/useProfileStore';
 
 // nav
@@ -63,7 +63,7 @@ import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 // types
 interface UserBasicForm {
-  photo: null | FormImage;
+  photo: null | FormFile;
   name: string;
   gender: (typeof GENDER)[number];
   phone_number: string;

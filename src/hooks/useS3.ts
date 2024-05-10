@@ -9,7 +9,7 @@ import {
   getFieldErrors,
   removeKeys,
 } from '@helpers/formHelpers';
-import {ApiImage, FormImage} from '@typedefs/common';
+import {ApiImage, FormFile, UploadedFile} from '@typedefs/common';
 import axios, {AxiosResponse} from 'axios';
 import {useCallback, useEffect, useState} from 'react';
 import {create} from 'zustand';
@@ -28,17 +28,12 @@ interface ApiS3Upload {
   };
 }
 
-interface UploadImage {
-  url: string;
-  hash: string;
-}
-
 export type FilesObj = {
-  [key: string]: FormImage | undefined;
+  [key: string]: FormFile | undefined;
 };
 
 interface UseS3Upload {
-  upload: (files: FilesObj) => Promise<{[key: string]: UploadImage}>;
+  upload: (files: FilesObj) => Promise<{[key: string]: UploadedFile}>;
 }
 
 // Create the hook for farmer search
@@ -46,7 +41,7 @@ export const useS3Upload = (): UseS3Upload => {
   const withAuth = useAuthStore(store => store.withAuth);
   const upload = async (
     files: FilesObj,
-  ): Promise<{[key: string]: UploadImage}> => {
+  ): Promise<{[key: string]: UploadedFile}> => {
     let output = {};
     await withAuth(async () => {
       try {
