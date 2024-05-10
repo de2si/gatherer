@@ -64,11 +64,11 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
           type: allowedFileTypes,
         });
       if (result) {
-        const {uri, name: pickedDocName} = result;
+        const {uri, type, name: pickedDocName} = result;
         const base64 = (await RNFS.readFile(result.uri, 'base64')) ?? null;
         onChange(
           uri
-            ? {uri: uri, name: pickedDocName, hash: calculateHash(base64, 256)}
+            ? {uri, type, name: pickedDocName, hash: calculateHash(base64, 256)}
             : null,
         );
         // showSnackbar('Document selected');
