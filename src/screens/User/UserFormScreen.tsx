@@ -47,6 +47,7 @@ import {useUserStore} from '@hooks/useUserStore';
 import {useAuthStore} from '@hooks/useAuthStore';
 import {useProfileStore} from '@hooks/useProfileStore';
 import {useBlockStore, useDistrictStore} from '@hooks/locationHooks';
+import {useS3Upload} from '@hooks/useS3';
 
 // api
 import {api} from '@api/axios';
@@ -210,7 +211,7 @@ const prepareAddFormData = (formData: UserBasicForm) => {
       'blocks',
       'projects',
     ]),
-    photo: formData.photo ? formatToUrlKey(formData.photo) : null,
+    // photo: formData.photo ? formatToUrlKey(formData.photo) : null,
     phone_number: add91Prefix(formData.phone_number),
     blocks: JSON.stringify(formData.blocks ?? []),
     projects: JSON.stringify(
@@ -277,6 +278,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
     user = profileUser;
   }
   const withAuth = useAuthStore(store => store.withAuth);
+  const {upload: uploadToS3} = useS3Upload();
   const filterDistrictCodes = useDistrictStore(store => store.getFilteredCodes);
   const filterBlockCodes = useBlockStore(store => store.getFilteredCodes);
 
@@ -362,12 +364,19 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
     try {
       setLoading(true);
       if (variant === 'add') {
+        let userAddData = prepareAddFormData(formData);
+        if (formData.photo) {
+          const uploadedPhoto = await uploadToS3({
+            photo: formData.photo,
+          });
+          userAddData = {
+            ...userAddData,
+            ...uploadedPhoto,
+          };
+        }
         await withAuth(async () => {
           try {
-            const result = await api.post(
-              'users/',
-              prepareAddFormData(formData),
-            );
+            const result = await api.post('users/', userAddData);
             if (result.status === 201) {
               reset(getUserAddDefaultValues(userType));
               showSnackbar('User added successfully');
@@ -385,12 +394,23 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
           }
         });
       } else if (variant === 'edit' && user) {
-        const dataToUpdate = prepareEditFormData(
+        let dataToUpdate = prepareEditFormData(
           formData,
           defaultValues as UserBasicForm,
         );
         if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
+        }
+        if ('photo' in dataToUpdate) {
+          let uploadedPhoto = formData.photo
+            ? await uploadToS3({
+                photo: formData.photo,
+              })
+            : {photo: formData.photo};
+          dataToUpdate = {
+            ...dataToUpdate,
+            ...uploadedPhoto,
+          };
         }
         await withAuth(async () => {
           try {

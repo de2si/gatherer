@@ -48,6 +48,7 @@ import useSnackbar from '@hooks/useSnackbar';
 import {useFormErrorScroll} from '@hooks/useFormErrorScroll';
 import {useAuthStore} from '@hooks/useAuthStore';
 import {useProfileStore} from '@hooks/useProfileStore';
+import {useS3Upload} from '@hooks/useS3';
 import {ApiBeneficiary, useBeneficiaryStore} from '@hooks/useBeneficiaryStore';
 import {FormFile} from '@typedefs/common';
 
@@ -233,9 +234,9 @@ const prepareAddFormData = (formData: BeneficiaryBasicForm) => {
     ]),
     guardian: formData.farmer?.id ?? null,
     id_hash: calculateHash(formData.aadhaar ?? ''),
-    profile_photo: formatToUrlKey(formData.profile_photo),
-    id_back_image: formatToUrlKey(formData.id_back_image),
-    id_front_image: formatToUrlKey(formData.id_front_image),
+    // profile_photo: formatToUrlKey(formData.profile_photo),
+    // id_back_image: formatToUrlKey(formData.id_back_image),
+    // id_front_image: formatToUrlKey(formData.id_front_image),
     date_of_birth: formatDate(formData.date_of_birth, 'YYYY-MM-DD'),
     phone_number: add91Prefix(formData.phone_number),
   };
@@ -291,6 +292,7 @@ const BeneficiaryFormScreen: React.FC<BeneficiaryFormScreenProps> = ({
     'beneficiary' in route.params ? route.params.beneficiary : undefined;
 
   const withAuth = useAuthStore(store => store.withAuth);
+  const {upload: uploadToS3} = useS3Upload();
   let loggedUser = useProfileStore(store => store.data);
 
   const [loading, setLoading] = useState(false);
@@ -380,12 +382,19 @@ const BeneficiaryFormScreen: React.FC<BeneficiaryFormScreenProps> = ({
     try {
       setLoading(true);
       if (variant === 'add') {
+        const {profile_photo, id_back_image, id_front_image} = formData;
+        const uploadedImages = await uploadToS3({
+          profile_photo,
+          id_back_image,
+          id_front_image,
+        });
+        const beneficiaryAddData = {
+          ...prepareAddFormData(formData),
+          ...uploadedImages,
+        };
         await withAuth(async () => {
           try {
-            const result = await api.post(
-              'beneficiaries/',
-              prepareAddFormData(formData),
-            );
+            const result = await api.post('beneficiaries/', beneficiaryAddData);
             if (result.status === 201) {
               reset(beneficiaryAddDefaultValues);
               showSnackbar('Beneficiary added successfully');
@@ -402,14 +411,29 @@ const BeneficiaryFormScreen: React.FC<BeneficiaryFormScreenProps> = ({
           }
         });
       } else if (variant === 'edit' && beneficiary) {
-        const dataToUpdate = prepareEditFormData(
+        let dataToUpdate = prepareEditFormData(
           formData,
           defaultValues as BeneficiaryBasicForm,
         );
-        console.log(dataToUpdate);
         if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
         }
+        let photosToUpdate = {
+          profile_photo:
+            'profile_photo' in dataToUpdate
+              ? formData.profile_photo
+              : undefined,
+          id_back_image:
+            'id_back_image' in dataToUpdate
+              ? formData.id_back_image
+              : undefined,
+          id_front_image:
+            'id_front_image' in dataToUpdate
+              ? formData.id_front_image
+              : undefined,
+        };
+        const uploadedImages = await uploadToS3(photosToUpdate);
+        dataToUpdate = {...dataToUpdate, ...uploadedImages};
         await withAuth(async () => {
           try {
             const result = await api.patch(

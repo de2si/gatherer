@@ -46,6 +46,7 @@ import useSnackbar from '@hooks/useSnackbar';
 import {useFormErrorScroll} from '@hooks/useFormErrorScroll';
 import {ApiFarmer, useFarmerStore} from '@hooks/useFarmerStore';
 import {useAuthStore} from '@hooks/useAuthStore';
+import {useS3Upload} from '@hooks/useS3';
 
 // api
 import {api} from '@api/axios';
@@ -56,7 +57,8 @@ import {FormFile} from '@typedefs/common';
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {FarmerStackScreenProps} from '@nav/FarmerStack';
-import {useS3Upload} from '@hooks/useS3';
+
+// styles
 import {
   commonStyles,
   detailStyles,
@@ -375,8 +377,8 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
           id_front_image,
         });
         const farmerAddData = {
-          ...uploadedImages,
           ...prepareAddFormData(formData as FarmerAddForm),
+          ...uploadedImages,
         };
         await withAuth(async () => {
           try {
@@ -401,6 +403,9 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
           formData,
           defaultValues as FarmerBasicForm,
         );
+        if (!Object.keys(dataToUpdate).length) {
+          throw new Error('No changes made');
+        }
         let photosToUpdate = {
           profile_photo:
             'profile_photo' in dataToUpdate
@@ -417,10 +422,6 @@ const FarmerFormScreen: React.FC<FarmerFormScreenProps> = ({
         };
         const uploadedImages = await uploadToS3(photosToUpdate);
         dataToUpdate = {...dataToUpdate, ...uploadedImages};
-        if (!Object.keys(dataToUpdate).length) {
-          throw new Error('No changes made');
-        }
-        console.log('sending', dataToUpdate);
         await withAuth(async () => {
           try {
             const result = await api.patch(

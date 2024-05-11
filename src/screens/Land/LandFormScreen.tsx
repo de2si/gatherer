@@ -49,12 +49,13 @@ import {useFormErrorScroll} from '@hooks/useFormErrorScroll';
 import {ApiLand, useLandStore} from '@hooks/useLandStore';
 import {useAuthStore} from '@hooks/useAuthStore';
 import {useProfileStore} from '@hooks/useProfileStore';
+import {useS3Upload} from '@hooks/useS3';
 
 // api
 import {api} from '@api/axios';
 
 // types
-import {FormImage} from '@typedefs/common';
+import {FormFile} from '@typedefs/common';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -71,7 +72,7 @@ interface LandBasicForm {
   area: number;
   area_unit: AreaUnit;
   khasra_number: string;
-  pictures?: FormImage[];
+  pictures?: FormFile[];
   farm_workers: number;
   state?: number;
   district?: number;
@@ -190,7 +191,7 @@ const prepareAddFormData = (formData: LandBasicForm) => {
     ]),
     area: convertToSquareMeters(formData.area, formData.area_unit),
     farmer_id: formData.farmer?.id ?? null,
-    pictures: JSON.stringify(formData.pictures?.map(formatToUrlKey)),
+    // pictures: JSON.stringify(formData.pictures?.map(formatToUrlKey)),
   };
 };
 const prepareEditFormData = (
@@ -235,6 +236,7 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
   const land = 'land' in route.params ? route.params.land : undefined;
 
   const withAuth = useAuthStore(store => store.withAuth);
+  const {upload: uploadToS3} = useS3Upload();
   let loggedUser = useProfileStore(store => store.data);
 
   const [loading, setLoading] = useState(false);
@@ -323,12 +325,19 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
     try {
       setLoading(true);
       if (variant === 'add') {
+        const promises =
+          formData.pictures?.map(async pic => await uploadToS3({pic})) ?? [];
+        const uploadResult = await Promise.all(promises);
+        const uploadedPics = uploadResult.map(result => result.pic);
+
+        const landAddData = {
+          ...prepareAddFormData(formData),
+          ...{pictures: JSON.stringify(uploadedPics)},
+        };
+
         await withAuth(async () => {
           try {
-            const result = await api.post(
-              'land-parcels/',
-              prepareAddFormData(formData),
-            );
+            const result = await api.post('land-parcels/', landAddData);
             if (result.status === 201) {
               reset(landAddDefaultValues);
               showSnackbar('Land added successfully');
@@ -345,12 +354,22 @@ const LandFormScreen: React.FC<LandFormScreenProps> = ({route, navigation}) => {
           }
         });
       } else if (variant === 'edit' && land) {
-        const dataToUpdate = prepareEditFormData(
+        let dataToUpdate = prepareEditFormData(
           formData,
           defaultValues as LandBasicForm,
         );
         if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
+        }
+        if ('pictures' in dataToUpdate) {
+          const promises =
+            formData.pictures?.map(async pic => await uploadToS3({pic})) ?? [];
+          const uploadResult = await Promise.all(promises);
+          const uploadedPics = uploadResult.map(result => result.pic);
+          dataToUpdate = {
+            ...dataToUpdate,
+            ...{pictures: JSON.stringify(uploadedPics)},
+          };
         }
         await withAuth(async () => {
           try {

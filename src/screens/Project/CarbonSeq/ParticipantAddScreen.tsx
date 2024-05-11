@@ -15,7 +15,6 @@ import FormDocumentInput from '@components/FormDocumentInput';
 // helpers
 import {docValidator} from '@helpers/validators';
 import {
-  formatToUrlKey,
   getErrorMessage,
   getFieldErrors,
   removeKeys,
@@ -25,7 +24,8 @@ import {
 import useSnackbar from '@hooks/useSnackbar';
 import {useFormErrorScroll} from '@hooks/useFormErrorScroll';
 import {useAuthStore} from '@hooks/useAuthStore';
-import {FormDoc} from '@typedefs/common';
+import {useS3Upload} from '@hooks/useS3';
+import {FormFile} from '@typedefs/common';
 
 // api
 import {api} from '@api/axios';
@@ -40,9 +40,9 @@ import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 interface ParticipantBasicForm {
   land_parcel: {id: number; name: string};
-  carbon_waiver_document: FormDoc;
-  agreement_document_type: FormDoc;
-  gram_panchayat_resolution: FormDoc;
+  carbon_waiver_document: FormFile;
+  agreement_document_type: FormFile;
+  gram_panchayat_resolution: FormFile;
 }
 
 const landValidator = Yup.object().shape({
@@ -91,11 +91,11 @@ const prepareAddFormData = (formData: ParticipantBasicForm) => {
       'gram_panchayat_resolution',
     ]),
     land_parcel: formData.land_parcel.id ?? null,
-    carbon_waiver_document: formatToUrlKey(formData.carbon_waiver_document),
-    agreement_document_type: formatToUrlKey(formData.agreement_document_type),
-    gram_panchayat_resolution: formatToUrlKey(
-      formData.gram_panchayat_resolution,
-    ),
+    // carbon_waiver_document: formatToUrlKey(formData.carbon_waiver_document),
+    // agreement_document_type: formatToUrlKey(formData.agreement_document_type),
+    // gram_panchayat_resolution: formatToUrlKey(
+    // formData.gram_panchayat_resolution,
+    // ),
   };
 };
 
@@ -109,6 +109,7 @@ const ParticipantAddScreen: React.FC<ParticipantAddScreenProps> = ({
 }) => {
   const theme = useTheme();
   const withAuth = useAuthStore(store => store.withAuth);
+  const {upload: uploadToS3} = useS3Upload();
 
   const [loading, setLoading] = useState(false);
   const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
@@ -151,12 +152,23 @@ const ParticipantAddScreen: React.FC<ParticipantAddScreenProps> = ({
   const onSubmit = async (formData: ParticipantBasicForm) => {
     try {
       setLoading(true);
+      const {
+        carbon_waiver_document,
+        agreement_document_type,
+        gram_panchayat_resolution,
+      } = formData;
+      const uploadedDocs = await uploadToS3({
+        carbon_waiver_document,
+        agreement_document_type,
+        gram_panchayat_resolution,
+      });
+      const participantAddData = {
+        ...prepareAddFormData(formData),
+        ...uploadedDocs,
+      };
       await withAuth(async () => {
         try {
-          const result = await api.post(
-            'projects/1/',
-            prepareAddFormData(formData),
-          );
+          const result = await api.post('projects/1/', participantAddData);
           if (result.status === 201) {
             reset(participantAddDefaultValues);
             showSnackbar('Participant added successfully');
