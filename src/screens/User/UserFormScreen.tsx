@@ -64,7 +64,7 @@ import {commonStyles, fontStyles, spacingStyles} from '@styles/common';
 
 // types
 interface UserBasicForm {
-  photo: null | FormFile;
+  profile_photo: null | FormFile;
   name: string;
   gender: (typeof GENDER)[number];
   phone_number: string;
@@ -79,7 +79,7 @@ interface UserBasicForm {
 
 // define validation schema(s)
 const userBasicValidation = {
-  photo: imageValidator.nullable(),
+  profile_photo: imageValidator.nullable(),
   name: nameValidator,
   gender: Yup.string()
     .required('Gender is required')
@@ -146,7 +146,7 @@ const getUserAddDefaultValues = (
   userType: UserType,
 ): Partial<UserBasicForm> => ({
   password: '',
-  photo: null,
+  profile_photo: null,
   projects: [],
   states: [],
   districts: [],
@@ -188,7 +188,7 @@ const getUserEditDefaultValues = ({
     }
   });
   return {
-    photo: null,
+    profile_photo: null,
     projects: projectCodes,
     states: stateCodes,
     districts: districtCodes,
@@ -204,14 +204,14 @@ const getUserEditDefaultValues = ({
 const prepareAddFormData = (formData: UserBasicForm) => {
   return {
     ...removeKeys(formData, [
-      'photo',
+      'profile_photo',
       'phone_number',
       'states',
       'districts',
       'blocks',
       'projects',
     ]),
-    // photo: formData.photo ? formatToUrlKey(formData.photo) : null,
+    // profile_photo: formData.profile_photo ? formatToUrlKey(formData.profile_photo) : null,
     phone_number: add91Prefix(formData.phone_number),
     blocks: JSON.stringify(formData.blocks ?? []),
     projects: JSON.stringify(
@@ -232,9 +232,16 @@ const prepareEditFormData = (
       if (formData[formKey] !== initialValues[formKey]) {
         acc[formKey] = add91Prefix(formData[formKey]);
       }
-    } else if (formKey === 'photo') {
-      if (!areObjectsEqual(formData.photo ?? {}, initialValues.photo ?? {})) {
-        acc.photo = formData.photo ? formatToUrlKey(formData.photo) : null;
+    } else if (formKey === 'profile_photo') {
+      if (
+        !areObjectsEqual(
+          formData.profile_photo ?? {},
+          initialValues.profile_photo ?? {},
+        )
+      ) {
+        acc.profile_photo = formData.profile_photo
+          ? formatToUrlKey(formData.profile_photo)
+          : null;
       }
     } else if (formKey === 'states' || formKey === 'districts') {
     } else if (formKey === 'blocks') {
@@ -365,9 +372,9 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
       setLoading(true);
       if (variant === 'add') {
         let userAddData = prepareAddFormData(formData);
-        if (formData.photo) {
+        if (formData.profile_photo) {
           const uploadedPhoto = await uploadToS3({
-            photo: formData.photo,
+            profile_photo: formData.profile_photo,
           });
           userAddData = {
             ...userAddData,
@@ -401,12 +408,12 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
         if (!Object.keys(dataToUpdate).length) {
           throw new Error('No changes made');
         }
-        if ('photo' in dataToUpdate) {
-          let uploadedPhoto = formData.photo
+        if ('profile_photo' in dataToUpdate) {
+          let uploadedPhoto = formData.profile_photo
             ? await uploadToS3({
-                photo: formData.photo,
+                profile_photo: formData.profile_photo,
               })
-            : {photo: formData.photo};
+            : {profile_photo: formData.profile_photo};
           dataToUpdate = {
             ...dataToUpdate,
             ...uploadedPhoto,
@@ -445,7 +452,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
           ({fieldName, fieldErrorMessage}) => {
             type FormFieldName = keyof UserBasicForm;
             if (
-              fieldName === 'photo' &&
+              fieldName === 'profile_photo' &&
               fieldErrorMessage.includes('already exists')
             ) {
               setError(fieldName, {message: 'Image file already exists'});
@@ -473,7 +480,7 @@ const UserFormScreen: React.FC<UserFormScreenProps> = ({
             spacingStyles.rowGap8,
           ]}>
           <FormImageInput
-            name="photo"
+            name="profile_photo"
             control={control}
             onLayout={handleLayout}
           />
