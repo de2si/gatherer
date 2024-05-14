@@ -169,6 +169,12 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
           ]}>
           No data found
         </Text>
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={dismissSnackbar}
+          duration={Snackbar.DURATION_SHORT}>
+          {snackbarMessage}
+        </Snackbar>
       </View>
     );
   }
