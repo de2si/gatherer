@@ -1,7 +1,7 @@
 // ParticipantDetailScreen.tsx
 
 import React, {useEffect, useState} from 'react';
-import {Linking, Pressable, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   ActivityIndicator,
@@ -12,6 +12,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import LandProgressTable from '@components/CarbonSeq/LandProgressTable';
+import DownloadPdfBtn from '@components/DownloadPdfBtn';
 
 // navigation
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -131,12 +132,6 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
     );
   }
 
-  const openFile = (fileUrl: string) => {
-    Linking.openURL(fileUrl).catch(err =>
-      console.error('Error opening file:', err),
-    );
-  };
-
   const onEdit = async (
     progressItem: ProgressItem | null,
     errorMessage: string | null,
@@ -228,45 +223,27 @@ const ParticipantDetailScreen: React.FC<ParticipantDetailScreenProps> = ({
                   </Button>
                 </View>
               </View>
-              <View style={cardStyles.cardDataRow}>
-                <Text
-                  variant="bodyLarge"
-                  style={{color: theme.colors.tertiary}}>
-                  Carbon waiver
-                </Text>
-                <Pressable
-                  onPress={() =>
-                    openFile(participant.carbon_waiver_document.url)
-                  }>
-                  <Text variant="bodyLarge">Open</Text>
-                </Pressable>
-              </View>
-              <View style={cardStyles.cardDataRow}>
-                <Text
-                  variant="bodyLarge"
-                  style={{color: theme.colors.tertiary}}>
-                  Agreement
-                </Text>
-                <Pressable
-                  onPress={() =>
-                    openFile(participant.agreement_document_type.url)
-                  }>
-                  <Text variant="bodyLarge">Open</Text>
-                </Pressable>
-              </View>
-              <View style={cardStyles.cardDataRow}>
-                <Text
-                  variant="bodyLarge"
-                  style={{color: theme.colors.tertiary}}>
-                  Gram panchayat resolution
-                </Text>
-                <Pressable
-                  onPress={() =>
-                    openFile(participant.gram_panchayat_resolution.url)
-                  }>
-                  <Text variant="bodyLarge">Open</Text>
-                </Pressable>
-              </View>
+              <DownloadPdfBtn
+                label="Carbon waiver"
+                color={theme.colors.tertiary}
+                value={participant.carbon_waiver_document}
+                onError={showSnackbar}
+                onSuccess={showSnackbar}
+              />
+              <DownloadPdfBtn
+                label="Agreement"
+                color={theme.colors.tertiary}
+                value={participant.agreement_document_type}
+                onError={showSnackbar}
+                onSuccess={showSnackbar}
+              />
+              <DownloadPdfBtn
+                label="Gram panchayat resolution"
+                color={theme.colors.tertiary}
+                value={participant.gram_panchayat_resolution}
+                onError={showSnackbar}
+                onSuccess={showSnackbar}
+              />
             </View>
             <View style={spacingStyles.mt16}>
               <LandProgressTable
