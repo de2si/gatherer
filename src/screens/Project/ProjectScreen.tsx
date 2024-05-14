@@ -13,12 +13,34 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useProjectStore} from '@hooks/useProjectStore';
 
 // styles
-import {cardStyles, fontStyles, spacingStyles} from '@styles/common';
+import {
+  cardStyles,
+  fontStyles,
+  otherStyles,
+  spacingStyles,
+} from '@styles/common';
+import {Style} from 'react-native-paper/lib/typescript/components/List/utils';
 
 type ProjectScreenProps = NativeStackScreenProps<
   ProjectStackScreenProps,
   'HomeScreen'
 >;
+
+const ListLeft: React.FC<{
+  isActive: boolean;
+  color: string;
+  style: Style;
+}> = ({isActive, ...props}) => (
+  <>
+    <ProjectIcon width={42} height={42} {...props} />
+    <View
+      style={[
+        otherStyles.dot,
+        isActive ? otherStyles.activeDot : otherStyles.inactiveDot,
+      ]}
+    />
+  </>
+);
 
 const ProjectScreen: React.FC<ProjectScreenProps> = ({navigation}) => {
   const theme = useTheme();
@@ -44,10 +66,9 @@ const ProjectScreen: React.FC<ProjectScreenProps> = ({navigation}) => {
               key={project.id}
               title={project.name}
               left={props =>
-                ProjectIcon({
-                  width: 42,
-                  height: 42,
+                ListLeft({
                   ...props,
+                  isActive: project.is_active,
                   color: theme.colors.primary,
                 })
               }

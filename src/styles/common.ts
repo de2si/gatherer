@@ -254,3 +254,19 @@ export const headerStyles = StyleSheet.create({
     marginTop: 4,
   },
 });
+
+export const otherStyles = StyleSheet.create({
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginLeft: 16,
+    alignSelf: 'center',
+  },
+  activeDot: {
+    backgroundColor: 'green',
+  },
+  inactiveDot: {
+    backgroundColor: 'grey',
+  },
+});
