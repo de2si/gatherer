@@ -32,10 +32,10 @@ interface FormDocumentInputProps<TFieldValues extends FieldValues> {
 }
 
 const allowedFileTypes = [
-  DocumentPicker.types.plainText,
+  // DocumentPicker.types.plainText,
   DocumentPicker.types.pdf,
-  DocumentPicker.types.doc,
-  DocumentPicker.types.docx,
+  // DocumentPicker.types.doc,
+  // DocumentPicker.types.docx,
   // 'application/msword',
   // 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   // 'application/pdf',
