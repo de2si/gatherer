@@ -205,7 +205,7 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
                     <Text
                       variant="titleMedium"
                       style={{color: theme.colors.secondary}}>
-                      {beneficiary.guardian}
+                      {formatIdAsCode('F', parseInt(beneficiary.guardian, 10))}
                     </Text>
                   </Pressable>
                 }
