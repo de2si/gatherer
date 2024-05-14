@@ -63,7 +63,7 @@ const FieldThumbnail = ({value, theme}: {value: ApiFile; theme: MD3Theme}) => (
     <ImageWrapper
       flavor="regular"
       value={value}
-      style={detailStyles.imageThumbnail}
+      style={[detailStyles.imageThumbnail, {borderRadius: theme.roundness}]}
     />
   </View>
 );
