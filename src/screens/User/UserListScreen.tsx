@@ -39,6 +39,7 @@ import {
   fontStyles,
   spacingStyles,
 } from '@styles/common';
+import {useProfileStore} from '@hooks/useProfileStore';
 
 interface ItemProps {
   data: UserPreview;
@@ -110,7 +111,7 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
 }) => {
   const userType = params.userType;
   const withAuth = useAuthStore(store => store.withAuth);
-
+  let loggedUser = useProfileStore(store => store.data);
   const users = useUserStore(store => store.data);
   const fetchData = useUserStore(store => store.fetchData);
   const refresh = useUserStore(store => store.refresh);
@@ -145,6 +146,7 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
     navigation.setOptions({
       headerRight: () =>
         ListScreenHeaderRight({
+          showAddBtn: loggedUser.userType === UserType.ADMIN,
           showFilterBtn: userType !== UserType.ADMIN,
           isFilterApplied,
           isSearchApplied,
@@ -154,7 +156,14 @@ const UserListScreen: React.FC<UserListScreenProps> = ({
           theme,
         }),
     });
-  }, [isFilterApplied, isSearchApplied, navigation, theme, userType]);
+  }, [
+    isFilterApplied,
+    isSearchApplied,
+    loggedUser.userType,
+    navigation,
+    theme,
+    userType,
+  ]);
 
   const initialLoad = useRef(false);
   const prevSearchText = useRef(searchText);

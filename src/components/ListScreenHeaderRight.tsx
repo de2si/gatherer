@@ -10,6 +10,7 @@ import {headerStyles} from '@styles/common';
 
 interface ListScreenHeaderRightProps {
   showFilterBtn?: boolean;
+  showAddBtn?: boolean;
   isFilterApplied?: boolean;
   isSearchApplied?: boolean;
   handleFilterPress?: () => void;
@@ -20,6 +21,7 @@ interface ListScreenHeaderRightProps {
 
 export const ListScreenHeaderRight = ({
   showFilterBtn = true,
+  showAddBtn = true,
   isFilterApplied = false,
   isSearchApplied = false,
   handleFilterPress = () => {},
@@ -62,9 +64,11 @@ export const ListScreenHeaderRight = ({
           color={iconColor(isSearchApplied)}
         />
       </Pressable>
-      <Pressable onPress={handleAddPress} style={headerStyles.pressable}>
-        <AddIcon height={24} width={24} color={iconColor(false)} />
-      </Pressable>
+      {showAddBtn && (
+        <Pressable onPress={handleAddPress} style={headerStyles.pressable}>
+          <AddIcon height={24} width={24} color={iconColor(false)} />
+        </Pressable>
+      )}
     </>
   );
 };
