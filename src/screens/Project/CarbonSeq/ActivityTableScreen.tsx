@@ -3,7 +3,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, RefreshControl, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {MD3Theme, Snackbar, Text, useTheme} from 'react-native-paper';
+import {MD3Theme, Portal, Snackbar, Text, useTheme} from 'react-native-paper';
 
 // nav
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -195,12 +195,14 @@ const ActivityTableScreen: React.FC<ActivityTableScreenProps> = ({
         onClose={() => setFilterBottomSheetVisible(false)}
         applyFilters={setFilters}
       />
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={dismissSnackbar}
-        duration={Snackbar.DURATION_SHORT}>
-        {snackbarMessage}
-      </Snackbar>
+      <Portal>
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={dismissSnackbar}
+          duration={Snackbar.DURATION_SHORT}>
+          {snackbarMessage}
+        </Snackbar>
+      </Portal>
     </View>
   );
 };

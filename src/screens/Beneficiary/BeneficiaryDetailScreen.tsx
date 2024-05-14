@@ -8,6 +8,7 @@ import {
   Divider,
   List,
   MD3Theme,
+  Portal,
   Snackbar,
   Text,
   useTheme,
@@ -243,12 +244,14 @@ const BeneficiaryDetailScreen: React.FC<BeneficiaryDetailScreenProps> = ({
             <Divider />
           </>
         )}
-        <Snackbar
-          visible={snackbarVisible}
-          onDismiss={dismissSnackbar}
-          duration={Snackbar.DURATION_SHORT}>
-          {snackbarMessage}
-        </Snackbar>
+        <Portal>
+          <Snackbar
+            visible={snackbarVisible}
+            onDismiss={dismissSnackbar}
+            duration={Snackbar.DURATION_SHORT}>
+            {snackbarMessage}
+          </Snackbar>
+        </Portal>
       </View>
     </ScrollView>
   );

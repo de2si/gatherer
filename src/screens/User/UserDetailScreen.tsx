@@ -317,13 +317,15 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
             )}
           </>
         )}
-        <Snackbar
-          visible={snackbarVisible}
-          onDismiss={dismissSnackbar}
-          duration={Snackbar.DURATION_SHORT}>
-          {snackbarMessage}
-        </Snackbar>
-        <Portal>{pageLoading && <LoadingIndicator />}</Portal>
+        <Portal>
+          <Snackbar
+            visible={snackbarVisible}
+            onDismiss={dismissSnackbar}
+            duration={Snackbar.DURATION_SHORT}>
+            {snackbarMessage}
+          </Snackbar>
+          {pageLoading && <LoadingIndicator />}
+        </Portal>
       </View>
     </ScrollView>
   );

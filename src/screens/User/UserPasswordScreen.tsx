@@ -128,14 +128,15 @@ const UserPasswordScreen: React.FC<UserPasswordScreenProps> = ({
             </Button>
           </View>
         </View>
-
-        <Snackbar
-          visible={snackbarVisible}
-          onDismiss={dismissSnackbar}
-          duration={Snackbar.DURATION_SHORT}>
-          {snackbarMessage}
-        </Snackbar>
-        <Portal>{loading && <LoadingIndicator />}</Portal>
+        <Portal>
+          <Snackbar
+            visible={snackbarVisible}
+            onDismiss={dismissSnackbar}
+            duration={Snackbar.DURATION_SHORT}>
+            {snackbarMessage}
+          </Snackbar>
+          {loading && <LoadingIndicator />}
+        </Portal>
       </View>
     </ScrollView>
   );
