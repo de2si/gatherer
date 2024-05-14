@@ -10,7 +10,7 @@ let apiUrl = BASE_URL;
 if (Platform.OS === 'android') {
   apiUrl = BASE_URL_ANDROID;
 }
-
+apiUrl = 'http://haritika-org.ap-south-1.elasticbeanstalk.com/';
 const api: AxiosInstance = axios.create({
   baseURL: apiUrl,
   headers: {
