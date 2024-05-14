@@ -67,7 +67,7 @@ const Item = ({data, onPress, color, borderColor}: ItemProps) => (
             {data.land.khasra_number}
           </Text>
         </View>
-        <View style={cardStyles.cardDataRow}>
+        <View style={[cardStyles.cardDataRow, spacingStyles.mt8]}>
           {Object.entries({
             Target: data.total_pits_target,
             Dug: data.total_pits_dug,
