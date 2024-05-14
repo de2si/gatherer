@@ -6,6 +6,7 @@ import {api} from '@api/axios';
 export interface Project {
   id: number;
   name: string;
+  is_active: boolean;
 }
 
 // Define the shape of the store
