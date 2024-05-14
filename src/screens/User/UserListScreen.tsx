@@ -58,7 +58,7 @@ const Item = ({
     onPress={() => onPress(id)}
     style={[cardStyles.card, {borderColor}, spacingStyles.mh16]}>
     <Card.Content style={cardStyles.cardContent}>
-      {photo.url ? (
+      {photo ? (
         <ImageWrapper
           flavor="avatar"
           value={photo}

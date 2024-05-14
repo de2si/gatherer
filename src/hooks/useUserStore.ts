@@ -17,10 +17,10 @@ import {Project} from '@hooks/useProjectStore';
 export interface UserPreview {
   id: number;
   name: string;
-  photo: ApiFile;
+  photo: ApiFile | null;
   code: string;
   phone: string;
-  projects: Project[];
+  projects: Omit<Project, 'is_active'>[];
 }
 
 // Define the shape of the store
@@ -47,7 +47,7 @@ const transformApiUser = (apiResponse: ApiUserType): UserPreview => {
   return {
     id: apiResponse.id,
     name: apiResponse.name,
-    photo: {id: 0, url: '', hash: ''},
+    photo: apiResponse.profile_photo,
     code: formatIdAsCode('U', apiResponse.id),
     phone: formatPhoneNumber(apiResponse.phone_number),
     projects: Object.entries(apiResponse.projects).map(([id, {name}]) => ({

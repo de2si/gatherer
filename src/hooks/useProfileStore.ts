@@ -35,8 +35,9 @@ export interface ApiUserType {
 
 interface User {
   id: number;
+  photo: ApiFile | null;
   blocks: Location[];
-  projects: Project[];
+  projects: Omit<Project, 'is_active'>[];
   userType: UserType;
   name: string;
   gender: (typeof GENDER)[number];
@@ -48,6 +49,7 @@ interface User {
 const transformApiUser = (apiResponse: ApiUserType): User => {
   return {
     id: apiResponse.id,
+    photo: apiResponse.profile_photo,
     blocks: Object.entries(apiResponse.blocks).map(([code, {name}]) => ({
       code: parseInt(code, 10),
       name,
@@ -75,6 +77,7 @@ const initialState: ProfileState = {
   loading: false,
   data: {
     id: 0,
+    photo: null,
     blocks: [],
     projects: [],
     userType: UserType.SURVEYOR,
