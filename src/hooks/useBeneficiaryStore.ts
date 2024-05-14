@@ -6,7 +6,7 @@ import {locationFilterDefaultValues} from '@components/FilterSheet';
 
 // helpers, types
 import {buildFilterQueryParams} from '@helpers/formHelpers';
-import {maskPhoneNumber} from '@helpers/formatters';
+import {formatIdAsCode, formatPhoneNumber} from '@helpers/formatters';
 import {
   FarmerPreview,
   buildFarmerSearchQueryParams,
@@ -62,8 +62,8 @@ const transformApiBeneficiary = (
     photo: apiResponse.profile_photo,
     code: 'BA9854',
     village: {name: apiResponse.village.name, code: apiResponse.village.code},
-    guardian: apiResponse.guardian,
-    phone: maskPhoneNumber(apiResponse.phone_number),
+    guardian: formatIdAsCode('F', parseInt(apiResponse.guardian, 10)),
+    phone: formatPhoneNumber(apiResponse.phone_number),
   };
 };
 
