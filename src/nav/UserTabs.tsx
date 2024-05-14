@@ -31,7 +31,14 @@ export type UserTabsNavProps = {
 
 const CustomUserBar = (props: MaterialTopTabBarProps) => {
   const theme = useTheme();
-  return <CustomTopBar theme={theme} {...props} />;
+  let loggedUser = useProfileStore(store => store.data);
+  return (
+    <CustomTopBar
+      theme={theme}
+      {...props}
+      hidden={loggedUser.userType === UserType.SUPERVISOR ? true : false}
+    />
+  );
 };
 
 // create navigation tab

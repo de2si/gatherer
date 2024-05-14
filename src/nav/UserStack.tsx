@@ -19,7 +19,7 @@ import UserPasswordScreen from '@screens/User/UserPasswordScreen';
 // types
 import {UserType} from '@helpers/constants';
 import {UserTabsNavProps} from '@nav/UserTabs';
-import {ApiUserType} from '@hooks/useProfileStore';
+import {ApiUserType, useProfileStore} from '@hooks/useProfileStore';
 
 // define screen params
 export type UserStackScreenProps = {
@@ -64,6 +64,7 @@ type UserStackProps = NativeStackScreenProps<
 >;
 const UserStack: React.FC<UserStackProps> = ({route}) => {
   const theme = useTheme();
+  let loggedUser = useProfileStore(store => store.data);
   const {userType} = route.params;
   const userTypeSentenceCase =
     userType.charAt(0).toUpperCase() + userType.slice(1).toLowerCase();
@@ -90,7 +91,10 @@ const UserStack: React.FC<UserStackProps> = ({route}) => {
         component={UserListScreen}
         initialParams={{userType}}
         options={{
-          title: '', // `${userTypeSentenceCase}s`,
+          title:
+            loggedUser.userType === UserType.SUPERVISOR
+              ? `${userTypeSentenceCase}s`
+              : '', // ,
         }}
       />
       <Stack.Screen

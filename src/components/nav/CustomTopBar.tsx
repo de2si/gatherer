@@ -10,6 +10,7 @@ interface CustomTopBarProps extends MaterialTopTabBarProps {
   flavor?: 'icon' | 'label';
   rightSide?: boolean;
   maxWidth?: DimensionValue;
+  hidden?: boolean;
 }
 
 const TOP_BAR_ICON_HEIGHT = 50;
@@ -18,6 +19,7 @@ const DEFAULT_PROPS = {
   flavor: 'label',
   rightSide: false,
   maxWidth: 'auto' as const,
+  hidden: false,
 };
 
 const CustomTopBar = ({
@@ -27,7 +29,7 @@ const CustomTopBar = ({
   theme,
   ...props
 }: CustomTopBarProps) => {
-  const {flavor, rightSide, maxWidth} = {...DEFAULT_PROPS, ...props};
+  const {flavor, rightSide, maxWidth, hidden} = {...DEFAULT_PROPS, ...props};
   const containerStyles = [
     {maxHeight: flavor === 'icon' ? TOP_BAR_ICON_HEIGHT : TOP_BAR_LABEL_HEIGHT},
     rightSide ? styles.sideTabContainer : null,
@@ -36,8 +38,9 @@ const CustomTopBar = ({
     flavor === 'label' ? commonStyles.centeredContainer : null,
     {maxWidth},
   ];
-
-  return (
+  return hidden ? (
+    <></>
+  ) : (
     <View
       style={[
         styles.tabContainer,
