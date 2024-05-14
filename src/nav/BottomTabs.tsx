@@ -114,7 +114,10 @@ const BottomTabs = () => {
       tabBar={props => CustomBottomBar({...props, theme})}
       initialRouteName="Project"
       safeAreaInsets={{bottom: 0}}
-      screenOptions={{headerShown: false}}
+      screenOptions={{
+        headerShown: false,
+        tabBarHideOnKeyboard: true,
+      }}
       sceneContainerStyle={{backgroundColor: theme.colors.background}}>
       <BottomTabNav.Screen
         name="Project"
