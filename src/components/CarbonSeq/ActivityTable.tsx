@@ -5,6 +5,7 @@ import {View} from 'react-native';
 import {DataTable, Text, useTheme} from 'react-native-paper';
 import {ScrollView} from 'react-native-gesture-handler';
 import {ActivityTableRow, MODELS} from '@hooks/carbonSeqHooks';
+import {truncateString} from '@helpers/formatters';
 import {
   borderStyles,
   commonStyles,
@@ -50,19 +51,31 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
               #
             </DataTable.Title>
             <DataTable.Title
-              style={[spacingStyles.pv0, tableStyles.w70]}
+              style={[
+                spacingStyles.pv0,
+                tableStyles.w90,
+                // commonStyles.centeredContainer,
+              ]}
               textStyle={titleTextStyle}>
               Land
             </DataTable.Title>
             <DataTable.Title
-              style={[spacingStyles.pv0, tableStyles.w90]}
+              style={[
+                spacingStyles.pv0,
+                tableStyles.w120,
+                // commonStyles.centeredContainer,
+              ]}
               textStyle={titleTextStyle}>
               Farmer
             </DataTable.Title>
             {['Total', ...MODELS].map(colTitle => (
               <DataTable.Title
                 key={colTitle}
-                style={[spacingStyles.pv0, tableStyles.w50]}
+                style={[
+                  spacingStyles.pv0,
+                  tableStyles.w50,
+                  commonStyles.centeredContainer,
+                ]}
                 textStyle={titleTextStyle}>
                 {colTitle.replace('MODEL_', '').replace(/_/g, '.')}
               </DataTable.Title>
@@ -89,22 +102,41 @@ const ActivityTable: React.FC<ActivityTableProps> = ({data, onPress}) => {
                 {rowIndex + 1}
               </DataTable.Cell>
               <DataTable.Cell
-                style={[tableStyles.w70, tableStyles.dataRow]}
+                style={[
+                  tableStyles.w90,
+                  tableStyles.dataRow,
+                  // commonStyles.centeredContainer,
+                ]}
                 textStyle={cellTextStyle}>
                 {row.landCode}
               </DataTable.Cell>
-              <DataTable.Cell style={[tableStyles.w90, tableStyles.dataRow]}>
-                <Text style={cellTextStyle}>{row.farmerName}</Text>
+              <DataTable.Cell
+                style={[
+                  tableStyles.w120,
+                  tableStyles.dataRow,
+                  // commonStyles.centeredContainer,
+                ]}>
+                <Text style={cellTextStyle}>
+                  {truncateString(row.farmerName, 40)}
+                </Text>
               </DataTable.Cell>
               <DataTable.Cell
-                style={[tableStyles.w50, tableStyles.dataRow]}
+                style={[
+                  tableStyles.w50,
+                  tableStyles.dataRow,
+                  commonStyles.centeredContainer,
+                ]}
                 textStyle={cellTextStyle}>
                 {row.total}
               </DataTable.Cell>
               {MODELS.map(colKey => (
                 <DataTable.Cell
                   key={row.id + colKey}
-                  style={[tableStyles.w50, tableStyles.dataRow]}
+                  style={[
+                    tableStyles.w50,
+                    tableStyles.dataRow,
+                    commonStyles.centeredContainer,
+                  ]}
                   textStyle={cellTextStyle}>
                   {row[colKey]}
                 </DataTable.Cell>
