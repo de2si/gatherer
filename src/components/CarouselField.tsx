@@ -20,7 +20,7 @@ const CarouselField = ({value, theme}: {value: ApiFile[]; theme: MD3Theme}) => {
         style={[
           commonStyles.centeredContainer,
           borderStyles.borderMinimal,
-          borderStyles.radius8,
+          borderStyles.radius12,
           {borderColor: theme.colors.outline},
         ]}>
         <ImageWrapper
@@ -30,11 +30,29 @@ const CarouselField = ({value, theme}: {value: ApiFile[]; theme: MD3Theme}) => {
         />
       </View>
       <View style={styles.buttonsContainer}>
-        <Pressable style={styles.prevButton} onPress={goToPrev}>
-          <IconButton icon="chevron-left" size={30} iconColor="white" />
+        <Pressable
+          style={styles.prevButton}
+          onPress={goToPrev}
+          disabled={picIndex === 0}>
+          <IconButton
+            icon="chevron-left"
+            size={30}
+            iconColor={picIndex === 0 ? theme.colors.outlineVariant : 'white'}
+          />
         </Pressable>
-        <Pressable style={styles.nextButton} onPress={goToNext}>
-          <IconButton icon="chevron-right" size={30} iconColor="white" />
+        <Pressable
+          style={styles.nextButton}
+          onPress={goToNext}
+          disabled={picIndex === value.length - 1}>
+          <IconButton
+            icon="chevron-right"
+            size={30}
+            iconColor={
+              picIndex === value.length - 1
+                ? theme.colors.outlineVariant
+                : 'white'
+            }
+          />
         </Pressable>
       </View>
     </View>
@@ -61,6 +79,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     resizeMode: 'cover',
-    borderRadius: 10,
+    borderRadius: 12,
   },
 });
