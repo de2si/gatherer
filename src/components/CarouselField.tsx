@@ -2,16 +2,10 @@ import {Pressable, StyleSheet, View} from 'react-native';
 import React, {useState} from 'react';
 import {IconButton, MD3Theme} from 'react-native-paper';
 import ImageWrapper from '@components/ImageWrapper';
-import {ApiImage} from '@typedefs/common';
+import {ApiFile} from '@typedefs/common';
 import {borderStyles, commonStyles} from '@styles/common';
 
-const CarouselField = ({
-  value,
-  theme,
-}: {
-  value: ApiImage[];
-  theme: MD3Theme;
-}) => {
+const CarouselField = ({value, theme}: {value: ApiFile[]; theme: MD3Theme}) => {
   const [picIndex, setPicIndex] = useState(0);
   const goToNext = () => {
     setPicIndex(picIndex === value.length - 1 ? 0 : picIndex + 1);

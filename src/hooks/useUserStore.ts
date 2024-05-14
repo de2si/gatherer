@@ -10,14 +10,14 @@ import {buildFilterQueryParams} from '@helpers/formHelpers';
 
 // types
 import {ApiUserType} from '@hooks/useProfileStore';
-import {ApiImage, Filter} from '@typedefs/common';
+import {ApiFile, Filter} from '@typedefs/common';
 import {UserType} from '@helpers/constants';
 import {Project} from '@hooks/useProjectStore';
 
 export interface UserPreview {
   id: number;
   name: string;
-  photo: ApiImage;
+  photo: ApiFile;
   code: string;
   phone: string;
   projects: Project[];

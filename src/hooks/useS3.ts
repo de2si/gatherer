@@ -9,7 +9,7 @@ import {
   getFieldErrors,
   removeKeys,
 } from '@helpers/formHelpers';
-import {ApiImage, FormFile, UploadedFile} from '@typedefs/common';
+import {ApiFile, FormFile, UploadedFile} from '@typedefs/common';
 import axios, {AxiosResponse} from 'axios';
 import {useCallback, useEffect, useState} from 'react';
 import {create} from 'zustand';
@@ -200,7 +200,7 @@ interface UseS3Download {
   localUrl: string;
   error: string | null;
 }
-export const useS3Download = (file: ApiImage): UseS3Download => {
+export const useS3Download = (file: ApiFile): UseS3Download => {
   const [localUrl, setLocalUrl] = useState('file://pseudo');
   const [error, setError] = useState<null | string>(null);
   const localFileIndex = useFileIndexStore(store => store.localFileIndex);

@@ -34,7 +34,7 @@ import {
 
 // types
 import {ApiBeneficiary} from '@hooks/useBeneficiaryStore';
-import {ApiImage} from '@typedefs/common';
+import {ApiFile} from '@typedefs/common';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
@@ -54,7 +54,7 @@ type BeneficiaryDetailScreenProps = NativeStackScreenProps<
   'BeneficiaryDetail'
 >;
 
-const FieldThumbnail = ({value, theme}: {value: ApiImage; theme: MD3Theme}) => (
+const FieldThumbnail = ({value, theme}: {value: ApiFile; theme: MD3Theme}) => (
   <View
     style={[
       borderStyles.borderMinimal,

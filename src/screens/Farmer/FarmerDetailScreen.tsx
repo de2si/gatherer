@@ -36,7 +36,7 @@ import {AreaUnit} from '@helpers/constants';
 
 // types
 import {ApiFarmer} from '@hooks/useFarmerStore';
-import {ApiImage} from '@typedefs/common';
+import {ApiFile} from '@typedefs/common';
 
 // hooks
 import useSnackbar from '@hooks/useSnackbar';
@@ -56,7 +56,7 @@ type FarmerDetailScreenProps = NativeStackScreenProps<
   'FarmerDetail'
 >;
 
-const FieldThumbnail = ({value, theme}: {value: ApiImage; theme: MD3Theme}) => (
+const FieldThumbnail = ({value, theme}: {value: ApiFile; theme: MD3Theme}) => (
   <View
     style={[
       borderStyles.borderMinimal,

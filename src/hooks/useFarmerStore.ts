@@ -13,14 +13,14 @@ import {buildFilterQueryParams} from '@helpers/formHelpers';
 // types
 import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useProfileStore';
-import {ApiImage, LocationFilter} from '@typedefs/common';
+import {ApiFile, LocationFilter} from '@typedefs/common';
 import {ApiLand} from '@hooks/useLandStore';
 
 export interface ApiFarmer {
   farmer_id: number;
-  profile_photo: ApiImage;
-  id_front_image: ApiImage;
-  id_back_image: ApiImage;
+  profile_photo: ApiFile;
+  id_front_image: ApiFile;
+  id_back_image: ApiFile;
   village: Location & {
     block: Location & {
       district: Location & {
@@ -47,7 +47,7 @@ export interface ApiFarmer {
 export interface FarmerPreview {
   id: number;
   name: string;
-  photo: ApiImage;
+  photo: ApiFile;
   code: string;
   village: Location;
   guardian: string;

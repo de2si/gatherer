@@ -13,14 +13,14 @@ import {
 } from '@hooks/useFarmerStore';
 import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useProfileStore';
-import {ApiImage, LocationFilter} from '@typedefs/common';
+import {ApiFile, LocationFilter} from '@typedefs/common';
 import {GENDER} from '@helpers/constants';
 
 export interface ApiBeneficiary {
   beneficiary_id: number;
-  profile_photo: ApiImage;
-  id_front_image: ApiImage;
-  id_back_image: ApiImage;
+  profile_photo: ApiFile;
+  id_front_image: ApiFile;
+  id_back_image: ApiFile;
   village: Location & {
     block: Location & {
       district: Location & {

@@ -6,7 +6,7 @@ import {formatIdAsCode} from '@helpers/formatters';
 import {buildFilterQueryParams} from '@helpers/formHelpers';
 import {buildFarmerSearchQueryParams} from '@hooks/useFarmerStore';
 import {ApiLand, LandPreview, transformApiLand} from '@hooks/useLandStore';
-import {ApiImage, LocationFilter} from '@typedefs/common';
+import {ApiFile, LocationFilter} from '@typedefs/common';
 import {locationFilterDefaultValues} from '@components/FilterSheet';
 
 // constants
@@ -44,9 +44,9 @@ export interface ApiParticipant {
   id: number;
   is_active: boolean;
   land_parcel: ApiLand;
-  carbon_waiver_document: ApiImage;
-  agreement_document_type: ApiImage;
-  gram_panchayat_resolution: ApiImage;
+  carbon_waiver_document: ApiFile;
+  agreement_document_type: ApiFile;
+  gram_panchayat_resolution: ApiFile;
   progress: ProgressItem[];
   total_pits_target: number;
   total_pits_dug: number;

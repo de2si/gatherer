@@ -3,13 +3,13 @@ import {View, Pressable} from 'react-native';
 import {Text} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 import {convertBlobToBase64, useAwsSignedCookies} from '@hooks/useS3';
-import {ApiImage} from '@typedefs/common';
+import {ApiFile} from '@typedefs/common';
 import {cardStyles} from '@styles/common';
 
 interface DownloadPdfBtnProps {
   label?: string;
   color: string;
-  value: ApiImage;
+  value: ApiFile;
   onError?: (error: string) => void;
   onSuccess?: (message: string) => void;
 }

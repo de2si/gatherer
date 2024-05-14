@@ -2,10 +2,10 @@ import React from 'react';
 import {Image, ImageProps, ImageSourcePropType} from 'react-native';
 import {Avatar, AvatarImageProps, useTheme} from 'react-native-paper';
 import {useS3Download} from '@hooks/useS3';
-import {ApiImage} from '@typedefs/common';
+import {ApiFile} from '@typedefs/common';
 
 type CommonProps = {
-  value: ApiImage;
+  value: ApiFile;
   //   theme: MD3Theme;
 };
 

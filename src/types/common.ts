@@ -1,4 +1,4 @@
-export interface ApiImage {
+export interface ApiFile {
   id: number;
   url: string;
   hash: string;

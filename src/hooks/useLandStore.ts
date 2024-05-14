@@ -11,7 +11,7 @@ import {buildFarmerSearchQueryParams} from '@hooks/useFarmerStore';
 // types
 import {Location} from '@hooks/locationHooks';
 import {ApiUserType} from '@hooks/useProfileStore';
-import {ApiImage, LocationFilter} from '@typedefs/common';
+import {ApiFile, LocationFilter} from '@typedefs/common';
 import {Ownership} from '@helpers/constants';
 import {formatIdAsCode} from '@helpers/formatters';
 
@@ -31,7 +31,7 @@ export interface ApiLand {
       };
     };
   };
-  pictures: ApiImage[];
+  pictures: ApiFile[];
   added_by: ApiUserType;
   added_on: string;
   last_edited_by: ApiUserType;
@@ -42,7 +42,7 @@ export interface LandPreview {
   id: number;
   ownership_type: Ownership;
   farmer: {id: number; name: string};
-  picture: ApiImage;
+  picture: ApiFile;
   khasra_number: string;
   code: string;
   village: Location;

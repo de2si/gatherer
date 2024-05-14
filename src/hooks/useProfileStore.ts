@@ -5,7 +5,7 @@ import {api} from '@api/axios';
 import {GENDER, UserType} from '@helpers/constants';
 import {Location} from '@hooks/locationHooks';
 import {Project} from '@hooks/useProjectStore';
-import {ApiImage} from '@typedefs/common';
+import {ApiFile} from '@typedefs/common';
 
 export interface ApiUserType {
   id: number;
@@ -23,7 +23,7 @@ export interface ApiUserType {
       blocks: number[];
     };
   };
-  profile_photo: ApiImage | null;
+  profile_photo: ApiFile | null;
   user_type: UserType;
   name: string;
   gender: (typeof GENDER)[number];
