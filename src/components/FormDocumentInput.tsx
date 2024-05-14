@@ -1,6 +1,6 @@
 // FormDocumentInput.tsx
 
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import {
   Button,
@@ -17,6 +17,7 @@ import DocumentPicker, {
 import {Control, FieldValues, useController} from 'react-hook-form';
 import useSnackbar from '@hooks/useSnackbar';
 import {calculateHash} from '@helpers/cryptoHelpers';
+import {truncateString} from '@helpers/formatters';
 import {
   borderStyles,
   commonStyles,
@@ -57,8 +58,10 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
     name,
     control,
   });
+  const [loading, setLoading] = useState(false);
   const handleDocumentPick = async () => {
     try {
+      setLoading(true);
       const result: DocumentPickerResponse | null =
         await DocumentPicker.pickSingle({
           type: allowedFileTypes,
@@ -81,6 +84,8 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
       } else {
         showSnackbar('Error in picking document');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,6 +108,7 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
           <Button
             icon="file-document"
             onPress={handleDocumentPick}
+            loading={loading}
             buttonColor={theme.colors.primary}
             textColor={
               value ? theme.colors.onPrimary : theme.colors.primaryContainer
@@ -117,7 +123,7 @@ const FormDocumentInput = <TFieldValues extends FieldValues>({
               commonStyles.flex1,
             ]}
             contentStyle={tableStyles.flexStart}>
-            {value ? value.name : 'Pick document'}
+            {value ? truncateString(value.name, 25) : 'Pick document'}
           </Button>
         </View>
       </View>
