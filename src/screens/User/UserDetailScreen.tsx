@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Avatar,
   Divider,
+  Icon,
   List,
   Portal,
   Snackbar,
@@ -246,11 +247,21 @@ const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
                   </Pressable>
                   {routeName === 'UserDetail' && (
                     <Pressable onPress={handleStatusChange}>
-                      <DeactivateIcon
-                        height={19}
-                        width={19}
-                        color={theme.colors.primary}
-                      />
+                      {user.is_active ? (
+                        <DeactivateIcon
+                          height={19}
+                          width={24}
+                          color={theme.colors.primary}
+                        />
+                      ) : (
+                        <View style={spacingStyles.mt8}>
+                          <Icon
+                            size={24}
+                            source={'plus-circle'}
+                            color={theme.colors.primary}
+                          />
+                        </View>
+                      )}
                     </Pressable>
                   )}
                 </View>
