@@ -121,7 +121,7 @@ const useFileIndexStore = create(
 );
 
 // Function to convert Blob to base64
-const convertBlobToBase64 = async (blob: Blob): Promise<string> => {
+export const convertBlobToBase64 = async (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
@@ -154,6 +154,48 @@ const setCookies = async (
   }
 };
 
+interface UseS3Cookies {
+  setCookiesOnUrl: (url: string) => Promise<void>;
+}
+
+export const useAwsSignedCookies = (): UseS3Cookies => {
+  const [awsSignedCookies, setAwsSignedCookies] = useState<{
+    [key: string]: string;
+  }>({});
+  const [lastFetchedTime, setLastFetchedTime] = useState(0);
+  const withAuth = useAuthStore(store => store.withAuth);
+
+  const fetchCookiesIfNeeded = async () => {
+    // Check if cookies are available and fetched within 5 minutes
+    if (!awsSignedCookies || Date.now() - lastFetchedTime > 5 * 60 * 1000) {
+      try {
+        await withAuth(async () => {
+          try {
+            const {data} = await api.get('getAwsSignedCookies');
+            setAwsSignedCookies(data.awsSignedCookies);
+            setLastFetchedTime(Date.now());
+          } catch (err) {
+            throw err;
+          }
+        });
+      } catch (err) {
+        throw err;
+      }
+    }
+  };
+
+  const setCookiesOnUrl = async (url: string) => {
+    await fetchCookiesIfNeeded();
+    if (awsSignedCookies) {
+      await setCookies(url, awsSignedCookies);
+    } else {
+      throw new Error('Error setting AWS signed cookies');
+    }
+  };
+
+  return {setCookiesOnUrl};
+};
+
 interface UseS3Download {
   localUrl: string;
   error: string | null;
@@ -161,9 +203,9 @@ interface UseS3Download {
 export const useS3Download = (file: ApiImage): UseS3Download => {
   const [localUrl, setLocalUrl] = useState('file://pseudo');
   const [error, setError] = useState<null | string>(null);
-  const withAuth = useAuthStore(store => store.withAuth);
   const localFileIndex = useFileIndexStore(store => store.localFileIndex);
   const updateIndex = useFileIndexStore(store => store.updateIndex);
+  const {setCookiesOnUrl} = useAwsSignedCookies();
 
   const download = useCallback(async () => {
     if (file.url.startsWith('file://')) {
@@ -174,38 +216,40 @@ export const useS3Download = (file: ApiImage): UseS3Download => {
       setLocalUrl(localFileIndex[file.id]);
       return;
     }
-    await withAuth(async () => {
-      try {
-        let {
-          data: {awsSignedCookies},
-        } = await api.get('getAwsSignedCookies');
-        await setCookies(file.url, awsSignedCookies);
+    try {
+      await setCookiesOnUrl(file.url);
 
-        // Download the image and update the store
-        const response = await fetch(file.url);
-        const blob = await response.blob();
-        const base64Image = await convertBlobToBase64(blob);
-        const calculatedHash = calculateHash(base64Image, 256);
+      // Download the image and update the store
+      const response = await fetch(file.url);
+      const blob = await response.blob();
+      const base64 = await convertBlobToBase64(blob);
+      const calculatedHash = calculateHash(base64, 256);
 
-        if (file.hash === calculatedHash) {
-          const localImageUrl = `file:///data/user/0/com.gatherer/cache/s3_${file.id}.png`;
-          updateIndex(file.id, localImageUrl);
-          await RNFS.writeFile(localImageUrl, base64Image, 'base64');
-          setLocalUrl(localImageUrl);
-        } else {
-          throw new Error('Hash failed to match');
-        }
-      } catch (err) {
-        let message = getErrorMessage(err);
-        let finalMessage =
-          typeof message === 'string'
-            ? message
-            : getFieldErrors(message)[0]?.fieldErrorMessage ??
-              'An unexpected error occurred when uploading image';
-        setError(finalMessage);
+      if (file.hash === calculatedHash) {
+        const localImageUrl = `file:///data/user/0/com.gatherer/cache/s3_${file.id}.png`;
+        updateIndex(file.id, localImageUrl);
+        await RNFS.writeFile(localImageUrl, base64, 'base64');
+        setLocalUrl(localImageUrl);
+      } else {
+        throw new Error('Hash failed to match');
       }
-    });
-  }, [file, localFileIndex, updateIndex, withAuth]);
+    } catch (err) {
+      let message = getErrorMessage(err);
+      let finalMessage =
+        typeof message === 'string'
+          ? message
+          : getFieldErrors(message)[0]?.fieldErrorMessage ??
+            'An unexpected error occurred when uploading image';
+      setError(finalMessage);
+    }
+  }, [
+    file.hash,
+    file.id,
+    file.url,
+    localFileIndex,
+    setCookiesOnUrl,
+    updateIndex,
+  ]);
 
   useEffect(() => {
     download();
