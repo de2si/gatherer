@@ -7,16 +7,16 @@ import {useAuthStore} from '@hooks/useAuthStore';
 import {
   getErrorMessage,
   getFieldErrors,
-  removeKeys,
+  // removeKeys,
 } from '@helpers/formHelpers';
 import {ApiFile, FormFile, UploadedFile} from '@typedefs/common';
 import axios, {AxiosResponse} from 'axios';
 import {useCallback, useEffect, useState} from 'react';
-import {create} from 'zustand';
-import {createJSONStorage, persist} from 'zustand/middleware';
-import {calculateHash} from '@helpers/cryptoHelpers';
-import RNFS from 'react-native-fs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import {create} from 'zustand';
+// import {createJSONStorage, persist} from 'zustand/middleware';
+// import {calculateHash} from '@helpers/cryptoHelpers';
+// import RNFS from 'react-native-fs';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import CookieManager from '@react-native-cookies/cookies';
 
 // Type Definitions
@@ -103,22 +103,22 @@ export const useS3Upload = (): UseS3Upload => {
   return {upload};
 };
 
-interface FileIndexStore {
-  localFileIndex: Record<number, string>;
-  updateIndex: (id: number, url: string) => void;
-  deleteIndex: (id: number) => void;
-}
-const useFileIndexStore = create(
-  persist<FileIndexStore>(
-    set => ({
-      localFileIndex: {},
-      updateIndex: (id, url) =>
-        set(state => ({localFileIndex: {...state.localFileIndex, [id]: url}})),
-      deleteIndex: id => set(state => removeKeys(state.localFileIndex, [id])),
-    }),
-    {name: 'MJKQp5GHGV1etw', storage: createJSONStorage(() => AsyncStorage)},
-  ),
-);
+// interface FileIndexStore {
+//   localFileIndex: Record<number, string>;
+//   updateIndex: (id: number, url: string) => void;
+//   deleteIndex: (id: number) => void;
+// }
+// const useFileIndexStore = create(
+//   persist<FileIndexStore>(
+//     set => ({
+//       localFileIndex: {},
+//       updateIndex: (id, url) =>
+//         set(state => ({localFileIndex: {...state.localFileIndex, [id]: url}})),
+//       deleteIndex: id => set(state => removeKeys(state.localFileIndex, [id])),
+//     }),
+//     {name: 'MJKQp5GHGV1etw', storage: createJSONStorage(() => AsyncStorage)},
+//   ),
+// );
 
 // Function to convert Blob to base64
 export const convertBlobToBase64 = async (blob: Blob): Promise<string> => {
@@ -203,8 +203,8 @@ interface UseS3Download {
 export const useS3Download = (file: ApiFile): UseS3Download => {
   const [localUrl, setLocalUrl] = useState('file://pseudo');
   const [error, setError] = useState<null | string>(null);
-  const localFileIndex = useFileIndexStore(store => store.localFileIndex);
-  const updateIndex = useFileIndexStore(store => store.updateIndex);
+  // const localFileIndex = useFileIndexStore(store => store.localFileIndex);
+  // const updateIndex = useFileIndexStore(store => store.updateIndex);
   const {setCookiesOnUrl} = useAwsSignedCookies();
 
   const download = useCallback(async () => {
@@ -212,27 +212,29 @@ export const useS3Download = (file: ApiFile): UseS3Download => {
       setLocalUrl(file.url);
       return;
     }
-    if (file.id in localFileIndex) {
-      setLocalUrl(localFileIndex[file.id]);
-      return;
-    }
+    // if (file.id in localFileIndex) {
+    //   setLocalUrl(localFileIndex[file.id]);
+    //   return;
+    // }
     try {
       await setCookiesOnUrl(file.url);
+      setLocalUrl(file.url);
 
       // Download the image and update the store
-      const response = await fetch(file.url);
-      const blob = await response.blob();
-      const base64 = await convertBlobToBase64(blob);
-      const calculatedHash = calculateHash(base64, 256);
+      // const response = await fetch(file.url);
+      // const blob = await response.blob();
+      // const base64 = await convertBlobToBase64(blob);
+      // const calculatedHash = calculateHash(base64, 256);
 
-      if (file.hash === calculatedHash) {
-        const localImageUrl = `file:///data/user/0/com.gatherer/cache/s3_${file.id}.png`;
-        updateIndex(file.id, localImageUrl);
-        await RNFS.writeFile(localImageUrl, base64, 'base64');
-        setLocalUrl(localImageUrl);
-      } else {
-        throw new Error('Hash failed to match');
-      }
+      // if (file.hash === calculatedHash) {
+      // const localImageUrl = `file:///data/user/0/com.gatherer/cache/s3_${file.id}.png`;
+      // updateIndex(file.id, file.url);
+      // setLocalUrl(file.url);
+      // await RNFS.writeFile(localImageUrl, base64, 'base64');
+      // setLocalUrl(localImageUrl);
+      // } else {
+      // throw new Error('Hash failed to match');
+      // }
     } catch (err) {
       let message = getErrorMessage(err);
       let finalMessage =
@@ -242,14 +244,7 @@ export const useS3Download = (file: ApiFile): UseS3Download => {
             'An unexpected error occurred when uploading image';
       setError(finalMessage);
     }
-  }, [
-    file.hash,
-    file.id,
-    file.url,
-    localFileIndex,
-    setCookiesOnUrl,
-    updateIndex,
-  ]);
+  }, [file.url, setCookiesOnUrl]);
 
   useEffect(() => {
     download();
