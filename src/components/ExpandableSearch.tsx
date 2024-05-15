@@ -100,8 +100,9 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   searchbarInput: {
-    height: 40,
-    minHeight: 40,
+    alignSelf: 'center',
+    // height: 40,
+    // minHeight: 40,
   },
 });
 

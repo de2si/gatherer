@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   dateInput: {
-    maxWidth: 120,
+    maxWidth: 150,
   },
   dateIcon: {
     flex: 1,
