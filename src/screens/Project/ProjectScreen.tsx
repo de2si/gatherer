@@ -2,15 +2,17 @@
 
 import React, {useEffect} from 'react';
 import {View, ScrollView} from 'react-native';
-import {List, useTheme} from 'react-native-paper';
+import {List, Portal, Snackbar, useTheme} from 'react-native-paper';
 import {ProjectIcon} from '@components/icons/ProjectIcon';
 
 // nav
 import {ProjectStackScreenProps} from '@nav/ProjectStack';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-// hooks
+// hooks, helpers
 import {useProjectStore} from '@hooks/useProjectStore';
+import useSnackbar from '@hooks/useSnackbar';
+import {getErrorMessage} from '@helpers/formHelpers';
 
 // styles
 import {
@@ -46,11 +48,21 @@ const ProjectScreen: React.FC<ProjectScreenProps> = ({navigation}) => {
   const theme = useTheme();
   const fetchData = useProjectStore(store => store.fetchData);
   const projects = useProjectStore(store => store.data);
+  const {snackbarVisible, snackbarMessage, showSnackbar, dismissSnackbar} =
+    useSnackbar('');
   useEffect(() => {
-    if (!projects.length) {
-      fetchData();
-    }
-  }, [fetchData, projects.length]);
+    const fetchProcessing = async () => {
+      try {
+        await fetchData();
+      } catch (error) {
+        let message = getErrorMessage(error);
+        typeof message === 'string'
+          ? showSnackbar(message)
+          : showSnackbar('Error in getting projects');
+      }
+    };
+    fetchProcessing();
+  }, [fetchData, showSnackbar]);
 
   const handlePress = (id: number) => {
     if (id === 1) {
@@ -79,6 +91,14 @@ const ProjectScreen: React.FC<ProjectScreenProps> = ({navigation}) => {
           ))}
         </List.Section>
       </ScrollView>
+      <Portal>
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={dismissSnackbar}
+          duration={Snackbar.DURATION_SHORT}>
+          {snackbarMessage}
+        </Snackbar>
+      </Portal>
     </View>
   );
 };
